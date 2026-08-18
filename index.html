@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartu Stok Gudang v2.1.0</title>
+  <title>Kartu Stok Gudang v2.2.0</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons (Hanya untuk Print & Save) -->
+  <!-- FontAwesome Icons (Hanya Print & Save) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,10 +18,13 @@
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      body { background: #fff; font-size: 12pt; }
+      body { background: #fff; font-size: 11pt; }
       .shadow, .rounded-xl, .border { box-shadow: none !important; border-radius: 0 !important; border: none !important; }
+      input { border: none !important; background: transparent !important; }
     }
     .print-only { display: none; }
+    /* Paksa tampilan teks input menjadi Kapital */
+    .uppercase-input { text-transform: uppercase; }
   </style>
 </head>
 <body class="h-full text-slate-800 antialiased flex flex-col md:flex-row">
@@ -32,7 +35,7 @@
       <div>
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.1.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.2.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
@@ -47,7 +50,7 @@
       </select>
     </div>
 
-    <!-- MENU ITEMS (Tanpa Ikon Hiasan) -->
+    <!-- MENU ITEMS -->
     <nav class="p-4 space-y-1 text-sm">
       <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">
         Dashboard Overview
@@ -59,7 +62,7 @@
         Riwayat Mutasi & Batch
       </button>
       <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Stok Opname
+        Stok Opname Massal
       </button>
       <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
         Kartu Stok Ledger
@@ -103,7 +106,6 @@
 
     <!-- VIEW 1: DASHBOARD -->
     <section id="view-dashboard" class="tab-view mt-6 space-y-6">
-      <!-- STAT CARDS -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Jenis Barang</p>
@@ -123,7 +125,6 @@
         </div>
       </div>
 
-      <!-- CHARTS SECTION -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Sebaran Stok Per Kategori</h4>
@@ -140,7 +141,7 @@
     <section id="view-products" class="tab-view mt-6 hidden space-y-4">
       <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
         <div class="w-full sm:w-80">
-          <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="Cari SKU, Nama Barang, atau Barcode..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA BARANG, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
           <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">
@@ -163,7 +164,7 @@
               <th class="p-3 text-center admin-only">Aksi</th>
             </tr>
           </thead>
-          <tbody id="tableProductBody" class="divide-y divide-slate-100"></tbody>
+          <tbody id="tableProductBody" class="divide-y divide-slate-100 font-mono"></tbody>
         </table>
       </div>
     </section>
@@ -192,61 +193,63 @@
       </div>
     </section>
 
-    <!-- VIEW 4: STOK OPNAME -->
-    <section id="view-opname" class="tab-view mt-6 hidden space-y-4">
+    <!-- VIEW 4: STOK OPNAME MASSAL (FITUR REVISI ABAH) -->
+    <section id="view-opname" class="tab-view mt-6 hidden space-y-6">
       <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <div class="flex justify-between items-center border-b pb-3">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
           <div>
-            <h4 class="font-bold text-slate-900">Form Stok Opname (Penyesuaian Fisik)</h4>
-            <p class="text-xs text-slate-500">Sesuaikan jumlah barang di sistem dengan hasil hitungan fisik gudang</p>
+            <h4 class="font-bold text-slate-900 text-lg">Lembar Hitung Stok Opname Fisik</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Seluruh barang di database ditampilkan dengan stok sistem hari ini. Masukkan hasil hitungan fisik lapangan.</p>
           </div>
-          <!-- ICON PRINT DIGUNAKAN DI SINI -->
-          <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-1">
-            <i class="fa-solid fa-print"></i>
-            <span>Cetak Form Opname</span>
-          </button>
-        </div>
-
-        <form id="formOpname" onsubmit="handleOpnameSubmit(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border">
-          <div>
-            <label class="block text-xs font-semibold mb-1">Pilih Barang</label>
-            <select id="opnameProduct" onchange="updateOpnameSystemStock()" required class="w-full p-2 border rounded text-sm bg-white"></select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold mb-1">Stok Sistem</label>
-            <input type="number" id="opnameSystemQty" readonly class="w-full p-2 border rounded text-sm bg-slate-100 font-bold">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold mb-1">Stok Hasil Fisik</label>
-            <input type="number" id="opnameActualQty" required class="w-full p-2 border rounded text-sm bg-white">
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-xs font-semibold mb-1">Alasan Penyesuaian (Selisih / Basah / Hilang)</label>
-            <input type="text" id="opnameReason" placeholder="Keterangan penyesuaian..." required class="w-full p-2 border rounded text-sm bg-white">
-          </div>
-          <div class="flex items-end">
-            <!-- ICON SAVE DIGUNAKAN DI SINI -->
-            <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded font-medium text-sm hover:bg-indigo-500 flex items-center justify-center space-x-2">
+          <div class="flex items-center space-x-2">
+            <!-- ICON PRINT -->
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-2">
+              <i class="fa-solid fa-print"></i>
+              <span>Cetak Lembar Opname</span>
+            </button>
+            <!-- ICON SAVE -->
+            <button onclick="saveBulkOpname()" class="px-4 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-2 hover:bg-indigo-500">
               <i class="fa-solid fa-floppy-disk"></i>
-              <span>Simpan Adjustment</span>
+              <span>Simpan Semua Adjustment</span>
             </button>
           </div>
-        </form>
+        </div>
 
-        <h5 class="font-bold text-slate-800 text-sm mt-6">Riwayat Audit Stok Opname</h5>
+        <!-- TABEL OPNAME MASSAL -->
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border">
-            <thead class="bg-slate-100 text-xs uppercase font-semibold">
-              <tr>
-                <th class="p-2">Tanggal</th>
-                <th class="p-2">Barang</th>
-                <th class="p-2 text-right">Sistem</th>
-                <th class="p-2 text-right">Fisik</th>
-                <th class="p-2 text-right">Selisih</th>
-                <th class="p-2">Alasan</th>
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
+                <th class="p-3">SKU / BARCODE</th>
+                <th class="p-3">NAMA BARANG</th>
+                <th class="p-3">KATEGORI & GUDANG</th>
+                <th class="p-3 text-right">STOK SISTEM</th>
+                <th class="p-3 text-right w-36">STOK FISIK (INPUT)</th>
+                <th class="p-3 text-right w-28">SELISIH</th>
+                <th class="p-3">CATATAN / ALASAN SELISIH</th>
               </tr>
             </thead>
-            <tbody id="tableOpnameBody" class="divide-y"></tbody>
+            <tbody id="tableOpnameMassBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RIWAYAT AUDIT OPNAME -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
+        <h5 class="font-bold text-slate-900 text-sm">Riwayat Audit Stok Opname Terakhir</h5>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm border">
+            <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600">
+              <tr>
+                <th class="p-2 border">Tanggal</th>
+                <th class="p-2 border">Nama Barang</th>
+                <th class="p-2 border text-right">Stok Sistem</th>
+                <th class="p-2 border text-right">Stok Fisik</th>
+                <th class="p-2 border text-right">Selisih</th>
+                <th class="p-2 border">Alasan Penyesuaian</th>
+              </tr>
+            </thead>
+            <tbody id="tableOpnameAuditBody" class="divide-y"></tbody>
           </table>
         </div>
       </div>
@@ -258,9 +261,8 @@
         <div class="flex flex-col sm:flex-row justify-between gap-3 no-print">
           <div class="w-full sm:w-80">
             <label class="block text-xs font-semibold mb-1">Pilih Barang Ledger</label>
-            <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white"></select>
+            <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
           </div>
-          <!-- ICON PRINT DIGUNAKAN DI SINI -->
           <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2">
             <i class="fa-solid fa-print"></i>
             <span>Cetak Kartu Stok</span>
@@ -270,7 +272,7 @@
         <div id="ledgerPrintArea" class="border rounded-lg p-5 bg-white">
           <div class="text-center border-b pb-4 mb-4">
             <h3 class="text-xl font-bold uppercase tracking-wide">KARTU STOK LEDGER</h3>
-            <p id="ledgerItemName" class="font-semibold text-indigo-600 mt-1">-- Pilih Barang --</p>
+            <p id="ledgerItemName" class="font-semibold text-indigo-600 mt-1">-- PILIH BARANG --</p>
           </div>
           <table class="w-full text-left text-sm border border-collapse">
             <thead>
@@ -303,7 +305,6 @@
           <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Fisik</h4>
           <p class="text-xs text-slate-500">Cetak lembar kerja resmi atau laporan ringkasan gudang.</p>
           <div class="space-y-2 pt-2">
-            <!-- ICON PRINT DIGUNAKAN DI SINI -->
             <button onclick="window.print()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
               <i class="fa-solid fa-print"></i>
               <span>Cetak Laporan Rekapitulasi</span>
@@ -330,7 +331,6 @@
             <label class="block text-xs font-semibold mb-1">Supabase Anon API Key</label>
             <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOi..." class="w-full p-2 border rounded text-sm">
           </div>
-          <!-- ICON SAVE DIGUNAKAN DI SINI -->
           <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded text-sm font-medium hover:bg-indigo-500 flex items-center space-x-2">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Simpan & Connect Cloud</span>
@@ -355,7 +355,7 @@
         <hr>
 
         <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>Versi Aplikasi: <strong>v2.1.0 Enterprise</strong></span>
+          <span>Versi Aplikasi: <strong>v2.2.0 Enterprise</strong></span>
           <span>Status Sistem: Active / Offline LocalStorage</span>
         </div>
       </div>
@@ -370,36 +370,35 @@
       <form id="formBarang" onsubmit="handleSaveBarang(event)" class="space-y-3">
         <input type="hidden" id="barangId">
         <div>
-          <label class="block text-xs font-semibold mb-1">SKU / Kode Barang</label>
-          <input type="text" id="barangSku" required class="w-full p-2 border rounded text-sm uppercase">
+          <label class="block text-xs font-semibold mb-1">SKU / KODE BARANG</label>
+          <input type="text" id="barangSku" required class="w-full p-2 border rounded text-sm uppercase-input">
         </div>
         <div>
-          <label class="block text-xs font-semibold mb-1">Nama Barang</label>
-          <input type="text" id="barangNama" required class="w-full p-2 border rounded text-sm">
+          <label class="block text-xs font-semibold mb-1">NAMA BARANG</label>
+          <input type="text" id="barangNama" required class="w-full p-2 border rounded text-sm uppercase-input">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">Kategori</label>
-            <input type="text" id="barangKategori" required placeholder="Bahan Baku" class="w-full p-2 border rounded text-sm">
+            <label class="block text-xs font-semibold mb-1">KATEGORI</label>
+            <input type="text" id="barangKategori" required placeholder="BAHAN BAKU" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">Gudang</label>
-            <input type="text" id="barangGudang" required placeholder="Gudang Utama" class="w-full p-2 border rounded text-sm">
+            <label class="block text-xs font-semibold mb-1">GUDANG</label>
+            <input type="text" id="barangGudang" required placeholder="GUDANG UTAMA" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">Batas Min. Stok</label>
+            <label class="block text-xs font-semibold mb-1">BATAS MIN. STOK</label>
             <input type="number" id="barangMinStock" required value="10" class="w-full p-2 border rounded text-sm">
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">Kode Barcode</label>
-            <input type="text" id="barangBarcode" placeholder="899..." class="w-full p-2 border rounded text-sm">
+            <label class="block text-xs font-semibold mb-1">KODE BARCODE</label>
+            <input type="text" id="barangBarcode" placeholder="899..." class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
         </div>
         <div class="flex justify-end space-x-2 pt-3">
           <button type="button" onclick="closeModal('modalBarang')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm font-medium">Batal</button>
-          <!-- ICON SAVE DIGUNAKAN DI SINI -->
           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-medium flex items-center space-x-1">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Simpan Barang</span>
@@ -416,34 +415,33 @@
       <form id="formTx" onsubmit="handleTxSubmit(event)" class="space-y-3">
         <input type="hidden" id="txType" value="IN">
         <div>
-          <label class="block text-xs font-semibold mb-1">Pilih Barang</label>
-          <select id="txProductId" required class="w-full p-2 border rounded text-sm"></select>
+          <label class="block text-xs font-semibold mb-1">PILIH BARANG</label>
+          <select id="txProductId" required class="w-full p-2 border rounded text-sm uppercase-input"></select>
         </div>
         <div>
-          <label class="block text-xs font-semibold mb-1">Jumlah (Qty)</label>
+          <label class="block text-xs font-semibold mb-1">JUMLAH (QTY)</label>
           <input type="number" id="txQty" min="1" required class="w-full p-2 border rounded text-sm">
         </div>
         <div id="txPriceGroup">
-          <label class="block text-xs font-semibold mb-1">Harga Beli Per Unit (Rp)</label>
+          <label class="block text-xs font-semibold mb-1">HARGA BELI PER UNIT (RP)</label>
           <input type="number" id="txUnitCost" placeholder="15000" class="w-full p-2 border rounded text-sm">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">No. Batch</label>
-            <input type="text" id="txBatchNo" placeholder="BATCH-001" class="w-full p-2 border rounded text-sm">
+            <label class="block text-xs font-semibold mb-1">NO. BATCH</label>
+            <input type="text" id="txBatchNo" placeholder="BATCH-001" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">Tanggal Expired</label>
+            <label class="block text-xs font-semibold mb-1">TANGGAL EXPIRED</label>
             <input type="date" id="txExpireDate" class="w-full p-2 border rounded text-sm">
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold mb-1">Keterangan / Supplier</label>
-          <input type="text" id="txNotes" placeholder="Catatan transaksi..." class="w-full p-2 border rounded text-sm">
+          <label class="block text-xs font-semibold mb-1">KETERANGAN / SUPPLIER</label>
+          <input type="text" id="txNotes" placeholder="Catatan transaksi..." class="w-full p-2 border rounded text-sm uppercase-input">
         </div>
         <div class="flex justify-end space-x-2 pt-3">
           <button type="button" onclick="closeModal('modalTx')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm font-medium">Batal</button>
-          <!-- ICON SAVE DIGUNAKAN DI SINI -->
           <button type="submit" id="btnTxSubmit" class="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-medium flex items-center space-x-1">
             <i class="fa-solid fa-floppy-disk"></i>
             <span>Simpan Transaksi</span>
@@ -470,14 +468,14 @@
       supabaseUrl: '',
       supabaseKey: '',
       products: [
-        { id: '1', sku: 'BRG-001', name: 'Minyak Goreng 1L', category: 'Sembako', warehouse: 'Gudang Utama', minStock: 20, stock: 45, avgHpp: 14000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'Kardus Box 30x20', category: 'Kemasan', warehouse: 'Gudang Utama', minStock: 50, stock: 12, avgHpp: 2500, barcode: '8991234567891' }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'GUDANG UTAMA', minStock: 20, stock: 45, avgHpp: 14000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'GUDANG UTAMA', minStock: 50, stock: 12, avgHpp: 2500, barcode: '8991234567891' }
       ],
       mutasi: [
-        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'Minyak Goreng 1L', qty: 45, unitCost: 14000, batchNo: 'BATCH-A1', expireDate: '2027-08-18', notes: 'Supplier A', user: 'Admin' }
+        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 45, unitCost: 14000, batchNo: 'BATCH-A1', expireDate: '2027-08-18', notes: 'SUPPLIER A', user: 'ADMIN' }
       ],
       opname: [
-        { id: 'ADJ-1', date: '2026-08-17', name: 'Kardus Box 30x20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'Rusak basah', user: 'Admin' }
+        { id: 'ADJ-1', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
       ]
     };
 
@@ -513,7 +511,7 @@
       }
 
       if(tabId === 'ledger') populateLedgerSelect();
-      if(tabId === 'opname') populateOpnameSelect();
+      if(tabId === 'opname') renderMassOpnameTable();
     }
 
     function renderAll() {
@@ -521,7 +519,7 @@
       renderStats();
       renderProducts();
       renderMutasi();
-      renderOpnameTable();
+      renderMassOpnameTable();
       renderCharts();
     }
 
@@ -553,13 +551,13 @@
 
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
-      const search = (document.getElementById('searchProduct').value || '').toLowerCase();
+      const search = (document.getElementById('searchProduct').value || '').toUpperCase();
       tbody.innerHTML = '';
 
       appData.products.filter(p => 
-        p.name.toLowerCase().includes(search) || 
-        p.sku.toLowerCase().includes(search) || 
-        (p.barcode && p.barcode.includes(search))
+        p.name.toUpperCase().includes(search) || 
+        p.sku.toUpperCase().includes(search) || 
+        (p.barcode && p.barcode.toUpperCase().includes(search))
       ).forEach(p => {
         const isLow = p.stock <= p.minStock;
         tbody.innerHTML += `
@@ -568,9 +566,9 @@
               <div>${p.sku}</div>
               <div class="text-slate-400 text-[10px]">${p.barcode || '-'}</div>
             </td>
-            <td class="p-3 font-semibold text-slate-800">${p.name}</td>
-            <td class="p-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs">${p.category}</span></td>
-            <td class="p-3 text-xs text-slate-500">${p.warehouse}</td>
+            <td class="p-3 font-semibold text-slate-800">${p.name.toUpperCase()}</td>
+            <td class="p-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs font-sans">${p.category.toUpperCase()}</span></td>
+            <td class="p-3 text-xs text-slate-500 font-sans">${p.warehouse.toUpperCase()}</td>
             <td class="p-3 text-right font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">
               ${p.stock} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
             </td>
@@ -598,55 +596,125 @@
                 ${isIn ? 'MASUK' : 'KELUAR'}
               </span>
             </td>
-            <td class="p-3 font-semibold">${m.name}</td>
-            <td class="p-3 text-xs font-mono">${m.batchNo || '-'}</td>
+            <td class="p-3 font-semibold">${m.name.toUpperCase()}</td>
+            <td class="p-3 text-xs font-mono">${(m.batchNo || '-').toUpperCase()}</td>
             <td class="p-3 text-xs text-slate-500">${m.expireDate || '-'}</td>
             <td class="p-3 text-right font-bold ${isIn ? 'text-emerald-600' : 'text-rose-600'}">
               ${isIn ? '+' : '-'}${m.qty}
             </td>
             <td class="p-3 text-right text-xs font-mono">${m.unitCost ? 'Rp ' + Number(m.unitCost).toLocaleString('id-ID') : '-'}</td>
-            <td class="p-3 text-xs text-slate-500">${m.user || 'System'}</td>
+            <td class="p-3 text-xs text-slate-500">${(m.user || 'System').toUpperCase()}</td>
           </tr>
         `;
       });
     }
 
-    function openModal(type) {
-      if(type === 'tambahBarang') {
-        document.getElementById('modalBarangTitle').innerText = 'Tambah Barang Baru';
-        document.getElementById('formBarang').reset();
-        document.getElementById('modalBarang').classList.remove('hidden');
-      } else if(type === 'stokMasuk' || type === 'stokKeluar') {
-        const isMasuk = type === 'stokMasuk';
-        document.getElementById('modalTxTitle').innerText = isMasuk ? 'Input Stok Masuk' : 'Input Stok Keluar';
-        document.getElementById('txType').value = isMasuk ? 'IN' : 'OUT';
-        document.getElementById('txPriceGroup').style.display = isMasuk ? '' : 'none';
-        
-        const sel = document.getElementById('txProductId');
-        sel.innerHTML = '';
-        appData.products.forEach(p => {
-          sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name} (Stok: ${p.stock})</option>`;
-        });
-        document.getElementById('modalTx').classList.remove('hidden');
+    // LOGIC OPNAME MASSAL (REVISI ABAH)
+    function renderMassOpnameTable() {
+      const tbody = document.getElementById('tableOpnameMassBody');
+      tbody.innerHTML = '';
+
+      appData.products.forEach(p => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono text-xs font-semibold">${p.sku}</td>
+            <td class="p-3 font-semibold text-slate-900">${p.name.toUpperCase()}</td>
+            <td class="p-3 text-xs text-slate-500">${p.category.toUpperCase()} - ${p.warehouse.toUpperCase()}</td>
+            <td class="p-3 text-right font-bold text-slate-700 bg-slate-50 font-mono">${p.stock}</td>
+            <td class="p-3 text-right">
+              <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-24 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
+            </td>
+            <td class="p-3 text-right font-bold font-mono" id="opnameDiff_${p.id}">0</td>
+            <td class="p-3">
+              <input type="text" id="opnameReason_${p.id}" placeholder="Keterangan jika ada selisih..." class="w-full p-1.5 border rounded text-xs uppercase-input">
+            </td>
+          </tr>
+        `;
+      });
+
+      renderOpnameAuditTable();
+    }
+
+    function calculateOpnameDiff(pId, systemStock) {
+      const actualInput = document.getElementById(`opnameActual_${pId}`);
+      const diffCell = document.getElementById(`opnameDiff_${pId}`);
+      const actualVal = Number(actualInput.value || 0);
+      const diff = actualVal - systemStock;
+
+      diffCell.innerText = (diff > 0 ? '+' : '') + diff;
+      if(diff < 0) diffCell.className = "p-3 text-right font-bold font-mono text-rose-600";
+      else if(diff > 0) diffCell.className = "p-3 text-right font-bold font-mono text-emerald-600";
+      else diffCell.className = "p-3 text-right font-bold font-mono text-slate-400";
+    }
+
+    function saveBulkOpname() {
+      let adjustmentCount = 0;
+      const today = new Date().toISOString().slice(0, 10);
+
+      appData.products.forEach(p => {
+        const actualInput = document.getElementById(`opnameActual_${p.id}`);
+        const reasonInput = document.getElementById(`opnameReason_${p.id}`);
+        if(!actualInput) return;
+
+        const actualQty = Number(actualInput.value);
+        const diff = actualQty - p.stock;
+
+        if(diff !== 0) {
+          adjustmentCount++;
+          appData.opname.push({
+            id: 'ADJ-' + Date.now().toString().slice(-4),
+            date: today,
+            name: p.name.toUpperCase(),
+            systemQty: p.stock,
+            actualQty: actualQty,
+            diffQty: diff,
+            reason: (reasonInput.value || 'HASIL OPNAME FISIK').toUpperCase(),
+            user: (appData.role || 'ADMIN').toUpperCase()
+          });
+
+          // Update Stok Fisik Sistem
+          p.stock = actualQty;
+        }
+      });
+
+      if(adjustmentCount > 0) {
+        saveData();
+        alert(`Berhasil menyesuaikan ${adjustmentCount} item barang yang memiliki selisih stok!`);
+      } else {
+        alert('Tidak ada selisih stok yang diubah.');
       }
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
+    function renderOpnameAuditTable() {
+      const tbody = document.getElementById('tableOpnameAuditBody');
+      tbody.innerHTML = '';
+      (appData.opname || []).slice().reverse().forEach(o => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="p-2 border text-xs">${o.date}</td>
+            <td class="p-2 border font-semibold">${o.name.toUpperCase()}</td>
+            <td class="p-2 border text-right font-mono">${o.systemQty}</td>
+            <td class="p-2 border text-right font-mono">${o.actualQty}</td>
+            <td class="p-2 border text-right font-mono font-bold ${o.diffQty < 0 ? 'text-rose-600' : 'text-emerald-600'}">${o.diffQty > 0 ? '+' : ''}${o.diffQty}</td>
+            <td class="p-2 border text-xs text-slate-500 uppercase-input">${(o.reason || '-').toUpperCase()}</td>
+          </tr>
+        `;
+      });
     }
 
+    // HANDLER SIMPAN BARANG (OTOMATIS UPPERCASE)
     function handleSaveBarang(e) {
       e.preventDefault();
       const newProduct = {
         id: Date.now().toString(),
         sku: document.getElementById('barangSku').value.toUpperCase(),
-        name: document.getElementById('barangNama').value,
-        category: document.getElementById('barangKategori').value,
-        warehouse: document.getElementById('barangGudang').value,
+        name: document.getElementById('barangNama').value.toUpperCase(),
+        category: document.getElementById('barangKategori').value.toUpperCase(),
+        warehouse: document.getElementById('barangGudang').value.toUpperCase(),
         minStock: Number(document.getElementById('barangMinStock').value),
         stock: 0,
         avgHpp: 0,
-        barcode: document.getElementById('barangBarcode').value
+        barcode: document.getElementById('barangBarcode').value.toUpperCase()
       };
 
       appData.products.push(newProduct);
@@ -683,21 +751,45 @@
         date: new Date().toISOString().replace('T', ' ').slice(0, 16),
         type: type,
         productId: product.id,
-        name: product.name,
+        name: product.name.toUpperCase(),
         qty: qty,
         unitCost: unitCost,
-        batchNo: document.getElementById('txBatchNo').value || '-',
+        batchNo: (document.getElementById('txBatchNo').value || '-').toUpperCase(),
         expireDate: document.getElementById('txExpireDate').value || '-',
-        notes: document.getElementById('txNotes').value || '-',
-        user: appData.role === 'admin' ? 'Admin' : 'Staf Gudang'
+        notes: (document.getElementById('txNotes').value || '-').toUpperCase(),
+        user: (appData.role === 'admin' ? 'ADMIN' : 'STAF GUDANG').toUpperCase()
       });
 
       closeModal('modalTx');
       saveData();
     }
 
+    function openModal(type) {
+      if(type === 'tambahBarang') {
+        document.getElementById('modalBarangTitle').innerText = 'TAMBAH BARANG BARU';
+        document.getElementById('formBarang').reset();
+        document.getElementById('modalBarang').classList.remove('hidden');
+      } else if(type === 'stokMasuk' || type === 'stokKeluar') {
+        const isMasuk = type === 'stokMasuk';
+        document.getElementById('modalTxTitle').innerText = isMasuk ? 'INPUT STOK MASUK' : 'INPUT STOK KELUAR';
+        document.getElementById('txType').value = isMasuk ? 'IN' : 'OUT';
+        document.getElementById('txPriceGroup').style.display = isMasuk ? '' : 'none';
+        
+        const sel = document.getElementById('txProductId');
+        sel.innerHTML = '';
+        appData.products.forEach(p => {
+          sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()} (STOK: ${p.stock})</option>`;
+        });
+        document.getElementById('modalTx').classList.remove('hidden');
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
     function deleteProduct(id) {
-      if(confirm('Hapus barang ini?')) {
+      if(confirm('Hapus barang ini dari database?')) {
         appData.products = appData.products.filter(p => p.id !== id);
         saveData();
       }
@@ -710,7 +802,7 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 150 } },
         (decodedText) => {
-          document.getElementById('searchProduct').value = decodedText;
+          document.getElementById('searchProduct').value = decodedText.toUpperCase();
           renderProducts();
           switchTab('products');
           closeScanModal();
@@ -734,67 +826,11 @@
       }
     }
 
-    function populateOpnameSelect() {
-      const sel = document.getElementById('opnameProduct');
-      sel.innerHTML = '';
-      appData.products.forEach(p => {
-        sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name}</option>`;
-      });
-      updateOpnameSystemStock();
-    }
-
-    function updateOpnameSystemStock() {
-      const pId = document.getElementById('opnameProduct').value;
-      const product = appData.products.find(p => p.id === pId);
-      if(product) document.getElementById('opnameSystemQty').value = product.stock;
-    }
-
-    function handleOpnameSubmit(e) {
-      e.preventDefault();
-      const pId = document.getElementById('opnameProduct').value;
-      const actualQty = Number(document.getElementById('opnameActualQty').value);
-      const product = appData.products.find(p => p.id === pId);
-      if(!product) return;
-
-      const diff = actualQty - product.stock;
-      appData.opname.push({
-        id: 'ADJ-' + Date.now().toString().slice(-4),
-        date: new Date().toISOString().slice(0, 10),
-        name: product.name,
-        systemQty: product.stock,
-        actualQty: actualQty,
-        diffQty: diff,
-        reason: document.getElementById('opnameReason').value,
-        user: appData.role
-      });
-
-      product.stock = actualQty;
-      saveData();
-      alert('Stok Opname Berhasil Disimpan!');
-    }
-
-    function renderOpnameTable() {
-      const tbody = document.getElementById('tableOpnameBody');
-      tbody.innerHTML = '';
-      (appData.opname || []).slice().reverse().forEach(o => {
-        tbody.innerHTML += `
-          <tr>
-            <td class="p-2 text-xs">${o.date}</td>
-            <td class="p-2 font-semibold">${o.name}</td>
-            <td class="p-2 text-right">${o.systemQty}</td>
-            <td class="p-2 text-right">${o.actualQty}</td>
-            <td class="p-2 text-right font-bold ${o.diffQty < 0 ? 'text-rose-600' : 'text-emerald-600'}">${o.diffQty > 0 ? '+' : ''}${o.diffQty}</td>
-            <td class="p-2 text-xs text-slate-500">${o.reason}</td>
-          </tr>
-        `;
-      });
-    }
-
     function populateLedgerSelect() {
       const sel = document.getElementById('ledgerProductSelect');
       sel.innerHTML = '';
       appData.products.forEach(p => {
-        sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name}</option>`;
+        sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()}</option>`;
       });
       renderLedger();
     }
@@ -804,7 +840,7 @@
       const product = appData.products.find(p => p.id === pId);
       if(!product) return;
 
-      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name;
+      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase();
       const tbody = document.getElementById('tableLedgerBody');
       tbody.innerHTML = '';
 
@@ -817,10 +853,10 @@
         tbody.innerHTML += `
           <tr>
             <td class="p-2 border text-xs">${m.date}</td>
-            <td class="p-2 border text-xs">${m.notes} (Batch: ${m.batchNo})</td>
+            <td class="p-2 border text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
             <td class="p-2 border text-right font-semibold text-emerald-600">${m.type === 'IN' ? m.qty : '-'}</td>
             <td class="p-2 border text-right font-semibold text-rose-600">${m.type === 'OUT' ? m.qty : '-'}</td>
-            <td class="p-2 border text-right font-bold">${runningStock}</td>
+            <td class="p-2 border text-right font-bold font-mono">${runningStock}</td>
           </tr>
         `;
       });
@@ -829,20 +865,20 @@
     function exportCSV(type) {
       let csvContent = "data:text/csv;charset=utf-8,";
       if(type === 'products') {
-        csvContent += "SKU,Nama Barang,Kategori,Gudang,Stok,MinStok,HPP\n";
+        csvContent += "SKU,NAMA BARANG,KATEGORI,GUDANG,STOK,MIN_STOK,HPP\n";
         appData.products.forEach(p => {
-          csvContent += `"${p.sku}","${p.name}","${p.category}","${p.warehouse}",${p.stock},${p.minStock},${p.avgHpp}\n`;
+          csvContent += `"${p.sku}","${p.name.toUpperCase()}","${p.category.toUpperCase()}","${p.warehouse.toUpperCase()}",${p.stock},${p.minStock},${p.avgHpp}\n`;
         });
       } else if(type === 'mutasi') {
-        csvContent += "Waktu,Tipe,Barang,Qty,HargaUnit,Batch,Expired,Catatan\n";
+        csvContent += "WAKTU,TIPE,NAMA BARANG,QTY,HARGA_UNIT,BATCH,EXPIRED,CATATAN\n";
         appData.mutasi.forEach(m => {
-          csvContent += `"${m.date}","${m.type}","${m.name}",${m.qty},${m.unitCost},"${m.batchNo}","${m.expireDate}","${m.notes}"\n`;
+          csvContent += `"${m.date}","${m.type}","${m.name.toUpperCase()}",${m.qty},${m.unitCost},"${(m.batchNo||'').toUpperCase()}","${m.expireDate}","${(m.notes||'').toUpperCase()}"\n`;
         });
       }
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `laporan-${type}-${Date.now()}.csv`);
+      link.setAttribute("download", `LAPORAN-${type.toUpperCase()}-${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
     }
@@ -851,7 +887,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
       const dlAnchor = document.createElement('a');
       dlAnchor.setAttribute("href", dataStr);
-      dlAnchor.setAttribute("download", `backup-kartustok-${Date.now()}.json`);
+      dlAnchor.setAttribute("download", `BACKUP-KARTUSTOK-${Date.now()}.json`);
       dlAnchor.click();
     }
 
@@ -881,7 +917,8 @@
     function renderCharts() {
       const catMap = {};
       appData.products.forEach(p => {
-        catMap[p.category] = (catMap[p.category] || 0) + Number(p.stock);
+        const catKey = p.category.toUpperCase();
+        catMap[catKey] = (catMap[catKey] || 0) + Number(p.stock);
       });
 
       const ctxCat = document.getElementById('chartCategory').getContext('2d');
@@ -900,9 +937,9 @@
       window.myMutChart = new Chart(ctxMut, {
         type: 'bar',
         data: {
-          labels: ['Stok Masuk', 'Stok Keluar'],
+          labels: ['STOK MASUK', 'STOK KELUAR'],
           datasets: [{
-            label: 'Qty Transaksi',
+            label: 'QTY TRANSAKSI',
             data: [
               appData.mutasi.filter(m => m.type === 'IN').reduce((a,b) => a + Number(b.qty), 0),
               appData.mutasi.filter(m => m.type === 'OUT').reduce((a,b) => a + Number(b.qty), 0)
