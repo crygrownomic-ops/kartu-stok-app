@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajerial Kartu Stok Gudang v2.6.0</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v2.7.0</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -17,7 +17,7 @@
   <style>
     /* ISOLASI TOTAL MEDIA PRINT A4 */
     @media print {
-      body > aside, body > main, .no-print {
+      body > aside, body > main, #modalLogin, .no-print {
         display: none !important;
       }
       #printableDocArea {
@@ -51,18 +51,21 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.6.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.7.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
 
-      <!-- USER ROLE BADGE -->
-      <div class="px-5 py-3 bg-slate-800/60 flex items-center justify-between border-b border-slate-800 text-xs">
-        <span class="text-slate-400 font-medium">Hak Akses:</span>
-        <select id="userRoleSelect" onchange="switchRole(this.value)" class="bg-slate-700 text-amber-300 rounded px-2 py-1 font-semibold outline-none border border-slate-600 text-xs">
-          <option value="admin">Administrator</option>
-          <option value="staff">Staf Gudang</option>
-        </select>
+      <!-- ACTIVE USER STATUS & LOGOUT -->
+      <div class="px-5 py-3 bg-slate-800/80 flex items-center justify-between border-b border-slate-800 text-xs">
+        <div>
+          <p class="text-[10px] text-slate-400">Pengguna Aktif:</p>
+          <p id="lblActiveUser" class="font-bold text-amber-300">ADMINISTRATOR</p>
+        </div>
+        <button onclick="handleLogout()" class="px-2 py-1 bg-rose-600/30 text-rose-300 hover:bg-rose-600 hover:text-white rounded transition text-[11px] font-semibold flex items-center space-x-1" title="Keluar Akun">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Keluar</span>
+        </button>
       </div>
 
       <!-- MENU ITEMS -->
@@ -85,7 +88,7 @@
         <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
           Laporan & Dokumen Fisik
         </button>
-        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">
           Pengaturan & Profil Bisnis
         </button>
       </nav>
@@ -178,7 +181,7 @@
           <table class="w-full text-left border-collapse text-sm">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
-                <th class="p-3">SKU / BARCODE</th>
+                <th class="p-3">SKU / BARCODE (KLIK EDIT)</th>
                 <th class="p-3">NAMA BARANG</th>
                 <th class="p-3">KATEGORI & GUDANG</th>
                 <th class="p-3 text-right">STOK FISIK</th>
@@ -233,7 +236,7 @@
                 <i class="fa-solid fa-print"></i>
                 <span>Cetak Lembar Fisik</span>
               </button>
-              <button onclick="saveBulkOpname()" class="px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-1 hover:bg-indigo-500">
+              <button onclick="saveBulkOpname()" class="px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-1 hover:bg-indigo-500 admin-only">
                 <i class="fa-solid fa-floppy-disk"></i>
                 <span>Simpan All Adjustment</span>
               </button>
@@ -348,7 +351,6 @@
 
       <!-- VIEW 7: PENGATURAN & PROFIL BISNIS -->
       <section id="view-settings" class="tab-view mt-6 hidden space-y-6">
-        <!-- FORM PROFIL USHA / BISNIS (FITUR DINAMIS V2.6.0) -->
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
             <h4 class="font-bold text-slate-900 text-lg">Profil Perusahaan / Owner</h4>
@@ -382,28 +384,6 @@
 
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div>
-            <h4 class="font-bold text-slate-900 text-lg">Konfigurasi Supabase Cloud Sync</h4>
-            <p class="text-xs text-slate-500">Hubungkan database Supabase agar data otomatis tersambung di berbagai lokasi</p>
-          </div>
-
-          <form onsubmit="saveSupabaseConfig(event)" class="space-y-4 max-w-xl">
-            <div>
-              <label class="block text-xs font-semibold mb-1">Supabase Project URL</label>
-              <input type="text" id="cfgSupabaseUrl" placeholder="https://xyz.supabase.co" class="w-full p-2 border rounded text-sm">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1">Supabase Anon API Key</label>
-              <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOi..." class="w-full p-2 border rounded text-sm">
-            </div>
-            <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded text-sm font-medium hover:bg-indigo-500 flex items-center space-x-2">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span>Simpan & Connect Cloud</span>
-            </button>
-          </form>
-
-          <hr>
-
-          <div>
             <h4 class="font-bold text-slate-900 text-lg">Cadangan & Pemulihan Manual (JSON)</h4>
             <p class="text-xs text-slate-500">Unduh berkas JSON cadangan untuk diamankan secara independen</p>
             <div class="flex flex-wrap gap-3 mt-4">
@@ -422,7 +402,7 @@
     <!-- FOOTER RESMI ENTERPRISE BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.6.0</span>
+        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.7.0</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -431,10 +411,43 @@
 
   </main>
 
-  <!-- AREA DOKUMEN CETAK RESMI A4 (SINKRON DATA PROFIL BISNIS) -->
+  <!-- AREA DOKUMEN CETAK RESMI A4 -->
   <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG -->
+  <!-- MODAL: LOGIN USER (V2.7.0 AUTHENTICATION) -->
+  <div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 z-50 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-5 border border-slate-100">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center mx-auto text-xl shadow-md">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="font-bold text-xl text-slate-900 pt-2">MASUK SISTEM GUDANG</h3>
+        <p class="text-xs text-slate-500">Masukkan Username & Password Akun Anda</p>
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-700">USERNAME</label>
+          <input type="text" id="loginUsername" required placeholder="admin / staf" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-700">PASSWORD</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-sm shadow-md transition">
+          Masuk Akun
+        </button>
+      </form>
+
+      <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg">
+        <p class="font-bold text-slate-700">Akun Default Sistem:</p>
+        <p>• Administrator: <span class="font-mono font-bold text-indigo-600">admin</span> / <span class="font-mono text-slate-600">admin123</span></p>
+        <p>• Staf Gudang: <span class="font-mono font-bold text-indigo-600">staf</span> / <span class="font-mono text-slate-600">staf123</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH / EDIT BARANG (KLIK BARCODE HANYA ADMIN) -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -482,7 +495,7 @@
           <button type="button" onclick="closeModal('modalBarang')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm font-medium">Batal</button>
           <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-medium flex items-center space-x-1">
             <i class="fa-solid fa-floppy-disk"></i>
-            <span>Simpan Barang</span>
+            <span>Simpan Data Barang</span>
           </button>
         </div>
       </form>
@@ -544,16 +557,19 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    const USER_DATABASE = [
+      { username: 'admin', password: 'admin123', role: 'admin', name: 'ADMINISTRATOR' },
+      { username: 'staf', password: 'staf123', role: 'staff', name: 'STAF GUDANG' }
+    ];
+
     const DEFAULT_DATA = {
-      role: 'admin',
+      currentUser: null,
       profile: {
         storeName: 'NAMA PERUSAHAAN / TOKO',
         address: 'JL. MERDEKA NO. 123',
         city: 'PONTIANAK, KALIMANTAN BARAT',
         phone: '0812-3456-7890'
       },
-      supabaseUrl: '',
-      supabaseKey: '',
       products: [
         { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'GUDANG UTAMA', minStock: 20, stock: 45, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
         { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'GUDANG UTAMA', minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
@@ -576,12 +592,52 @@
       renderAll();
     }
 
-    function switchRole(role) {
-      appData.role = role;
+    // AUTHENTICATION LOGIC (V2.7.0)
+    function checkAuthSession() {
+      const modal = document.getElementById('modalLogin');
+      if(!appData.currentUser) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+        applyUserPermissions();
+      }
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const uInput = document.getElementById('loginUsername').value.toLowerCase().trim();
+      const pInput = document.getElementById('loginPassword').value.trim();
+
+      const found = USER_DATABASE.find(u => u.username === uInput && u.password === pInput);
+      if(found) {
+        appData.currentUser = found;
+        saveData();
+        checkAuthSession();
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+      } else {
+        alert('Username atau Password salah!');
+      }
+    }
+
+    function handleLogout() {
+      if(confirm('Keluar dari sistem?')) {
+        appData.currentUser = null;
+        saveData();
+        checkAuthSession();
+      }
+    }
+
+    function applyUserPermissions() {
+      const user = appData.currentUser;
+      if(!user) return;
+
+      document.getElementById('lblActiveUser').innerText = user.name;
+      const isAdmin = (user.role === 'admin');
+
       document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = (role === 'admin') ? '' : 'none';
+        el.style.display = isAdmin ? '' : 'none';
       });
-      saveData();
     }
 
     function switchTab(tabId) {
@@ -630,7 +686,7 @@
         phone: document.getElementById('cfgPhone').value
       };
       saveData();
-      alert('Profil Usaha Berhasil Disimpan & Tersinkron ke Seluruh Dokumen Cetak!');
+      alert('Profil Usaha Berhasil Disimpan!');
     }
 
     function renderAlerts() {
@@ -659,6 +715,7 @@
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
+    // RENDER PRODUCTS & KLIK BARCODE FOR EDIT (V2.7.0)
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
       const search = (document.getElementById('searchProduct').value || '').toUpperCase();
@@ -673,10 +730,13 @@
         const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
 
         tbody.innerHTML += `
-          <tr class="hover:bg-slate-50">
+          <tr class="hover:bg-slate-50 transition">
             <td class="p-3 font-mono text-xs font-semibold">
-              <div>${p.sku}</div>
-              <div class="text-slate-400 text-[10px]">${p.barcode || '-'}</div>
+              <div onclick="clickEditProduct('${p.id}')" class="cursor-pointer text-indigo-600 hover:text-indigo-900 hover:underline flex items-center space-x-1" title="Klik untuk Edit Barang (Khusus Admin)">
+                <span>${p.sku}</span>
+                <i class="fa-solid fa-pen-to-square text-[10px] ml-1 opacity-70"></i>
+              </div>
+              <div onclick="clickEditProduct('${p.id}')" class="text-slate-400 text-[10px] cursor-pointer hover:underline" title="Klik Barcode untuk Edit">${p.barcode || '-'}</div>
             </td>
             <td class="p-3 font-semibold text-slate-800">${p.name.toUpperCase()}</td>
             <td class="p-3 text-xs font-sans text-slate-500">${p.category.toUpperCase()} / ${p.warehouse.toUpperCase()}</td>
@@ -692,6 +752,72 @@
           </tr>
         `;
       });
+
+      applyUserPermissions();
+    }
+
+    // EDIT BARANG BY KLIK BARCODE (V2.7.0 PROTEKSI ROLE)
+    function clickEditProduct(productId) {
+      if(!appData.currentUser || appData.currentUser.role !== 'admin') {
+        alert('Akses Ditolak: Hanya Administrator yang berhak mengubah master data barang!');
+        return;
+      }
+
+      const p = appData.products.find(item => item.id === productId);
+      if(!p) return;
+
+      document.getElementById('modalBarangTitle').innerText = 'EDIT DATA BARANG (' + p.sku + ')';
+      document.getElementById('barangId').value = p.id;
+      document.getElementById('barangSku').value = p.sku;
+      document.getElementById('barangNama').value = p.name;
+      document.getElementById('barangKategori').value = p.category;
+      document.getElementById('barangGudang').value = p.warehouse;
+      document.getElementById('barangCostPrice').value = p.avgHpp || 0;
+      document.getElementById('barangSellPrice').value = p.sellPrice || 0;
+      document.getElementById('barangMinStock').value = p.minStock || 10;
+      document.getElementById('barangBarcode').value = p.barcode || '';
+
+      document.getElementById('modalBarang').classList.remove('hidden');
+    }
+
+    function handleSaveBarang(e) {
+      e.preventDefault();
+      const existingId = document.getElementById('barangId').value;
+      const costPrice = Number(document.getElementById('barangCostPrice').value || 0);
+      const sellPrice = Number(document.getElementById('barangSellPrice').value || 0);
+
+      if(existingId) {
+        // UPDATE EXISTING PRODUCT
+        const product = appData.products.find(p => p.id === existingId);
+        if(product) {
+          product.sku = document.getElementById('barangSku').value.toUpperCase();
+          product.name = document.getElementById('barangNama').value.toUpperCase();
+          product.category = document.getElementById('barangKategori').value.toUpperCase();
+          product.warehouse = document.getElementById('barangGudang').value.toUpperCase();
+          product.avgHpp = costPrice;
+          product.sellPrice = sellPrice;
+          product.minStock = Number(document.getElementById('barangMinStock').value);
+          product.barcode = document.getElementById('barangBarcode').value.toUpperCase();
+        }
+      } else {
+        // ADD NEW PRODUCT
+        const newProduct = {
+          id: Date.now().toString(),
+          sku: document.getElementById('barangSku').value.toUpperCase(),
+          name: document.getElementById('barangNama').value.toUpperCase(),
+          category: document.getElementById('barangKategori').value.toUpperCase(),
+          warehouse: document.getElementById('barangGudang').value.toUpperCase(),
+          minStock: Number(document.getElementById('barangMinStock').value),
+          stock: 0,
+          avgHpp: costPrice,
+          sellPrice: sellPrice,
+          barcode: document.getElementById('barangBarcode').value.toUpperCase()
+        };
+        appData.products.push(newProduct);
+      }
+
+      closeModal('modalBarang');
+      saveData();
     }
 
     function renderMutasi() {
@@ -780,7 +906,7 @@
             actualQty: actualQty,
             diffQty: diff,
             reason: (reasonInput.value || 'HASIL OPNAME FISIK').toUpperCase(),
-            user: (appData.role || 'ADMIN').toUpperCase()
+            user: (appData.currentUser ? appData.currentUser.name : 'ADMIN').toUpperCase()
           });
 
           p.stock = actualQty;
@@ -812,7 +938,7 @@
       });
     }
 
-    // FUNGSI CETAK DOKUMEN (SINKRON DATA PROFIL BISNIS PERUSAHAAN)
+    // CETAK DOKUMEN RESMI A4
     function printSuratJalan() {
       const area = document.getElementById('printableDocArea');
       const prof = appData.profile || {};
@@ -1055,29 +1181,6 @@
       window.print();
     }
 
-    function handleSaveBarang(e) {
-      e.preventDefault();
-      const costPrice = Number(document.getElementById('barangCostPrice').value || 0);
-      const sellPrice = Number(document.getElementById('barangSellPrice').value || 0);
-
-      const newProduct = {
-        id: Date.now().toString(),
-        sku: document.getElementById('barangSku').value.toUpperCase(),
-        name: document.getElementById('barangNama').value.toUpperCase(),
-        category: document.getElementById('barangKategori').value.toUpperCase(),
-        warehouse: document.getElementById('barangGudang').value.toUpperCase(),
-        minStock: Number(document.getElementById('barangMinStock').value),
-        stock: 0,
-        avgHpp: costPrice,
-        sellPrice: sellPrice,
-        barcode: document.getElementById('barangBarcode').value.toUpperCase()
-      };
-
-      appData.products.push(newProduct);
-      closeModal('modalBarang');
-      saveData();
-    }
-
     function handleTxSubmit(e) {
       e.preventDefault();
       const pId = document.getElementById('txProductId').value;
@@ -1113,7 +1216,7 @@
         batchNo: (document.getElementById('txBatchNo').value || '-').toUpperCase(),
         expireDate: document.getElementById('txExpireDate').value || '-',
         notes: (document.getElementById('txNotes').value || '-').toUpperCase(),
-        user: (appData.role === 'admin' ? 'ADMIN' : 'STAF GUDANG').toUpperCase()
+        user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
       });
 
       closeModal('modalTx');
@@ -1123,6 +1226,7 @@
     function openModal(type) {
       if(type === 'tambahBarang') {
         document.getElementById('modalBarangTitle').innerText = 'TAMBAH BARANG BARU';
+        document.getElementById('barangId').value = '';
         document.getElementById('formBarang').reset();
         document.getElementById('modalBarang').classList.remove('hidden');
       } else if(type === 'stokMasuk' || type === 'stokKeluar') {
@@ -1265,6 +1369,7 @@
         try {
           appData = JSON.parse(e.target.result);
           saveData();
+          checkAuthSession();
           alert('Data Berhasil Dipulihkan!');
         } catch(err) {
           alert('Berkas JSON tidak valid!');
@@ -1277,6 +1382,7 @@
       if(confirm('Reset seluruh data ke setelan awal?')) {
         appData = DEFAULT_DATA;
         saveData();
+        checkAuthSession();
       }
     }
 
@@ -1318,8 +1424,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      switchRole(appData.role || 'admin');
-      loadProfileInputs();
+      checkAuthSession();
       renderAll();
     });
   </script>
