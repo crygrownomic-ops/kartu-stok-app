@@ -370,7 +370,7 @@
 
   </main>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (SOLUSI HPP & HARGA JUAL) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -559,11 +559,9 @@
       const totalQty = appData.products.reduce((acc, p) => acc + Number(p.stock), 0);
       document.getElementById('statTotalQty').innerText = totalQty;
 
-      // Valuasi HPP Modal
       const totalHppValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
       document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
 
-      // Valuasi Harga Jual (Omset)
       const totalSellValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
@@ -884,26 +882,31 @@
       });
     }
 
+    // FUNGSI EKSPOR CSV EXCEL OTOMATIS TERBAGI KOLOM
     function exportCSV(type) {
-      let csvContent = "data:text/csv;charset=utf-8,";
+      let csvContent = "\uFEFF"; 
+
       if(type === 'products') {
-        csvContent += "SKU,NAMA BARANG,KATEGORI,GUDANG,STOK,HARGA_BELI_HPP,HARGA_JUAL,MARGIN\n";
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
         appData.products.forEach(p => {
           const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
-          csvContent += `"${p.sku}","${p.name.toUpperCase()}","${p.category.toUpperCase()}","${p.warehouse.toUpperCase()}",${p.stock},${p.avgHpp},${p.sellPrice},${margin}\n`;
+          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.avgHpp};${p.sellPrice};${margin}\n`;
         });
       } else if(type === 'mutasi') {
-        csvContent += "WAKTU,TIPE,NAMA BARANG,QTY,HARGA_UNIT,BATCH,EXPIRED,CATATAN\n";
+        csvContent += "WAKTU;TIPE;NAMA BARANG;QTY;HARGA UNIT;NO BATCH;TANGGAL EXPIRED;KETERANGAN;PETUGAS\n";
         appData.mutasi.forEach(m => {
-          csvContent += `"${m.date}","${m.type}","${m.name.toUpperCase()}",${m.qty},${m.unitCost},"${(m.batchNo||'').toUpperCase()}","${m.expireDate}","${(m.notes||'').toUpperCase()}"\n`;
+          csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
         });
       }
-      const encodedUri = encodeURI(csvContent);
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `LAPORAN-${type.toUpperCase()}-${Date.now()}.csv`);
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `LAPORAN_${type.toUpperCase()}_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
 
     function exportBackupJSON() {
