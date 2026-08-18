@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartu Stok Gudang v2.3.0 - Developer: Urai Ikhsan Fadhilah</title>
+  <title>Kartu Stok Gudang v2.4.0 - Developer: Urai Ikhsan Fadhilah</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons (Hanya Print & Save) -->
@@ -18,9 +18,10 @@
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
-      body { background: #fff; font-size: 11pt; }
+      body { background: #fff; font-size: 11pt; color: #000; }
       .shadow, .rounded-xl, .border { box-shadow: none !important; border-radius: 0 !important; border: none !important; }
       input { border: none !important; background: transparent !important; }
+      .print-page { page-break-after: always; }
     }
     .print-only { display: none; }
     .uppercase-input { text-transform: uppercase; }
@@ -34,7 +35,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.3.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.4.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
@@ -66,7 +67,7 @@
           Kartu Stok Ledger
         </button>
         <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Laporan & Ekspor
+          Laporan & Dokumen Fisik
         </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
           Pengaturan & Cloud
@@ -208,14 +209,17 @@
               <h4 class="font-bold text-slate-900 text-lg">Lembar Hitung Stok Opname Fisik</h4>
               <p class="text-xs text-slate-500 mt-0.5">Seluruh barang di database ditampilkan dengan stok sistem hari ini. Masukkan hasil hitungan fisik lapangan.</p>
             </div>
-            <div class="flex items-center space-x-2">
-              <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-2">
-                <i class="fa-solid fa-print"></i>
-                <span>Cetak Lembar Opname</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportCSV('opname_template')" class="px-3 py-2 bg-emerald-700 text-white rounded text-xs font-medium">
+                Unduh Template Form Opname (.csv)
               </button>
-              <button onclick="saveBulkOpname()" class="px-4 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-2 hover:bg-indigo-500">
+              <button onclick="printOpnameAuditSheet()" class="px-3 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-1">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Lembar Fisik</span>
+              </button>
+              <button onclick="saveBulkOpname()" class="px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-1 hover:bg-indigo-500">
                 <i class="fa-solid fa-floppy-disk"></i>
-                <span>Simpan Semua Adjustment</span>
+                <span>Simpan All Adjustment</span>
               </button>
             </div>
           </div>
@@ -293,24 +297,33 @@
         </div>
       </section>
 
-      <!-- VIEW 6: LAPORAN & EKSPOR -->
+      <!-- VIEW 6: LAPORAN & DOKUMEN FISIK (SOLUSI DOKUMEN CETAK RESMI) -->
       <section id="view-reports" class="tab-view mt-6 hidden space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
             <h4 class="font-bold text-slate-900 text-base">Ekspor Data Format Excel (CSV)</h4>
-            <p class="text-xs text-slate-500">Unduh master data barang atau riwayat transaksi untuk analisis Excel.</p>
+            <p class="text-xs text-slate-500">Unduh data master barang, mutasi, atau lembar opname dalam format titik-koma terpisah per kolom Excel.</p>
             <div class="space-y-2 pt-2">
               <button onclick="exportCSV('products')" class="w-full py-2 bg-emerald-700 text-white rounded text-sm font-medium hover:bg-emerald-600">Unduh Master Data Barang (.csv)</button>
               <button onclick="exportCSV('mutasi')" class="w-full py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500">Unduh Riwayat Mutasi (.csv)</button>
+              <button onclick="exportCSV('opname_template')" class="w-full py-2 bg-teal-700 text-white rounded text-sm font-medium hover:bg-teal-600">Unduh Template Opname Excel (.csv)</button>
             </div>
           </div>
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Fisik</h4>
-            <p class="text-xs text-slate-500">Cetak lembar kerja resmi atau laporan ringkasan gudang.</p>
+            <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Resmi Fisik A4</h4>
+            <p class="text-xs text-slate-500">Cetak dokumen fisik berformat standar perusahaan untuk operasional gudang dan bukti arsip.</p>
             <div class="space-y-2 pt-2">
-              <button onclick="window.print()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
+              <button onclick="printSuratJalan()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-print"></i>
-                <span>Cetak Laporan Rekapitulasi</span>
+                <span>Cetak Template Surat Jalan / Serah Terima</span>
+              </button>
+              <button onclick="printOpnameAuditSheet()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Lembar Hitung Stok Opname Fisik</span>
+              </button>
+              <button onclick="printLaporanRekapitulasi()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Laporan Rekapitulasi & Valuasi Aset</span>
               </button>
             </div>
           </div>
@@ -361,7 +374,7 @@
     <!-- FOOTER RESMI ENTERPRISE DEVELOPER BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang Enterprise <span class="font-mono font-bold text-indigo-600">v2.3.0</span>
+        Sistem Manajemen Kartu Stok Gudang Enterprise <span class="font-mono font-bold text-indigo-600">v2.4.0</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -369,6 +382,9 @@
     </footer>
 
   </main>
+
+  <!-- AREA KHUSUS DOKUMEN CETAK RESMI A4 (PRINT-ONLY) -->
+  <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
 
   <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
@@ -719,6 +735,193 @@
       });
     }
 
+    // FUNGSI CETAK DOKUMEN RESMI A4 (SOLUSI V2.4.0)
+    function printSuratJalan() {
+      const area = document.getElementById('printableDocArea');
+      const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+      
+      area.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex justify-between items-start border-b-2 border-black pb-4">
+            <div>
+              <h1 class="text-2xl font-bold uppercase tracking-wider">SURAT JALAN / SERAH TERIMA</h1>
+              <p class="text-xs font-mono">No. SJ: SJ/${Date.now().toString().slice(-6)}</p>
+            </div>
+            <div class="text-right text-xs">
+              <p class="font-bold text-sm">CRYGROWNOMIC OPS LOGISTICS</p>
+              <p>Pontianak, Kalimantan Barat</p>
+              <p>Tanggal: ${today}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-xs border p-3 rounded">
+            <div>
+              <p class="font-bold">PENGIRIM (GUDANG):</p>
+              <p>Gudang Utama Crygrownomic</p>
+              <p>Petugas: Admin Gudang</p>
+            </div>
+            <div>
+              <p class="font-bold">PENERIMA / TUJUAN:</p>
+              <p>___________________________________</p>
+              <p>Alamat: ________________________________</p>
+            </div>
+          </div>
+
+          <table class="w-full text-left text-xs border border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b font-bold">
+                <th class="p-2 border">NO</th>
+                <th class="p-2 border">SKU</th>
+                <th class="p-2 border">NAMA BARANG</th>
+                <th class="p-2 border text-right">QTY KELUAR</th>
+                <th class="p-2 border">KETERANGAN</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appData.products.slice(0, 5).map((p, idx) => `
+                <tr>
+                  <td class="p-2 border text-center">${idx + 1}</td>
+                  <td class="p-2 border font-mono">${p.sku}</td>
+                  <td class="p-2 border font-bold">${p.name.toUpperCase()}</td>
+                  <td class="p-2 border text-right font-bold">______</td>
+                  <td class="p-2 border text-xs">Pengiriman Barang</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="grid grid-cols-3 gap-4 text-center text-xs pt-12">
+            <div>
+              <p>Pengirim / Gudang</p>
+              <br><br><br>
+              <p class="font-bold underline">( _________________ )</p>
+            </div>
+            <div>
+              <p>Sopir / Kurir</p>
+              <br><br><br>
+              <p class="font-bold underline">( _________________ )</p>
+            </div>
+            <div>
+              <p>Penerima Barang</p>
+              <br><br><br>
+              <p class="font-bold underline">( _________________ )</p>
+            </div>
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    function printOpnameAuditSheet() {
+      const area = document.getElementById('printableDocArea');
+      const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      area.innerHTML = `
+        <div class="space-y-4">
+          <div class="text-center border-b-2 border-black pb-3">
+            <h1 class="text-xl font-bold uppercase tracking-wide">LEMBAR AUDIT HITUNG FISIK (STOK OPNAME)</h1>
+            <p class="text-xs">Tanggal Audit: ${today} | Pengembang: Urai Ikhsan Fadhilah</p>
+          </div>
+
+          <table class="w-full text-left text-xs border border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b font-bold uppercase">
+                <th class="p-2 border text-center">NO</th>
+                <th class="p-2 border">SKU</th>
+                <th class="p-2 border">NAMA BARANG</th>
+                <th class="p-2 border">KATEGORI & GUDANG</th>
+                <th class="p-2 border text-right">STOK SISTEM</th>
+                <th class="p-2 border text-center w-28">HITUNG FISIK</th>
+                <th class="p-2 border">CATATAN LAPANGAN</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appData.products.map((p, idx) => `
+                <tr>
+                  <td class="p-2 border text-center font-mono">${idx + 1}</td>
+                  <td class="p-2 border font-mono">${p.sku}</td>
+                  <td class="p-2 border font-bold">${p.name.toUpperCase()}</td>
+                  <td class="p-2 border">${p.category.toUpperCase()} / ${p.warehouse.toUpperCase()}</td>
+                  <td class="p-2 border text-right font-mono font-bold">${p.stock}</td>
+                  <td class="p-2 border text-center">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td>
+                  <td class="p-2 border text-xs">________________________</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="flex justify-between text-xs pt-8">
+            <div>
+              <p>Auditor / Petugas Gudang:</p>
+              <br><br>
+              <p class="font-bold underline">( ________________________ )</p>
+            </div>
+            <div>
+              <p>Mengetahui / Supervisor:</p>
+              <br><br>
+              <p class="font-bold underline">( ________________________ )</p>
+            </div>
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    function printLaporanRekapitulasi() {
+      const area = document.getElementById('printableDocArea');
+      const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+      const totalHpp = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
+      const totalSell = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
+
+      area.innerHTML = `
+        <div class="space-y-5">
+          <div class="border-b-2 border-black pb-3 flex justify-between items-center">
+            <div>
+              <h1 class="text-xl font-bold uppercase tracking-wide">LAPORAN REKAPITULASI & VALUASI STOK</h1>
+              <p class="text-xs">Sistem Manajerial Gudang Enterprise v2.4.0</p>
+            </div>
+            <div class="text-right text-xs">
+              <p class="font-bold">Tanggal Cetak: ${today}</p>
+              <p>Developer: Urai Ikhsan Fadhilah</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 text-xs font-mono border p-3 bg-slate-50">
+            <div>TOTAL JENIS BARANG: <strong>${appData.products.length} ITEM</strong></div>
+            <div>VALUASI MODAL HPP: <strong>Rp ${totalHpp.toLocaleString('id-ID')}</strong></div>
+            <div>POTENSI OMSET JUAL: <strong>Rp ${totalSell.toLocaleString('id-ID')}</strong></div>
+          </div>
+
+          <table class="w-full text-left text-xs border border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b font-bold uppercase">
+                <th class="p-2 border">SKU</th>
+                <th class="p-2 border">NAMA BARANG</th>
+                <th class="p-2 border text-right">STOK FISIK</th>
+                <th class="p-2 border text-right">HPP MODAL</th>
+                <th class="p-2 border text-right">TOTAL ASET HPP</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${appData.products.map(p => {
+                const totalAsset = p.stock * (p.avgHpp || 0);
+                return `
+                  <tr>
+                    <td class="p-2 border font-mono">${p.sku}</td>
+                    <td class="p-2 border font-bold">${p.name.toUpperCase()}</td>
+                    <td class="p-2 border text-right font-bold">${p.stock}</td>
+                    <td class="p-2 border text-right font-mono">Rp ${Number(p.avgHpp||0).toLocaleString('id-ID')}</td>
+                    <td class="p-2 border text-right font-mono font-bold">Rp ${totalAsset.toLocaleString('id-ID')}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      window.print();
+    }
+
     function handleSaveBarang(e) {
       e.preventDefault();
       const costPrice = Number(document.getElementById('barangCostPrice').value || 0);
@@ -882,7 +1085,7 @@
       });
     }
 
-    // FUNGSI EKSPOR CSV EXCEL OTOMATIS TERBAGI KOLOM
+    // FUNGSI EKSPOR EXCEL CSV (MENDUKUNG TEMPLATE OPNAME)
     function exportCSV(type) {
       let csvContent = "\uFEFF"; 
 
@@ -896,6 +1099,11 @@
         csvContent += "WAKTU;TIPE;NAMA BARANG;QTY;HARGA UNIT;NO BATCH;TANGGAL EXPIRED;KETERANGAN;PETUGAS\n";
         appData.mutasi.forEach(m => {
           csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
+        });
+      } else if(type === 'opname_template') {
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
+        appData.products.forEach(p => {
+          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.stock};0;""\n`;
         });
       }
 
