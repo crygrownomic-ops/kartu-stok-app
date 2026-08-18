@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartu Stok Gudang v2.2.0</title>
+  <title>Kartu Stok Gudang v2.3.0 - Developer: Urai Ikhsan Fadhilah</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons (Hanya Print & Save) -->
@@ -23,350 +23,357 @@
       input { border: none !important; background: transparent !important; }
     }
     .print-only { display: none; }
-    /* Paksa tampilan teks input menjadi Kapital */
     .uppercase-input { text-transform: uppercase; }
   </style>
 </head>
 <body class="h-full text-slate-800 antialiased flex flex-col md:flex-row">
 
   <!-- SIDEBAR NAVIGATION -->
-  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 no-print">
-    <div class="p-5 border-b border-slate-800 flex items-center justify-between">
-      <div>
+  <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between no-print">
+    <div>
+      <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.2.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.3.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
+
+      <!-- USER ROLE BADGE -->
+      <div class="px-5 py-3 bg-slate-800/60 flex items-center justify-between border-b border-slate-800 text-xs">
+        <span class="text-slate-400 font-medium">Hak Akses:</span>
+        <select id="userRoleSelect" onchange="switchRole(this.value)" class="bg-slate-700 text-amber-300 rounded px-2 py-1 font-semibold outline-none border border-slate-600 text-xs">
+          <option value="admin">Administrator</option>
+          <option value="staff">Staf Gudang</option>
+        </select>
+      </div>
+
+      <!-- MENU ITEMS -->
+      <nav class="p-4 space-y-1 text-sm">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">
+          Dashboard Overview
+        </button>
+        <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Master Data Barang
+        </button>
+        <button onclick="switchTab('mutasi')" id="nav-mutasi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Riwayat Mutasi & Batch
+        </button>
+        <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Stok Opname Massal
+        </button>
+        <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Kartu Stok Ledger
+        </button>
+        <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Laporan & Ekspor
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
+          Pengaturan & Cloud
+        </button>
+      </nav>
     </div>
 
-    <!-- USER ROLE BADGE -->
-    <div class="px-5 py-3 bg-slate-800/60 flex items-center justify-between border-b border-slate-800 text-xs">
-      <span class="text-slate-400 font-medium">Hak Akses:</span>
-      <select id="userRoleSelect" onchange="switchRole(this.value)" class="bg-slate-700 text-amber-300 rounded px-2 py-1 font-semibold outline-none border border-slate-600 text-xs">
-        <option value="admin">Administrator</option>
-        <option value="staff">Staf Gudang</option>
-      </select>
+    <!-- BRANDING DEVELOPER SIDEBAR -->
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
+      <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
+      <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
+      <p class="text-[10px] text-slate-500">Crygrownomic Ops System</p>
     </div>
-
-    <!-- MENU ITEMS -->
-    <nav class="p-4 space-y-1 text-sm">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">
-        Dashboard Overview
-      </button>
-      <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Master Data Barang
-      </button>
-      <button onclick="switchTab('mutasi')" id="nav-mutasi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Riwayat Mutasi & Batch
-      </button>
-      <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Stok Opname Massal
-      </button>
-      <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Kartu Stok Ledger
-      </button>
-      <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Laporan & Ekspor
-      </button>
-      <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-        Pengaturan & Cloud
-      </button>
-    </nav>
   </aside>
 
   <!-- MAIN CONTENT AREA -->
-  <main class="flex-1 overflow-y-auto p-4 md:p-8">
+  <main class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col justify-between">
     
-    <!-- TOP HEADER -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-slate-200 gap-4 no-print">
-      <div>
-        <div class="flex items-center space-x-3">
-          <h2 id="pageTitle" class="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
-          <span class="text-xs font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Build 2026.08</span>
+    <div>
+      <!-- TOP HEADER -->
+      <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-slate-200 gap-4 no-print">
+        <div>
+          <div class="flex items-center space-x-3">
+            <h2 id="pageTitle" class="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
+            <span class="text-xs font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Build 2026.08</span>
+          </div>
+          <p id="pageSub" class="text-sm text-slate-500 mt-1">Ringkasan status barang, analisis modal HPP, harga jual, dan valuasi aset</p>
         </div>
-        <p id="pageSub" class="text-sm text-slate-500 mt-1">Ringkasan status barang, penyesuaian stok, dan valuasi aset</p>
-      </div>
-      <div class="flex items-center space-x-2">
-        <button onclick="openScanModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition">
-          Scan Barcode
-        </button>
-        <button onclick="openModal('stokMasuk')" class="px-4 py-2 bg-emerald-700 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition">
-          + Stok Masuk
-        </button>
-        <button onclick="openModal('stokKeluar')" class="px-4 py-2 bg-rose-700 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition">
-          - Stok Keluar
-        </button>
-      </div>
-    </header>
-
-    <!-- NOTIFICATION BANNERS -->
-    <div id="alertContainer" class="mt-6 space-y-3 no-print"></div>
-
-    <!-- VIEW 1: DASHBOARD -->
-    <section id="view-dashboard" class="tab-view mt-6 space-y-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Jenis Barang</p>
-          <h3 id="statTotalItems" class="text-3xl font-bold text-slate-900 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Kuantitas Stok</p>
-          <h3 id="statTotalQty" class="text-3xl font-bold text-slate-900 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Stok Menipis (Alert)</p>
-          <h3 id="statLowStock" class="text-3xl font-bold text-amber-600 mt-2">0</h3>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Valuasi Total Aset (HPP)</p>
-          <h3 id="statTotalValuation" class="text-2xl font-bold text-slate-900 mt-2">Rp 0</h3>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Sebaran Stok Per Kategori</h4>
-          <canvas id="chartCategory" class="max-h-64"></canvas>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Tren Mutasi Stok</h4>
-          <canvas id="chartMutasi" class="max-h-64"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 2: DATA BARANG -->
-    <section id="view-products" class="tab-view mt-6 hidden space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div class="w-full sm:w-80">
-          <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA BARANG, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
-        </div>
-        <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">
-            + Tambah Barang Baru
+        <div class="flex items-center space-x-2">
+          <button onclick="openScanModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition">
+            Scan Barcode
+          </button>
+          <button onclick="openModal('stokMasuk')" class="px-4 py-2 bg-emerald-700 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition">
+            + Stok Masuk
+          </button>
+          <button onclick="openModal('stokKeluar')" class="px-4 py-2 bg-rose-700 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition">
+            - Stok Keluar
           </button>
         </div>
-      </div>
+      </header>
 
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-        <table class="w-full text-left border-collapse text-sm">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
-              <th class="p-3">SKU / Barcode</th>
-              <th class="p-3">Nama Barang</th>
-              <th class="p-3">Kategori</th>
-              <th class="p-3">Gudang</th>
-              <th class="p-3 text-right">Stok Fisik</th>
-              <th class="p-3 text-right">Min. Stok</th>
-              <th class="p-3 text-right">HPP Rata-rata</th>
-              <th class="p-3 text-center admin-only">Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="tableProductBody" class="divide-y divide-slate-100 font-mono"></tbody>
-        </table>
-      </div>
-    </section>
+      <!-- NOTIFICATION BANNERS -->
+      <div id="alertContainer" class="mt-6 space-y-3 no-print"></div>
 
-    <!-- VIEW 3: MUTASI & BATCH -->
-    <section id="view-mutasi" class="tab-view mt-6 hidden space-y-4">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-        <h4 class="font-bold text-slate-800 mb-3 text-sm">Riwayat Mutasi Stok & Tanggal Expired</h4>
-        <div class="overflow-x-auto">
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="tab-view mt-6 space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Jenis Barang</p>
+            <h3 id="statTotalItems" class="text-3xl font-bold text-slate-900 mt-2">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Kuantitas Stok</p>
+            <h3 id="statTotalQty" class="text-3xl font-bold text-slate-900 mt-2">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Valuasi Modal Aset (HPP)</p>
+            <h3 id="statTotalValuation" class="text-2xl font-bold text-slate-900 mt-2">Rp 0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Potensi Omset (Harga Jual)</p>
+            <h3 id="statTotalSellingValuation" class="text-2xl font-bold text-emerald-700 mt-2">Rp 0</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Sebaran Stok Per Kategori</h4>
+            <canvas id="chartCategory" class="max-h-64"></canvas>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Tren Mutasi Stok</h4>
+            <canvas id="chartMutasi" class="max-h-64"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: DATA BARANG -->
+      <section id="view-products" class="tab-view mt-6 hidden space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="w-full sm:w-80">
+            <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA BARANG, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
+          </div>
+          <div class="flex items-center space-x-2 w-full sm:w-auto">
+            <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">
+              + Tambah Barang Baru
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
-                <th class="p-3">Waktu</th>
-                <th class="p-3">Tipe</th>
-                <th class="p-3">Barang</th>
-                <th class="p-3">No. Batch</th>
-                <th class="p-3">Exp. Date</th>
-                <th class="p-3 text-right">Jumlah</th>
-                <th class="p-3 text-right">Harga Unit</th>
-                <th class="p-3">Petugas</th>
-              </tr>
-            </thead>
-            <tbody id="tableMutasiBody" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 4: STOK OPNAME MASSAL (FITUR REVISI ABAH) -->
-    <section id="view-opname" class="tab-view mt-6 hidden space-y-6">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
-          <div>
-            <h4 class="font-bold text-slate-900 text-lg">Lembar Hitung Stok Opname Fisik</h4>
-            <p class="text-xs text-slate-500 mt-0.5">Seluruh barang di database ditampilkan dengan stok sistem hari ini. Masukkan hasil hitungan fisik lapangan.</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <!-- ICON PRINT -->
-            <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-2">
-              <i class="fa-solid fa-print"></i>
-              <span>Cetak Lembar Opname</span>
-            </button>
-            <!-- ICON SAVE -->
-            <button onclick="saveBulkOpname()" class="px-4 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-2 hover:bg-indigo-500">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span>Simpan Semua Adjustment</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- TABEL OPNAME MASSAL -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm">
-            <thead>
-              <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
                 <th class="p-3">SKU / BARCODE</th>
                 <th class="p-3">NAMA BARANG</th>
                 <th class="p-3">KATEGORI & GUDANG</th>
-                <th class="p-3 text-right">STOK SISTEM</th>
-                <th class="p-3 text-right w-36">STOK FISIK (INPUT)</th>
-                <th class="p-3 text-right w-28">SELISIH</th>
-                <th class="p-3">CATATAN / ALASAN SELISIH</th>
+                <th class="p-3 text-right">STOK FISIK</th>
+                <th class="p-3 text-right">HARGA BELI (HPP)</th>
+                <th class="p-3 text-right">HARGA JUAL</th>
+                <th class="p-3 text-right">POTENSI MARGIN</th>
+                <th class="p-3 text-center admin-only">AKSI</th>
               </tr>
             </thead>
-            <tbody id="tableOpnameMassBody" class="divide-y divide-slate-200"></tbody>
+            <tbody id="tableProductBody" class="divide-y divide-slate-100 font-mono"></tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <!-- RIWAYAT AUDIT OPNAME -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
-        <h5 class="font-bold text-slate-900 text-sm">Riwayat Audit Stok Opname Terakhir</h5>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm border">
-            <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600">
-              <tr>
-                <th class="p-2 border">Tanggal</th>
-                <th class="p-2 border">Nama Barang</th>
-                <th class="p-2 border text-right">Stok Sistem</th>
-                <th class="p-2 border text-right">Stok Fisik</th>
-                <th class="p-2 border text-right">Selisih</th>
-                <th class="p-2 border">Alasan Penyesuaian</th>
-              </tr>
-            </thead>
-            <tbody id="tableOpnameAuditBody" class="divide-y"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 5: KARTU STOK LEDGER -->
-    <section id="view-ledger" class="tab-view mt-6 hidden space-y-4">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between gap-3 no-print">
-          <div class="w-full sm:w-80">
-            <label class="block text-xs font-semibold mb-1">Pilih Barang Ledger</label>
-            <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
-          </div>
-          <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2">
-            <i class="fa-solid fa-print"></i>
-            <span>Cetak Kartu Stok</span>
-          </button>
-        </div>
-
-        <div id="ledgerPrintArea" class="border rounded-lg p-5 bg-white">
-          <div class="text-center border-b pb-4 mb-4">
-            <h3 class="text-xl font-bold uppercase tracking-wide">KARTU STOK LEDGER</h3>
-            <p id="ledgerItemName" class="font-semibold text-indigo-600 mt-1">-- PILIH BARANG --</p>
-          </div>
-          <table class="w-full text-left text-sm border border-collapse">
-            <thead>
-              <tr class="bg-slate-100 border-b text-xs uppercase font-semibold">
-                <th class="p-2 border">Waktu</th>
-                <th class="p-2 border">Keterangan / Transaksi</th>
-                <th class="p-2 border text-right">Masuk</th>
-                <th class="p-2 border text-right">Keluar</th>
-                <th class="p-2 border text-right">Saldo Stok</th>
-              </tr>
-            </thead>
-            <tbody id="tableLedgerBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIEW 6: LAPORAN & EKSPOR -->
-    <section id="view-reports" class="tab-view mt-6 hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-          <h4 class="font-bold text-slate-900 text-base">Ekspor Data Format Excel (CSV)</h4>
-          <p class="text-xs text-slate-500">Unduh master data barang atau riwayat transaksi untuk analisis Excel.</p>
-          <div class="space-y-2 pt-2">
-            <button onclick="exportCSV('products')" class="w-full py-2 bg-emerald-700 text-white rounded text-sm font-medium hover:bg-emerald-600">Unduh Master Data Barang (.csv)</button>
-            <button onclick="exportCSV('mutasi')" class="w-full py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500">Unduh Riwayat Mutasi (.csv)</button>
+      <!-- VIEW 3: MUTASI & BATCH -->
+      <section id="view-mutasi" class="tab-view mt-6 hidden space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <h4 class="font-bold text-slate-800 mb-3 text-sm">Riwayat Mutasi Stok & Tanggal Expired</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
+                  <th class="p-3">Waktu</th>
+                  <th class="p-3">Tipe</th>
+                  <th class="p-3">Barang</th>
+                  <th class="p-3">No. Batch</th>
+                  <th class="p-3">Exp. Date</th>
+                  <th class="p-3 text-right">Jumlah</th>
+                  <th class="p-3 text-right">Harga Unit</th>
+                  <th class="p-3">Petugas</th>
+                </tr>
+              </thead>
+              <tbody id="tableMutasiBody" class="divide-y divide-slate-100"></tbody>
+            </table>
           </div>
         </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-          <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Fisik</h4>
-          <p class="text-xs text-slate-500">Cetak lembar kerja resmi atau laporan ringkasan gudang.</p>
-          <div class="space-y-2 pt-2">
-            <button onclick="window.print()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
+      </section>
+
+      <!-- VIEW 4: STOK OPNAME MASSAL -->
+      <section id="view-opname" class="tab-view mt-6 hidden space-y-6">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
+            <div>
+              <h4 class="font-bold text-slate-900 text-lg">Lembar Hitung Stok Opname Fisik</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Seluruh barang di database ditampilkan dengan stok sistem hari ini. Masukkan hasil hitungan fisik lapangan.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center space-x-2">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Lembar Opname</span>
+              </button>
+              <button onclick="saveBulkOpname()" class="px-4 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center space-x-2 hover:bg-indigo-500">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span>Simpan Semua Adjustment</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
+                  <th class="p-3">SKU / BARCODE</th>
+                  <th class="p-3">NAMA BARANG</th>
+                  <th class="p-3">KATEGORI & GUDANG</th>
+                  <th class="p-3 text-right">STOK SISTEM</th>
+                  <th class="p-3 text-right w-36">STOK FISIK (INPUT)</th>
+                  <th class="p-3 text-right w-28">SELISIH</th>
+                  <th class="p-3">CATATAN / ALASAN SELISIH</th>
+                </tr>
+              </thead>
+              <tbody id="tableOpnameMassBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
+          <h5 class="font-bold text-slate-900 text-sm">Riwayat Audit Stok Opname Terakhir</h5>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm border">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600">
+                <tr>
+                  <th class="p-2 border">Tanggal</th>
+                  <th class="p-2 border">Nama Barang</th>
+                  <th class="p-2 border text-right">Stok Sistem</th>
+                  <th class="p-2 border text-right">Stok Fisik</th>
+                  <th class="p-2 border text-right">Selisih</th>
+                  <th class="p-2 border">Alasan Penyesuaian</th>
+                </tr>
+              </thead>
+              <tbody id="tableOpnameAuditBody" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: KARTU STOK LEDGER -->
+      <section id="view-ledger" class="tab-view mt-6 hidden space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between gap-3 no-print">
+            <div class="w-full sm:w-80">
+              <label class="block text-xs font-semibold mb-1">Pilih Barang Ledger</label>
+              <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
+            </div>
+            <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2">
               <i class="fa-solid fa-print"></i>
-              <span>Cetak Laporan Rekapitulasi</span>
+              <span>Cetak Kartu Stok</span>
             </button>
           </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- VIEW 7: PENGATURAN & CLOUD -->
-    <section id="view-settings" class="tab-view mt-6 hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
-        <div>
-          <h4 class="font-bold text-slate-900 text-lg">Konfigurasi Supabase Cloud Sync</h4>
-          <p class="text-xs text-slate-500">Hubungkan database Supabase agar data otomatis tersambung di berbagai lokasi</p>
+          <div id="ledgerPrintArea" class="border rounded-lg p-5 bg-white">
+            <div class="text-center border-b pb-4 mb-4">
+              <h3 class="text-xl font-bold uppercase tracking-wide">KARTU STOK LEDGER</h3>
+              <p id="ledgerItemName" class="font-semibold text-indigo-600 mt-1">-- PILIH BARANG --</p>
+            </div>
+            <table class="w-full text-left text-sm border border-collapse">
+              <thead>
+                <tr class="bg-slate-100 border-b text-xs uppercase font-semibold">
+                  <th class="p-2 border">Waktu</th>
+                  <th class="p-2 border">Keterangan / Transaksi</th>
+                  <th class="p-2 border text-right">Masuk</th>
+                  <th class="p-2 border text-right">Keluar</th>
+                  <th class="p-2 border text-right">Saldo Stok</th>
+                </tr>
+              </thead>
+              <tbody id="tableLedgerBody"></tbody>
+            </table>
+          </div>
         </div>
+      </section>
 
-        <form onsubmit="saveSupabaseConfig(event)" class="space-y-4 max-w-xl">
+      <!-- VIEW 6: LAPORAN & EKSPOR -->
+      <section id="view-reports" class="tab-view mt-6 hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h4 class="font-bold text-slate-900 text-base">Ekspor Data Format Excel (CSV)</h4>
+            <p class="text-xs text-slate-500">Unduh master data barang atau riwayat transaksi untuk analisis Excel.</p>
+            <div class="space-y-2 pt-2">
+              <button onclick="exportCSV('products')" class="w-full py-2 bg-emerald-700 text-white rounded text-sm font-medium hover:bg-emerald-600">Unduh Master Data Barang (.csv)</button>
+              <button onclick="exportCSV('mutasi')" class="w-full py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500">Unduh Riwayat Mutasi (.csv)</button>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Fisik</h4>
+            <p class="text-xs text-slate-500">Cetak lembar kerja resmi atau laporan ringkasan gudang.</p>
+            <div class="space-y-2 pt-2">
+              <button onclick="window.print()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Laporan Rekapitulasi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: PENGATURAN & CLOUD -->
+      <section id="view-settings" class="tab-view mt-6 hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div>
-            <label class="block text-xs font-semibold mb-1">Supabase Project URL</label>
-            <input type="text" id="cfgSupabaseUrl" placeholder="https://xyz.supabase.co" class="w-full p-2 border rounded text-sm">
+            <h4 class="font-bold text-slate-900 text-lg">Konfigurasi Supabase Cloud Sync</h4>
+            <p class="text-xs text-slate-500">Hubungkan database Supabase agar data otomatis tersambung di berbagai lokasi</p>
           </div>
+
+          <form onsubmit="saveSupabaseConfig(event)" class="space-y-4 max-w-xl">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Supabase Project URL</label>
+              <input type="text" id="cfgSupabaseUrl" placeholder="https://xyz.supabase.co" class="w-full p-2 border rounded text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Supabase Anon API Key</label>
+              <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOi..." class="w-full p-2 border rounded text-sm">
+            </div>
+            <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded text-sm font-medium hover:bg-indigo-500 flex items-center space-x-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan & Connect Cloud</span>
+            </button>
+          </form>
+
+          <hr>
+
           <div>
-            <label class="block text-xs font-semibold mb-1">Supabase Anon API Key</label>
-            <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOi..." class="w-full p-2 border rounded text-sm">
-          </div>
-          <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded text-sm font-medium hover:bg-indigo-500 flex items-center space-x-2">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Simpan & Connect Cloud</span>
-          </button>
-        </form>
-
-        <hr>
-
-        <div>
-          <h4 class="font-bold text-slate-900 text-lg">Cadangan & Pemulihan Manual (JSON)</h4>
-          <p class="text-xs text-slate-500">Unduh berkas JSON cadangan untuk diamankan secara independen</p>
-          <div class="flex flex-wrap gap-3 mt-4">
-            <button onclick="exportBackupJSON()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium">Unduh File Backup JSON</button>
-            <label class="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-medium cursor-pointer">
-              Pulihkan dari File JSON
-              <input type="file" onchange="importBackupJSON(event)" accept=".json" class="hidden">
-            </label>
-            <button onclick="resetData()" class="admin-only px-4 py-2 bg-rose-600 text-white rounded text-sm font-medium">Reset Data ke Default</button>
+            <h4 class="font-bold text-slate-900 text-lg">Cadangan & Pemulihan Manual (JSON)</h4>
+            <p class="text-xs text-slate-500">Unduh berkas JSON cadangan untuk diamankan secara independen</p>
+            <div class="flex flex-wrap gap-3 mt-4">
+              <button onclick="exportBackupJSON()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium">Unduh File Backup JSON</button>
+              <label class="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-medium cursor-pointer">
+                Pulihkan dari File JSON
+                <input type="file" onchange="importBackupJSON(event)" accept=".json" class="hidden">
+              </label>
+              <button onclick="resetData()" class="admin-only px-4 py-2 bg-rose-600 text-white rounded text-sm font-medium">Reset Data ke Default</button>
+            </div>
           </div>
         </div>
+      </section>
+    </div>
 
-        <hr>
-
-        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>Versi Aplikasi: <strong>v2.2.0 Enterprise</strong></span>
-          <span>Status Sistem: Active / Offline LocalStorage</span>
-        </div>
+    <!-- FOOTER RESMI ENTERPRISE DEVELOPER BRANDING -->
+    <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
+      <div>
+        Sistem Manajemen Kartu Stok Gudang Enterprise <span class="font-mono font-bold text-indigo-600">v2.3.0</span>
       </div>
-    </section>
+      <div>
+        Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
+      </div>
+    </footer>
 
   </main>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG -->
+  <!-- MODAL: TAMBAH / EDIT BARANG (SOLUSI HPP & HARGA JUAL) -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-      <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">Tambah Barang Baru</h3>
+      <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
       <form id="formBarang" onsubmit="handleSaveBarang(event)" class="space-y-3">
         <input type="hidden" id="barangId">
         <div>
@@ -385,6 +392,16 @@
           <div>
             <label class="block text-xs font-semibold mb-1">GUDANG</label>
             <input type="text" id="barangGudang" required placeholder="GUDANG UTAMA" class="w-full p-2 border rounded text-sm uppercase-input">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold mb-1">HARGA BELI MODAL (HPP)</label>
+            <input type="number" id="barangCostPrice" required placeholder="14000" class="w-full p-2 border rounded text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">HARGA JUAL</label>
+            <input type="number" id="barangSellPrice" required placeholder="18000" class="w-full p-2 border rounded text-sm font-bold text-emerald-700">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -411,7 +428,7 @@
   <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR -->
   <div id="modalTx" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
-      <h3 id="modalTxTitle" class="font-bold text-lg text-slate-900">Input Stok Masuk</h3>
+      <h3 id="modalTxTitle" class="font-bold text-lg text-slate-900">INPUT STOK MASUK</h3>
       <form id="formTx" onsubmit="handleTxSubmit(event)" class="space-y-3">
         <input type="hidden" id="txType" value="IN">
         <div>
@@ -423,7 +440,7 @@
           <input type="number" id="txQty" min="1" required class="w-full p-2 border rounded text-sm">
         </div>
         <div id="txPriceGroup">
-          <label class="block text-xs font-semibold mb-1">HARGA BELI PER UNIT (RP)</label>
+          <label class="block text-xs font-semibold mb-1">HARGA BELI PER UNIT BARU (RP)</label>
           <input type="number" id="txUnitCost" placeholder="15000" class="w-full p-2 border rounded text-sm">
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -468,8 +485,8 @@
       supabaseUrl: '',
       supabaseKey: '',
       products: [
-        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'GUDANG UTAMA', minStock: 20, stock: 45, avgHpp: 14000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'GUDANG UTAMA', minStock: 50, stock: 12, avgHpp: 2500, barcode: '8991234567891' }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'GUDANG UTAMA', minStock: 20, stock: 45, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'GUDANG UTAMA', minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
         { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 45, unitCost: 14000, batchNo: 'BATCH-A1', expireDate: '2027-08-18', notes: 'SUPPLIER A', user: 'ADMIN' }
@@ -541,12 +558,14 @@
       document.getElementById('statTotalItems').innerText = appData.products.length;
       const totalQty = appData.products.reduce((acc, p) => acc + Number(p.stock), 0);
       document.getElementById('statTotalQty').innerText = totalQty;
-      
-      const lowCount = appData.products.filter(p => p.stock <= p.minStock).length;
-      document.getElementById('statLowStock').innerText = lowCount;
 
-      const totalValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
-      document.getElementById('statTotalValuation').innerText = 'Rp ' + totalValuation.toLocaleString('id-ID');
+      // Valuasi HPP Modal
+      const totalHppValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
+      document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
+
+      // Valuasi Harga Jual (Omset)
+      const totalSellValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
+      document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
     function renderProducts() {
@@ -560,6 +579,8 @@
         (p.barcode && p.barcode.toUpperCase().includes(search))
       ).forEach(p => {
         const isLow = p.stock <= p.minStock;
+        const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
+
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-mono text-xs font-semibold">
@@ -567,13 +588,13 @@
               <div class="text-slate-400 text-[10px]">${p.barcode || '-'}</div>
             </td>
             <td class="p-3 font-semibold text-slate-800">${p.name.toUpperCase()}</td>
-            <td class="p-3"><span class="px-2 py-1 bg-slate-100 rounded text-xs font-sans">${p.category.toUpperCase()}</span></td>
-            <td class="p-3 text-xs text-slate-500 font-sans">${p.warehouse.toUpperCase()}</td>
+            <td class="p-3 text-xs font-sans text-slate-500">${p.category.toUpperCase()} / ${p.warehouse.toUpperCase()}</td>
             <td class="p-3 text-right font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">
               ${p.stock} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
             </td>
-            <td class="p-3 text-right text-xs text-slate-400">${p.minStock}</td>
             <td class="p-3 text-right text-xs font-mono">Rp ${Number(p.avgHpp || 0).toLocaleString('id-ID')}</td>
+            <td class="p-3 text-right text-xs font-mono font-bold text-emerald-700">Rp ${Number(p.sellPrice || 0).toLocaleString('id-ID')}</td>
+            <td class="p-3 text-right text-xs font-mono text-indigo-600">+Rp ${margin.toLocaleString('id-ID')}</td>
             <td class="p-3 text-center admin-only">
               <button onclick="deleteProduct('${p.id}')" class="text-rose-600 hover:text-rose-800 text-xs font-semibold px-2 py-1">Hapus</button>
             </td>
@@ -609,7 +630,6 @@
       });
     }
 
-    // LOGIC OPNAME MASSAL (REVISI ABAH)
     function renderMassOpnameTable() {
       const tbody = document.getElementById('tableOpnameMassBody');
       tbody.innerHTML = '';
@@ -624,7 +644,7 @@
             <td class="p-3 text-right">
               <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-24 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
             </td>
-            <td class="p-3 text-right font-bold font-mono" id="opnameDiff_${p.id}">0</td>
+            <td class="p-3 text-right font-bold font-mono text-slate-400" id="opnameDiff_${p.id}">0</td>
             <td class="p-3">
               <input type="text" id="opnameReason_${p.id}" placeholder="Keterangan jika ada selisih..." class="w-full p-1.5 border rounded text-xs uppercase-input">
             </td>
@@ -672,14 +692,13 @@
             user: (appData.role || 'ADMIN').toUpperCase()
           });
 
-          // Update Stok Fisik Sistem
           p.stock = actualQty;
         }
       });
 
       if(adjustmentCount > 0) {
         saveData();
-        alert(`Berhasil menyesuaikan ${adjustmentCount} item barang yang memiliki selisih stok!`);
+        alert(`Berhasil menyesuaikan ${adjustmentCount} barang selisih!`);
       } else {
         alert('Tidak ada selisih stok yang diubah.');
       }
@@ -702,9 +721,11 @@
       });
     }
 
-    // HANDLER SIMPAN BARANG (OTOMATIS UPPERCASE)
     function handleSaveBarang(e) {
       e.preventDefault();
+      const costPrice = Number(document.getElementById('barangCostPrice').value || 0);
+      const sellPrice = Number(document.getElementById('barangSellPrice').value || 0);
+
       const newProduct = {
         id: Date.now().toString(),
         sku: document.getElementById('barangSku').value.toUpperCase(),
@@ -713,7 +734,8 @@
         warehouse: document.getElementById('barangGudang').value.toUpperCase(),
         minStock: Number(document.getElementById('barangMinStock').value),
         stock: 0,
-        avgHpp: 0,
+        avgHpp: costPrice,
+        sellPrice: sellPrice,
         barcode: document.getElementById('barangBarcode').value.toUpperCase()
       };
 
@@ -753,7 +775,7 @@
         productId: product.id,
         name: product.name.toUpperCase(),
         qty: qty,
-        unitCost: unitCost,
+        unitCost: unitCost || product.avgHpp,
         batchNo: (document.getElementById('txBatchNo').value || '-').toUpperCase(),
         expireDate: document.getElementById('txExpireDate').value || '-',
         notes: (document.getElementById('txNotes').value || '-').toUpperCase(),
@@ -865,9 +887,10 @@
     function exportCSV(type) {
       let csvContent = "data:text/csv;charset=utf-8,";
       if(type === 'products') {
-        csvContent += "SKU,NAMA BARANG,KATEGORI,GUDANG,STOK,MIN_STOK,HPP\n";
+        csvContent += "SKU,NAMA BARANG,KATEGORI,GUDANG,STOK,HARGA_BELI_HPP,HARGA_JUAL,MARGIN\n";
         appData.products.forEach(p => {
-          csvContent += `"${p.sku}","${p.name.toUpperCase()}","${p.category.toUpperCase()}","${p.warehouse.toUpperCase()}",${p.stock},${p.minStock},${p.avgHpp}\n`;
+          const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
+          csvContent += `"${p.sku}","${p.name.toUpperCase()}","${p.category.toUpperCase()}","${p.warehouse.toUpperCase()}",${p.stock},${p.avgHpp},${p.sellPrice},${margin}\n`;
         });
       } else if(type === 'mutasi') {
         csvContent += "WAKTU,TIPE,NAMA BARANG,QTY,HARGA_UNIT,BATCH,EXPIRED,CATATAN\n";
