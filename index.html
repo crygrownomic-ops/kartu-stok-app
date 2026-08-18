@@ -414,7 +414,7 @@
   <!-- AREA DOKUMEN CETAK RESMI A4 -->
   <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
 
-  <!-- MODAL: LOGIN USER (V2.7.0 AUTHENTICATION) -->
+  <!-- MODAL: LOGIN USER (PRIVASI PENUH - INFORMASI PENGEMBANG & VERSI) -->
   <div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 z-50 no-print">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-5 border border-slate-100">
       <div class="text-center space-y-1">
@@ -428,7 +428,7 @@
       <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold mb-1 text-slate-700">USERNAME</label>
-          <input type="text" id="loginUsername" required placeholder="admin / staf" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          <input type="text" id="loginUsername" required placeholder="Username..." class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         <div>
           <label class="block text-xs font-semibold mb-1 text-slate-700">PASSWORD</label>
@@ -439,15 +439,16 @@
         </button>
       </form>
 
-      <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg">
-        <p class="font-bold text-slate-700">Akun Default Sistem:</p>
-        <p>• Administrator: <span class="font-mono font-bold text-indigo-600">admin</span> / <span class="font-mono text-slate-600">admin123</span></p>
-        <p>• Staf Gudang: <span class="font-mono font-bold text-indigo-600">staf</span> / <span class="font-mono text-slate-600">staf123</span></p>
+      <!-- BAGIAN PRIVASI: MENAMPILKAN HANYA VERSI & PENGEMBANG -->
+      <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
+        <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v2.7.0</span></p>
+        <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (KLIK BARCODE HANYA ADMIN) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -592,7 +593,6 @@
       renderAll();
     }
 
-    // AUTHENTICATION LOGIC (V2.7.0)
     function checkAuthSession() {
       const modal = document.getElementById('modalLogin');
       if(!appData.currentUser) {
@@ -715,7 +715,6 @@
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
-    // RENDER PRODUCTS & KLIK BARCODE FOR EDIT (V2.7.0)
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
       const search = (document.getElementById('searchProduct').value || '').toUpperCase();
@@ -756,7 +755,6 @@
       applyUserPermissions();
     }
 
-    // EDIT BARANG BY KLIK BARCODE (V2.7.0 PROTEKSI ROLE)
     function clickEditProduct(productId) {
       if(!appData.currentUser || appData.currentUser.role !== 'admin') {
         alert('Akses Ditolak: Hanya Administrator yang berhak mengubah master data barang!');
@@ -787,7 +785,6 @@
       const sellPrice = Number(document.getElementById('barangSellPrice').value || 0);
 
       if(existingId) {
-        // UPDATE EXISTING PRODUCT
         const product = appData.products.find(p => p.id === existingId);
         if(product) {
           product.sku = document.getElementById('barangSku').value.toUpperCase();
@@ -800,7 +797,6 @@
           product.barcode = document.getElementById('barangBarcode').value.toUpperCase();
         }
       } else {
-        // ADD NEW PRODUCT
         const newProduct = {
           id: Date.now().toString(),
           sku: document.getElementById('barangSku').value.toUpperCase(),
@@ -938,7 +934,6 @@
       });
     }
 
-    // CETAK DOKUMEN RESMI A4
     function printSuratJalan() {
       const area = document.getElementById('printableDocArea');
       const prof = appData.profile || {};
