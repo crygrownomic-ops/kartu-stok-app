@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajerial Kartu Stok Gudang v2.7.0</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v2.8.0</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -51,7 +51,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.7.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.8.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
@@ -402,7 +402,7 @@
     <!-- FOOTER RESMI ENTERPRISE BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.7.0</span>
+        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.8.0</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -414,7 +414,7 @@
   <!-- AREA DOKUMEN CETAK RESMI A4 -->
   <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
 
-  <!-- MODAL: LOGIN USER (PRIVASI PENUH - INFORMASI PENGEMBANG & VERSI) -->
+  <!-- MODAL: LOGIN USER -->
   <div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 z-50 no-print">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-5 border border-slate-100">
       <div class="text-center space-y-1">
@@ -439,16 +439,15 @@
         </button>
       </form>
 
-      <!-- BAGIAN PRIVASI: MENAMPILKAN HANYA VERSI & PENGEMBANG -->
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v2.7.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v2.8.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG -->
+  <!-- MODAL: TAMBAH / EDIT BARANG (WITH AUTO CURRENCY FORMAT V2.8.0) -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -475,11 +474,11 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-xs font-semibold mb-1">HARGA BELI MODAL (HPP)</label>
-            <input type="number" id="barangCostPrice" required placeholder="14000" class="w-full p-2 border rounded text-sm font-bold">
+            <input type="text" id="barangCostPrice" required placeholder="14.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-bold font-mono">
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">HARGA JUAL</label>
-            <input type="number" id="barangSellPrice" required placeholder="18000" class="w-full p-2 border rounded text-sm font-bold text-emerald-700">
+            <input type="text" id="barangSellPrice" required placeholder="18.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-bold font-mono text-emerald-700">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -519,7 +518,7 @@
         </div>
         <div id="txPriceGroup">
           <label class="block text-xs font-semibold mb-1">HARGA BELI PER UNIT BARU (RP)</label>
-          <input type="number" id="txUnitCost" placeholder="15000" class="w-full p-2 border rounded text-sm">
+          <input type="text" id="txUnitCost" placeholder="15.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-mono">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -587,6 +586,21 @@
     if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
 
     let html5QrcodeScanner = null;
+
+    // HELPER AUTO FORMAT INPUT NOMINAL RIBUAN (V2.8.0)
+    function formatCurrencyInput(el) {
+      let raw = el.value.replace(/\D/g, '');
+      if (raw) {
+        el.value = Number(raw).toLocaleString('id-ID');
+      } else {
+        el.value = '';
+      }
+    }
+
+    function parseCurrencyNumber(valStr) {
+      if (!valStr) return 0;
+      return Number(String(valStr).replace(/\D/g, '')) || 0;
+    }
 
     function saveData() {
       localStorage.setItem('KARTU_STOK_PRO_DATA', JSON.stringify(appData));
@@ -770,8 +784,8 @@
       document.getElementById('barangNama').value = p.name;
       document.getElementById('barangKategori').value = p.category;
       document.getElementById('barangGudang').value = p.warehouse;
-      document.getElementById('barangCostPrice').value = p.avgHpp || 0;
-      document.getElementById('barangSellPrice').value = p.sellPrice || 0;
+      document.getElementById('barangCostPrice').value = p.avgHpp ? Number(p.avgHpp).toLocaleString('id-ID') : '';
+      document.getElementById('barangSellPrice').value = p.sellPrice ? Number(p.sellPrice).toLocaleString('id-ID') : '';
       document.getElementById('barangMinStock').value = p.minStock || 10;
       document.getElementById('barangBarcode').value = p.barcode || '';
 
@@ -781,8 +795,8 @@
     function handleSaveBarang(e) {
       e.preventDefault();
       const existingId = document.getElementById('barangId').value;
-      const costPrice = Number(document.getElementById('barangCostPrice').value || 0);
-      const sellPrice = Number(document.getElementById('barangSellPrice').value || 0);
+      const costPrice = parseCurrencyNumber(document.getElementById('barangCostPrice').value);
+      const sellPrice = parseCurrencyNumber(document.getElementById('barangSellPrice').value);
 
       if(existingId) {
         const product = appData.products.find(p => p.id === existingId);
@@ -1181,7 +1195,7 @@
       const pId = document.getElementById('txProductId').value;
       const type = document.getElementById('txType').value;
       const qty = Number(document.getElementById('txQty').value);
-      const unitCost = Number(document.getElementById('txUnitCost').value || 0);
+      const unitCost = parseCurrencyNumber(document.getElementById('txUnitCost').value);
 
       const product = appData.products.find(p => p.id === pId);
       if(!product) return;
