@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartu Stok Gudang v2.5.0 - Developer: Urai Ikhsan Fadhilah</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v2.6.0</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons (Hanya Print & Save) -->
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,13 +15,11 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ISOLASI TOTAL MEDIA PRINT (SOLUSI FIX V2.5.0) */
+    /* ISOLASI TOTAL MEDIA PRINT A4 */
     @media print {
-      /* Sembunyikan seluruh UI web (sidebar, main header, tombol, form) */
       body > aside, body > main, .no-print {
         display: none !important;
       }
-      /* Tampilkan HANYA area dokumen resmi A4 */
       #printableDocArea {
         display: block !important;
         position: absolute;
@@ -53,7 +51,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.5.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.6.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
@@ -88,7 +86,7 @@
           Laporan & Dokumen Fisik
         </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Pengaturan & Cloud
+          Pengaturan & Profil Bisnis
         </button>
       </nav>
     </div>
@@ -97,7 +95,7 @@
     <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
       <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
       <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">Crygrownomic Ops System</p>
+      <p class="text-[10px] text-slate-500">Inventory Ops System</p>
     </div>
   </aside>
 
@@ -348,8 +346,40 @@
         </div>
       </section>
 
-      <!-- VIEW 7: PENGATURAN & CLOUD -->
+      <!-- VIEW 7: PENGATURAN & PROFIL BISNIS -->
       <section id="view-settings" class="tab-view mt-6 hidden space-y-6">
+        <!-- FORM PROFIL USHA / BISNIS (FITUR DINAMIS V2.6.0) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div>
+            <h4 class="font-bold text-slate-900 text-lg">Profil Perusahaan / Owner</h4>
+            <p class="text-xs text-slate-500">Data ini akan otomatis muncul sebagai Kop Surat dan Identitas Resmi pada seluruh dokumen yang dicetak.</p>
+          </div>
+          <form onsubmit="saveProfileConfig(event)" class="space-y-3 max-w-xl">
+            <div>
+              <label class="block text-xs font-semibold mb-1">NAMA BISNIS / TOKO / PERUSAHAAN</label>
+              <input type="text" id="cfgStoreName" required placeholder="NAMA TOKO ABAN..." class="w-full p-2 border rounded text-sm uppercase-input">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">ALAMAT LENGKAP</label>
+              <input type="text" id="cfgAddress" required placeholder="JL. MERDEKA NO. 123..." class="w-full p-2 border rounded text-sm uppercase-input">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-semibold mb-1">KOTA & PROVINSI</label>
+                <input type="text" id="cfgCity" required placeholder="PONTIANAK, KALBAR" class="w-full p-2 border rounded text-sm uppercase-input">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1">NOMOR HP / WHATSAPP</label>
+                <input type="text" id="cfgPhone" required placeholder="0812-3456-7890" class="w-full p-2 border rounded text-sm">
+              </div>
+            </div>
+            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500 flex items-center space-x-2">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan Profil Usaha</span>
+            </button>
+          </form>
+        </div>
+
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div>
             <h4 class="font-bold text-slate-900 text-lg">Konfigurasi Supabase Cloud Sync</h4>
@@ -389,10 +419,10 @@
       </section>
     </div>
 
-    <!-- FOOTER RESMI ENTERPRISE DEVELOPER BRANDING -->
+    <!-- FOOTER RESMI ENTERPRISE BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang Enterprise <span class="font-mono font-bold text-indigo-600">v2.5.0</span>
+        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.6.0</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -401,7 +431,7 @@
 
   </main>
 
-  <!-- AREA KHUSUS DOKUMEN CETAK RESMI A4 (PRINT-ONLY - ISOLASI TOTAL) -->
+  <!-- AREA DOKUMEN CETAK RESMI A4 (SINKRON DATA PROFIL BISNIS) -->
   <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
 
   <!-- MODAL: TAMBAH / EDIT BARANG -->
@@ -516,6 +546,12 @@
   <script>
     const DEFAULT_DATA = {
       role: 'admin',
+      profile: {
+        storeName: 'NAMA PERUSAHAAN / TOKO',
+        address: 'JL. MERDEKA NO. 123',
+        city: 'PONTIANAK, KALIMANTAN BARAT',
+        phone: '0812-3456-7890'
+      },
       supabaseUrl: '',
       supabaseKey: '',
       products: [
@@ -531,6 +567,8 @@
     };
 
     let appData = JSON.parse(localStorage.getItem('KARTU_STOK_PRO_DATA')) || DEFAULT_DATA;
+    if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
+
     let html5QrcodeScanner = null;
 
     function saveData() {
@@ -563,6 +601,7 @@
 
       if(tabId === 'ledger') populateLedgerSelect();
       if(tabId === 'opname') renderMassOpnameTable();
+      if(tabId === 'settings') loadProfileInputs();
     }
 
     function renderAll() {
@@ -572,6 +611,26 @@
       renderMutasi();
       renderMassOpnameTable();
       renderCharts();
+    }
+
+    function loadProfileInputs() {
+      const p = appData.profile || {};
+      document.getElementById('cfgStoreName').value = p.storeName || '';
+      document.getElementById('cfgAddress').value = p.address || '';
+      document.getElementById('cfgCity').value = p.city || '';
+      document.getElementById('cfgPhone').value = p.phone || '';
+    }
+
+    function saveProfileConfig(e) {
+      e.preventDefault();
+      appData.profile = {
+        storeName: document.getElementById('cfgStoreName').value.toUpperCase(),
+        address: document.getElementById('cfgAddress').value.toUpperCase(),
+        city: document.getElementById('cfgCity').value.toUpperCase(),
+        phone: document.getElementById('cfgPhone').value
+      };
+      saveData();
+      alert('Profil Usaha Berhasil Disimpan & Tersinkron ke Seluruh Dokumen Cetak!');
     }
 
     function renderAlerts() {
@@ -753,9 +812,10 @@
       });
     }
 
-    // FUNGSI CETAK DOKUMEN RESMI TERISOLASI A4
+    // FUNGSI CETAK DOKUMEN (SINKRON DATA PROFIL BISNIS PERUSAHAAN)
     function printSuratJalan() {
       const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
       
       area.innerHTML = `
@@ -766,17 +826,18 @@
               <p class="text-xs font-mono">No. SJ: SJ/${Date.now().toString().slice(-6)}</p>
             </div>
             <div class="text-right text-xs">
-              <p class="font-bold text-sm">CRYGROWNOMIC OPS LOGISTICS</p>
-              <p>Pontianak, Kalimantan Barat</p>
-              <p>Tanggal: ${today}</p>
+              <p class="font-bold text-sm uppercase">${prof.storeName || 'NAMA PERUSAHAAN'}</p>
+              <p>${prof.address || ''}</p>
+              <p>${prof.city || ''} ${prof.phone ? '| Telp: ' + prof.phone : ''}</p>
+              <p class="mt-1 font-semibold">Tanggal: ${today}</p>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4 text-xs border border-black p-3 rounded">
             <div>
               <p class="font-bold">PENGIRIM (GUDANG):</p>
-              <p>Gudang Utama Crygrownomic</p>
-              <p>Petugas: Admin Gudang</p>
+              <p class="font-bold uppercase">${prof.storeName || 'GUDANG UTAMA'}</p>
+              <p>Petugas Gudang</p>
             </div>
             <div>
               <p class="font-bold">PENERIMA / TUJUAN:</p>
@@ -832,13 +893,15 @@
 
     function printOpnameAuditSheet() {
       const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
 
       area.innerHTML = `
         <div class="space-y-4">
           <div class="text-center border-b-2 border-black pb-3">
             <h1 class="text-xl font-bold uppercase tracking-wide">LEMBAR AUDIT HITUNG FISIK (STOK OPNAME)</h1>
-            <p class="text-xs">Tanggal Audit: ${today} | Pengembang: Urai Ikhsan Fadhilah</p>
+            <p class="text-sm font-bold uppercase text-slate-900 mt-1">${prof.storeName || 'PERUSAHAAN'}</p>
+            <p class="text-xs text-slate-600">Tanggal Audit: ${today} | ${prof.city || ''} ${prof.phone ? '| Telp: ' + prof.phone : ''}</p>
           </div>
 
           <table class="w-full text-left text-xs border border-black border-collapse">
@@ -887,6 +950,7 @@
 
     function printLaporanRekapitulasi() {
       const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
       const totalHpp = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
       const totalSell = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
@@ -896,11 +960,12 @@
           <div class="border-b-2 border-black pb-3 flex justify-between items-center">
             <div>
               <h1 class="text-xl font-bold uppercase tracking-wide">LAPORAN REKAPITULASI & VALUASI STOK</h1>
-              <p class="text-xs">Sistem Manajerial Gudang Enterprise v2.5.0</p>
+              <p class="text-sm font-bold uppercase mt-0.5">${prof.storeName || 'PERUSAHAAN'}</p>
+              <p class="text-xs text-slate-600">${prof.address || ''} ${prof.city || ''}</p>
             </div>
             <div class="text-right text-xs">
               <p class="font-bold">Tanggal Cetak: ${today}</p>
-              <p>Developer: Urai Ikhsan Fadhilah</p>
+              <p>${prof.phone ? 'Telp: ' + prof.phone : ''}</p>
             </div>
           </div>
 
@@ -946,6 +1011,7 @@
       if(!product) return alert('Pilih barang terlebih dahulu!');
 
       const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
       
       let runningStock = 0;
@@ -968,8 +1034,8 @@
         <div class="space-y-4">
           <div class="text-center border-b-2 border-black pb-3">
             <h1 class="text-xl font-bold uppercase tracking-wide">KARTU STOK LEDGER BARANG</h1>
-            <p class="text-sm font-bold text-slate-900 mt-1">${product.sku} - ${product.name.toUpperCase()}</p>
-            <p class="text-xs text-slate-600 mt-0.5">Dicetak pada: ${today} | Developer: Urai Ikhsan Fadhilah</p>
+            <p class="text-sm font-bold uppercase text-slate-900 mt-1">${prof.storeName || 'PERUSAHAAN'} - ${product.sku} (${product.name.toUpperCase()})</p>
+            <p class="text-xs text-slate-600 mt-0.5">Tanggal Cetak: ${today} ${prof.phone ? '| Telp: ' + prof.phone : ''}</p>
           </div>
 
           <table class="w-full text-left text-xs border border-black border-collapse">
@@ -1253,6 +1319,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       switchRole(appData.role || 'admin');
+      loadProfileInputs();
       renderAll();
     });
   </script>
