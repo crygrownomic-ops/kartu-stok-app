@@ -2,8 +2,8 @@
 <html lang="id" class="h-full bg-slate-100">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistem Manajerial Kartu Stok Gudang v2.8.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sistem Manajerial Kartu Stok Gudang v2.9.0</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -43,7 +43,7 @@
     .uppercase-input { text-transform: uppercase; }
   </style>
 </head>
-<body class="h-full text-slate-800 antialiased flex flex-col md:flex-row">
+<body class="h-full text-slate-800 antialiased flex flex-col md:flex-row overflow-x-hidden">
 
   <!-- SIDEBAR NAVIGATION -->
   <aside class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between no-print">
@@ -51,7 +51,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.8.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v2.9.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
       </div>
@@ -115,14 +115,14 @@
           </div>
           <p id="pageSub" class="text-sm text-slate-500 mt-1">Ringkasan status barang, analisis modal HPP, harga jual, dan valuasi aset</p>
         </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="openScanModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition">
+        <div class="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          <button onclick="openScanModal()" class="px-3 py-2 bg-slate-800 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-slate-700 transition whitespace-nowrap">
             Scan Barcode
           </button>
-          <button onclick="openModal('stokMasuk')" class="px-4 py-2 bg-emerald-700 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition">
+          <button onclick="openModal('stokMasuk')" class="px-3 py-2 bg-emerald-700 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-emerald-600 transition whitespace-nowrap">
             + Stok Masuk
           </button>
-          <button onclick="openModal('stokKeluar')" class="px-4 py-2 bg-rose-700 text-white rounded-lg text-sm font-medium hover:bg-rose-600 transition">
+          <button onclick="openModal('stokKeluar')" class="px-3 py-2 bg-rose-700 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-rose-600 transition whitespace-nowrap">
             - Stok Keluar
           </button>
         </div>
@@ -155,11 +155,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Sebaran Stok Per Kategori</h4>
-            <canvas id="chartCategory" class="max-h-64"></canvas>
+            <div class="relative h-64 w-full">
+              <canvas id="chartCategory"></canvas>
+            </div>
           </div>
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Tren Mutasi Stok</h4>
-            <canvas id="chartMutasi" class="max-h-64"></canvas>
+            <div class="relative h-64 w-full">
+              <canvas id="chartMutasi"></canvas>
+            </div>
           </div>
         </div>
       </section>
@@ -171,7 +175,7 @@
             <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA BARANG, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
           </div>
           <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">
+            <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition w-full sm:w-auto">
               + Tambah Barang Baru
             </button>
           </div>
@@ -295,7 +299,7 @@
             </button>
           </div>
 
-          <div id="ledgerPrintArea" class="border rounded-lg p-5 bg-white">
+          <div id="ledgerPrintArea" class="border rounded-lg p-5 bg-white overflow-x-auto">
             <div class="text-center border-b pb-4 mb-4">
               <h3 class="text-xl font-bold uppercase tracking-wide">KARTU STOK LEDGER</h3>
               <p id="ledgerItemName" class="font-semibold text-indigo-600 mt-1">-- PILIH BARANG --</p>
@@ -402,7 +406,7 @@
     <!-- FOOTER RESMI ENTERPRISE BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.8.0</span>
+        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v2.9.0</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -441,15 +445,15 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v2.8.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v2.9.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (WITH AUTO CURRENCY FORMAT V2.8.0) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
       <form id="formBarang" onsubmit="handleSaveBarang(event)" class="space-y-3">
         <input type="hidden" id="barangId">
@@ -504,7 +508,7 @@
 
   <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR -->
   <div id="modalTx" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
       <h3 id="modalTxTitle" class="font-bold text-lg text-slate-900">INPUT STOK MASUK</h3>
       <form id="formTx" onsubmit="handleTxSubmit(event)" class="space-y-3">
         <input type="hidden" id="txType" value="IN">
@@ -549,13 +553,13 @@
   <div id="modalScan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden no-print z-50">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 space-y-4 text-center">
       <h3 class="font-bold text-slate-900">Scan Barcode Kamera</h3>
-      <div id="reader" class="w-full bg-black rounded-lg overflow-hidden min-h-[250px]"></div>
+      <div id="reader" class="w-full bg-black rounded-lg overflow-hidden min-h-[220px]"></div>
       <p id="scanResult" class="text-xs text-slate-500 font-mono">Arahkan kamera ke barcode produk...</p>
       <button onclick="closeScanModal()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium">Tutup Scanner</button>
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC (OPTIMIZED FOR MOBILE ANTI-FREEZE) -->
   <script>
     const USER_DATABASE = [
       { username: 'admin', password: 'admin123', role: 'admin', name: 'ADMINISTRATOR' },
@@ -583,15 +587,18 @@
     };
 
     let appData = JSON.parse(localStorage.getItem('KARTU_STOK_PRO_DATA')) || DEFAULT_DATA;
+    if(!appData.products) appData.products = DEFAULT_DATA.products;
+    if(!appData.mutasi) appData.mutasi = DEFAULT_DATA.mutasi;
+    if(!appData.opname) appData.opname = DEFAULT_DATA.opname;
     if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
 
     let html5QrcodeScanner = null;
 
-    // HELPER AUTO FORMAT INPUT NOMINAL RIBUAN (V2.8.0)
     function formatCurrencyInput(el) {
       let raw = el.value.replace(/\D/g, '');
       if (raw) {
-        el.value = Number(raw).toLocaleString('id-ID');
+        let formatted = Number(raw).toLocaleString('id-ID');
+        if (el.value !== formatted) el.value = formatted;
       } else {
         el.value = '';
       }
@@ -646,7 +653,8 @@
       const user = appData.currentUser;
       if(!user) return;
 
-      document.getElementById('lblActiveUser').innerText = user.name;
+      const lbl = document.getElementById('lblActiveUser');
+      if(lbl) lbl.innerText = user.name;
       const isAdmin = (user.role === 'admin');
 
       document.querySelectorAll('.admin-only').forEach(el => {
@@ -685,10 +693,13 @@
 
     function loadProfileInputs() {
       const p = appData.profile || {};
-      document.getElementById('cfgStoreName').value = p.storeName || '';
-      document.getElementById('cfgAddress').value = p.address || '';
-      document.getElementById('cfgCity').value = p.city || '';
-      document.getElementById('cfgPhone').value = p.phone || '';
+      const elStore = document.getElementById('cfgStoreName');
+      if(elStore) {
+        document.getElementById('cfgStoreName').value = p.storeName || '';
+        document.getElementById('cfgAddress').value = p.address || '';
+        document.getElementById('cfgCity').value = p.city || '';
+        document.getElementById('cfgPhone').value = p.phone || '';
+      }
     }
 
     function saveProfileConfig(e) {
@@ -705,10 +716,11 @@
 
     function renderAlerts() {
       const container = document.getElementById('alertContainer');
+      if(!container) return;
       container.innerHTML = '';
-      const lowStockItems = appData.products.filter(p => p.stock <= p.minStock);
+      const lowStockItems = (appData.products || []).filter(p => p.stock <= p.minStock);
       if(lowStockItems.length > 0) {
-        container.innerHTML += `
+        container.innerHTML = `
           <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg flex items-center justify-between text-amber-800 text-sm">
             <div><strong>PERINGATAN STOK MENIPIS!</strong> Terdapat ${lowStockItems.length} barang di bawah batas minimum.</div>
             <button onclick="switchTab('products')" class="font-bold underline text-xs uppercase">Lihat Barang</button>
@@ -718,41 +730,46 @@
     }
 
     function renderStats() {
-      document.getElementById('statTotalItems').innerText = appData.products.length;
-      const totalQty = appData.products.reduce((acc, p) => acc + Number(p.stock), 0);
+      const items = appData.products || [];
+      document.getElementById('statTotalItems').innerText = items.length;
+      const totalQty = items.reduce((acc, p) => acc + Number(p.stock || 0), 0);
       document.getElementById('statTotalQty').innerText = totalQty;
 
-      const totalHppValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
+      const totalHppValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.avgHpp || 0)), 0);
       document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
 
-      const totalSellValuation = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
+      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0)), 0);
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
+    /* RENDER DENGAN STRING BUFFERING (PERFORMA MAKSIMAL HP) */
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
-      const search = (document.getElementById('searchProduct').value || '').toUpperCase();
-      tbody.innerHTML = '';
+      if(!tbody) return;
+      const search = (document.getElementById('searchProduct')?.value || '').toUpperCase();
+      let html = '';
 
-      appData.products.filter(p => 
-        p.name.toUpperCase().includes(search) || 
-        p.sku.toUpperCase().includes(search) || 
+      const filtered = (appData.products || []).filter(p => 
+        (p.name || '').toUpperCase().includes(search) || 
+        (p.sku || '').toUpperCase().includes(search) || 
         (p.barcode && p.barcode.toUpperCase().includes(search))
-      ).forEach(p => {
+      );
+
+      filtered.forEach(p => {
         const isLow = p.stock <= p.minStock;
         const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
 
-        tbody.innerHTML += `
+        html += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-3 font-mono text-xs font-semibold">
               <div onclick="clickEditProduct('${p.id}')" class="cursor-pointer text-indigo-600 hover:text-indigo-900 hover:underline flex items-center space-x-1" title="Klik untuk Edit Barang (Khusus Admin)">
-                <span>${p.sku}</span>
+                <span>${p.sku || ''}</span>
                 <i class="fa-solid fa-pen-to-square text-[10px] ml-1 opacity-70"></i>
               </div>
               <div onclick="clickEditProduct('${p.id}')" class="text-slate-400 text-[10px] cursor-pointer hover:underline" title="Klik Barcode untuk Edit">${p.barcode || '-'}</div>
             </td>
-            <td class="p-3 font-semibold text-slate-800">${p.name.toUpperCase()}</td>
-            <td class="p-3 text-xs font-sans text-slate-500">${p.category.toUpperCase()} / ${p.warehouse.toUpperCase()}</td>
+            <td class="p-3 font-semibold text-slate-800">${(p.name || '').toUpperCase()}</td>
+            <td class="p-3 text-xs font-sans text-slate-500">${(p.category || '').toUpperCase()} / ${(p.warehouse || '').toUpperCase()}</td>
             <td class="p-3 text-right font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">
               ${p.stock} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
             </td>
@@ -766,6 +783,7 @@
         `;
       });
 
+      tbody.innerHTML = html;
       applyUserPermissions();
     }
 
@@ -775,15 +793,15 @@
         return;
       }
 
-      const p = appData.products.find(item => item.id === productId);
+      const p = (appData.products || []).find(item => item.id === productId);
       if(!p) return;
 
       document.getElementById('modalBarangTitle').innerText = 'EDIT DATA BARANG (' + p.sku + ')';
       document.getElementById('barangId').value = p.id;
-      document.getElementById('barangSku').value = p.sku;
-      document.getElementById('barangNama').value = p.name;
-      document.getElementById('barangKategori').value = p.category;
-      document.getElementById('barangGudang').value = p.warehouse;
+      document.getElementById('barangSku').value = p.sku || '';
+      document.getElementById('barangNama').value = p.name || '';
+      document.getElementById('barangKategori').value = p.category || '';
+      document.getElementById('barangGudang').value = p.warehouse || '';
       document.getElementById('barangCostPrice').value = p.avgHpp ? Number(p.avgHpp).toLocaleString('id-ID') : '';
       document.getElementById('barangSellPrice').value = p.sellPrice ? Number(p.sellPrice).toLocaleString('id-ID') : '';
       document.getElementById('barangMinStock').value = p.minStock || 10;
@@ -832,41 +850,45 @@
 
     function renderMutasi() {
       const tbody = document.getElementById('tableMutasiBody');
-      tbody.innerHTML = '';
+      if(!tbody) return;
+      let html = '';
 
-      appData.mutasi.slice().reverse().forEach(m => {
+      (appData.mutasi || []).slice().reverse().forEach(m => {
         const isIn = m.type === 'IN';
-        tbody.innerHTML += `
+        html += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 text-xs text-slate-500">${m.date}</td>
+            <td class="p-3 text-xs text-slate-500">${m.date || ''}</td>
             <td class="p-3">
               <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isIn ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
                 ${isIn ? 'MASUK' : 'KELUAR'}
               </span>
             </td>
-            <td class="p-3 font-semibold">${m.name.toUpperCase()}</td>
+            <td class="p-3 font-semibold">${(m.name || '').toUpperCase()}</td>
             <td class="p-3 text-xs font-mono">${(m.batchNo || '-').toUpperCase()}</td>
             <td class="p-3 text-xs text-slate-500">${m.expireDate || '-'}</td>
             <td class="p-3 text-right font-bold ${isIn ? 'text-emerald-600' : 'text-rose-600'}">
-              ${isIn ? '+' : '-'}${m.qty}
+              ${isIn ? '+' : '-'}${m.qty || 0}
             </td>
             <td class="p-3 text-right text-xs font-mono">${m.unitCost ? 'Rp ' + Number(m.unitCost).toLocaleString('id-ID') : '-'}</td>
             <td class="p-3 text-xs text-slate-500">${(m.user || 'System').toUpperCase()}</td>
           </tr>
         `;
       });
+
+      tbody.innerHTML = html;
     }
 
     function renderMassOpnameTable() {
       const tbody = document.getElementById('tableOpnameMassBody');
-      tbody.innerHTML = '';
+      if(!tbody) return;
+      let html = '';
 
-      appData.products.forEach(p => {
-        tbody.innerHTML += `
+      (appData.products || []).forEach(p => {
+        html += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono text-xs font-semibold">${p.sku}</td>
-            <td class="p-3 font-semibold text-slate-900">${p.name.toUpperCase()}</td>
-            <td class="p-3 text-xs text-slate-500">${p.category.toUpperCase()} - ${p.warehouse.toUpperCase()}</td>
+            <td class="p-3 font-mono text-xs font-semibold">${p.sku || ''}</td>
+            <td class="p-3 font-semibold text-slate-900">${(p.name || '').toUpperCase()}</td>
+            <td class="p-3 text-xs text-slate-500">${(p.category || '').toUpperCase()} - ${(p.warehouse || '').toUpperCase()}</td>
             <td class="p-3 text-right font-bold text-slate-700 bg-slate-50 font-mono">${p.stock}</td>
             <td class="p-3 text-right">
               <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-24 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
@@ -879,12 +901,14 @@
         `;
       });
 
+      tbody.innerHTML = html;
       renderOpnameAuditTable();
     }
 
     function calculateOpnameDiff(pId, systemStock) {
       const actualInput = document.getElementById(`opnameActual_${pId}`);
       const diffCell = document.getElementById(`opnameDiff_${pId}`);
+      if(!actualInput || !diffCell) return;
       const actualVal = Number(actualInput.value || 0);
       const diff = actualVal - systemStock;
 
@@ -933,19 +957,23 @@
 
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
-      tbody.innerHTML = '';
+      if(!tbody) return;
+      let html = '';
+
       (appData.opname || []).slice().reverse().forEach(o => {
-        tbody.innerHTML += `
+        html += `
           <tr>
-            <td class="p-2 border text-xs">${o.date}</td>
-            <td class="p-2 border font-semibold">${o.name.toUpperCase()}</td>
-            <td class="p-2 border text-right font-mono">${o.systemQty}</td>
-            <td class="p-2 border text-right font-mono">${o.actualQty}</td>
-            <td class="p-2 border text-right font-mono font-bold ${o.diffQty < 0 ? 'text-rose-600' : 'text-emerald-600'}">${o.diffQty > 0 ? '+' : ''}${o.diffQty}</td>
+            <td class="p-2 border text-xs">${o.date || ''}</td>
+            <td class="p-2 border font-semibold">${(o.name || '').toUpperCase()}</td>
+            <td class="p-2 border text-right font-mono">${o.systemQty || 0}</td>
+            <td class="p-2 border text-right font-mono">${o.actualQty || 0}</td>
+            <td class="p-2 border text-right font-mono font-bold ${o.diffQty < 0 ? 'text-rose-600' : 'text-emerald-600'}">${o.diffQty > 0 ? '+' : ''}${o.diffQty || 0}</td>
             <td class="p-2 border text-xs text-slate-500 uppercase-input">${(o.reason || '-').toUpperCase()}</td>
           </tr>
         `;
       });
+
+      tbody.innerHTML = html;
     }
 
     function printSuratJalan() {
@@ -992,7 +1020,7 @@
               </tr>
             </thead>
             <tbody>
-              ${appData.products.slice(0, 5).map((p, idx) => `
+              ${(appData.products || []).slice(0, 5).map((p, idx) => `
                 <tr>
                   <td class="p-2 border border-black text-center">${idx + 1}</td>
                   <td class="p-2 border border-black font-mono">${p.sku}</td>
@@ -1052,7 +1080,7 @@
               </tr>
             </thead>
             <tbody>
-              ${appData.products.map((p, idx) => `
+              ${(appData.products || []).map((p, idx) => `
                 <tr>
                   <td class="p-2 border border-black text-center font-mono">${idx + 1}</td>
                   <td class="p-2 border border-black font-mono">${p.sku}</td>
@@ -1087,8 +1115,8 @@
       const area = document.getElementById('printableDocArea');
       const prof = appData.profile || {};
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
-      const totalHpp = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
-      const totalSell = appData.products.reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
+      const totalHpp = (appData.products || []).reduce((acc, p) => acc + (Number(p.stock) * Number(p.avgHpp || 0)), 0);
+      const totalSell = (appData.products || []).reduce((acc, p) => acc + (Number(p.stock) * Number(p.sellPrice || 0)), 0);
 
       area.innerHTML = `
         <div class="space-y-5">
@@ -1105,7 +1133,7 @@
           </div>
 
           <div class="grid grid-cols-3 gap-4 text-xs font-mono border border-black p-3 bg-slate-50">
-            <div>TOTAL JENIS BARANG: <strong>${appData.products.length} ITEM</strong></div>
+            <div>TOTAL JENIS BARANG: <strong>${(appData.products||[]).length} ITEM</strong></div>
             <div>VALUASI MODAL HPP: <strong>Rp ${totalHpp.toLocaleString('id-ID')}</strong></div>
             <div>POTENSI OMSET JUAL: <strong>Rp ${totalSell.toLocaleString('id-ID')}</strong></div>
           </div>
@@ -1121,7 +1149,7 @@
               </tr>
             </thead>
             <tbody>
-              ${appData.products.map(p => {
+              ${(appData.products || []).map(p => {
                 const totalAsset = p.stock * (p.avgHpp || 0);
                 return `
                   <tr>
@@ -1142,7 +1170,7 @@
 
     function printLedgerDoc() {
       const pId = document.getElementById('ledgerProductSelect').value;
-      const product = appData.products.find(p => p.id === pId);
+      const product = (appData.products || []).find(p => p.id === pId);
       if(!product) return alert('Pilih barang terlebih dahulu!');
 
       const area = document.getElementById('printableDocArea');
@@ -1150,7 +1178,7 @@
       const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
       
       let runningStock = 0;
-      const itemMutasi = appData.mutasi.filter(m => m.productId === pId);
+      const itemMutasi = (appData.mutasi || []).filter(m => m.productId === pId);
       const rows = itemMutasi.map(m => {
         if(m.type === 'IN') runningStock += Number(m.qty);
         else runningStock -= Number(m.qty);
@@ -1246,7 +1274,7 @@
         
         const sel = document.getElementById('txProductId');
         sel.innerHTML = '';
-        appData.products.forEach(p => {
+        (appData.products || []).forEach(p => {
           sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()} (STOK: ${p.stock})</option>`;
         });
         document.getElementById('modalTx').classList.remove('hidden');
@@ -1264,12 +1292,29 @@
       }
     }
 
+    /* KONTROL SCANNER HP AMAN DARI LEAK KAMERA */
     function openScanModal() {
       document.getElementById('modalScan').classList.remove('hidden');
+      if (typeof Html5Qrcode === "undefined") {
+        document.getElementById('scanResult').innerText = "Modul Scanner belum siap.";
+        return;
+      }
+      try {
+        if(html5QrcodeScanner) {
+          html5QrcodeScanner.stop().catch(() => {}).finally(() => { initScanner(); });
+        } else {
+          initScanner();
+        }
+      } catch(err) {
+        console.error(err);
+      }
+    }
+
+    function initScanner() {
       html5QrcodeScanner = new Html5Qrcode("reader");
       html5QrcodeScanner.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 150 } },
+        { fps: 10, qrbox: { width: 220, height: 140 } },
         (decodedText) => {
           document.getElementById('searchProduct').value = decodedText.toUpperCase();
           renderProducts();
@@ -1278,48 +1323,49 @@
         },
         () => {}
       ).catch(() => {
-        document.getElementById('scanResult').innerText = "Kamera tidak dapat diakses.";
+        document.getElementById('scanResult').innerText = "Kamera tidak dapat diakses / izin ditolak.";
       });
     }
 
     function closeScanModal() {
+      document.getElementById('modalScan').classList.add('hidden');
       if(html5QrcodeScanner) {
         html5QrcodeScanner.stop().then(() => {
           html5QrcodeScanner.clear();
-          document.getElementById('modalScan').classList.add('hidden');
+          html5QrcodeScanner = null;
         }).catch(() => {
-          document.getElementById('modalScan').classList.add('hidden');
+          html5QrcodeScanner = null;
         });
-      } else {
-        document.getElementById('modalScan').classList.add('hidden');
       }
     }
 
     function populateLedgerSelect() {
       const sel = document.getElementById('ledgerProductSelect');
+      if(!sel) return;
       sel.innerHTML = '';
-      appData.products.forEach(p => {
+      (appData.products || []).forEach(p => {
         sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()}</option>`;
       });
       renderLedger();
     }
 
     function renderLedger() {
-      const pId = document.getElementById('ledgerProductSelect').value;
-      const product = appData.products.find(p => p.id === pId);
+      const pId = document.getElementById('ledgerProductSelect')?.value;
+      const product = (appData.products || []).find(p => p.id === pId);
       if(!product) return;
 
       document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase();
       const tbody = document.getElementById('tableLedgerBody');
-      tbody.innerHTML = '';
+      if(!tbody) return;
+      let html = '';
 
       let runningStock = 0;
-      const itemMutasi = appData.mutasi.filter(m => m.productId === pId);
+      const itemMutasi = (appData.mutasi || []).filter(m => m.productId === pId);
       itemMutasi.forEach(m => {
         if(m.type === 'IN') runningStock += Number(m.qty);
         else runningStock -= Number(m.qty);
 
-        tbody.innerHTML += `
+        html += `
           <tr>
             <td class="p-2 border text-xs">${m.date}</td>
             <td class="p-2 border text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
@@ -1329,6 +1375,8 @@
           </tr>
         `;
       });
+
+      tbody.innerHTML = html;
     }
 
     function exportCSV(type) {
@@ -1336,18 +1384,18 @@
 
       if(type === 'products') {
         csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
-        appData.products.forEach(p => {
+        (appData.products || []).forEach(p => {
           const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
           csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.avgHpp};${p.sellPrice};${margin}\n`;
         });
       } else if(type === 'mutasi') {
         csvContent += "WAKTU;TIPE;NAMA BARANG;QTY;HARGA UNIT;NO BATCH;TANGGAL EXPIRED;KETERANGAN;PETUGAS\n";
-        appData.mutasi.forEach(m => {
+        (appData.mutasi || []).forEach(m => {
           csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
         });
       } else if(type === 'opname_template') {
         csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
-        appData.products.forEach(p => {
+        (appData.products || []).forEach(p => {
           csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.stock};0;""\n`;
         });
       }
@@ -1395,41 +1443,58 @@
       }
     }
 
+    /* GRAFIK SAFE-MODE HP (ANTI LOOP RESIZING) */
     function renderCharts() {
-      const catMap = {};
-      appData.products.forEach(p => {
-        const catKey = p.category.toUpperCase();
-        catMap[catKey] = (catMap[catKey] || 0) + Number(p.stock);
-      });
+      try {
+        const catCanvas = document.getElementById('chartCategory');
+        const mutCanvas = document.getElementById('chartMutasi');
+        if(!catCanvas || !mutCanvas) return;
 
-      const ctxCat = document.getElementById('chartCategory').getContext('2d');
-      if(window.myCatChart) window.myCatChart.destroy();
-      window.myCatChart = new Chart(ctxCat, {
-        type: 'doughnut',
-        data: {
-          labels: Object.keys(catMap),
-          datasets: [{ data: Object.values(catMap), backgroundColor: ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
+        const catMap = {};
+        (appData.products || []).forEach(p => {
+          const catKey = (p.category || 'LAINNYA').toUpperCase();
+          catMap[catKey] = (catMap[catKey] || 0) + Number(p.stock || 0);
+        });
 
-      const ctxMut = document.getElementById('chartMutasi').getContext('2d');
-      if(window.myMutChart) window.myMutChart.destroy();
-      window.myMutChart = new Chart(ctxMut, {
-        type: 'bar',
-        data: {
-          labels: ['STOK MASUK', 'STOK KELUAR'],
-          datasets: [{
-            label: 'QTY TRANSAKSI',
-            data: [
-              appData.mutasi.filter(m => m.type === 'IN').reduce((a,b) => a + Number(b.qty), 0),
-              appData.mutasi.filter(m => m.type === 'OUT').reduce((a,b) => a + Number(b.qty), 0)
-            ],
-            backgroundColor: ['#059669', '#dc2626']
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-      });
+        const ctxCat = catCanvas.getContext('2d');
+        if(window.myCatChart) window.myCatChart.destroy();
+        window.myCatChart = new Chart(ctxCat, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(catMap),
+            datasets: [{ data: Object.values(catMap), backgroundColor: ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed'] }]
+          },
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            resizeDelay: 200
+          }
+        });
+
+        const ctxMut = mutCanvas.getContext('2d');
+        if(window.myMutChart) window.myMutChart.destroy();
+        window.myMutChart = new Chart(ctxMut, {
+          type: 'bar',
+          data: {
+            labels: ['STOK MASUK', 'STOK KELUAR'],
+            datasets: [{
+              label: 'QTY TRANSAKSI',
+              data: [
+                (appData.mutasi || []).filter(m => m.type === 'IN').reduce((a,b) => a + Number(b.qty || 0), 0),
+                (appData.mutasi || []).filter(m => m.type === 'OUT').reduce((a,b) => a + Number(b.qty || 0), 0)
+              ],
+              backgroundColor: ['#059669', '#dc2626']
+            }]
+          },
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            resizeDelay: 200
+          }
+        });
+      } catch(e) {
+        console.warn("Chart render skipped on mobile device:", e);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
