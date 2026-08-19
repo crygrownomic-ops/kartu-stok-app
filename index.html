@@ -737,7 +737,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // KONEKSI SUPABASE KHUSUS PROJECT ABAH
+    // KONEKSI SUPABASE PROJECT ABAH
     const SUPABASE_URL = "https://wfbclfxnknspamkavqtk.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmYmNsZnhua25zcGFta2F2cXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxODQ4NDQsImV4cCI6MjEwMTc2MDg0NH0.xORViaKJlXYWoXA-fhrQE1_E1I8DGxS7PNthYZoz3nw";
     
@@ -795,7 +795,7 @@
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
 
-    // 1. MESIN UNTUK MENYEDOT DATA TERBARU DARI CLOUD SUPABASE
+    // 1. MESIN SEDOT DATA TERBARU DARI SUPABASE CLOUD
     async function fetchDataFromCloud() {
       if (!supabaseClient || !navigator.onLine) return;
       const iconSync = document.getElementById('iconSync');
@@ -803,8 +803,8 @@
 
       try {
         // Tarik Data Barang
-        const { data: dbProducts } = await supabaseClient.from('products').select('*');
-        if (dbProducts && dbProducts.length > 0) {
+        const { data: dbProducts, error: errP } = await supabaseClient.from('products').select('*');
+        if (!errP && dbProducts && dbProducts.length > 0) {
           appData.products = dbProducts.map(p => ({
             id: String(p.id),
             sku: p.sku || '',
@@ -823,8 +823,8 @@
         }
 
         // Tarik Data Mutasi
-        const { data: dbMutasi } = await supabaseClient.from('mutasi').select('*');
-        if (dbMutasi && dbMutasi.length > 0) {
+        const { data: dbMutasi, error: errM } = await supabaseClient.from('mutasi').select('*');
+        if (!errM && dbMutasi && dbMutasi.length > 0) {
           appData.mutasi = dbMutasi.map(m => ({
             id: String(m.id),
             date: m.date,
@@ -843,8 +843,8 @@
         }
 
         // Tarik Data Opname
-        const { data: dbOpname } = await supabaseClient.from('opname').select('*');
-        if (dbOpname && dbOpname.length > 0) {
+        const { data: dbOpname, error: errO } = await supabaseClient.from('opname').select('*');
+        if (!errO && dbOpname && dbOpname.length > 0) {
           appData.opname = dbOpname.map(o => ({
             id: String(o.id),
             date: o.date,
@@ -858,8 +858,8 @@
         }
 
         // Tarik Profil
-        const { data: dbProfile } = await supabaseClient.from('profile').select('*').single();
-        if (dbProfile) {
+        const { data: dbProfile, error: errProf } = await supabaseClient.from('profile').select('*').single();
+        if (!errProf && dbProfile) {
           appData.profile = {
             storeName: dbProfile.store_name || '',
             address: dbProfile.address || '',
@@ -878,67 +878,74 @@
       }
     }
 
-    // 2. MESIN UNTUK MENGIRIM DATA LOKAL KE CLOUD SUPABASE
+    // 2. MESIN KIRIM DATA LOKAL KE SUPABASE CLOUD (DENGAN PENANGANAN ERROR)
     async function syncDataToCloud() {
       if(!supabaseClient || !navigator.onLine) return;
       const iconSync = document.getElementById('iconSync');
       if(iconSync) iconSync.classList.add('fa-spin');
 
       try {
-        if(appData.products.length > 0) {
+        // Sync Data Products
+        if(appData.products && appData.products.length > 0) {
           const dbProducts = appData.products.map(p => ({
             id: String(p.id),
-            sku: p.sku,
-            name: p.name,
-            category: p.category,
-            warehouse: p.warehouse,
-            satuan: p.satuan,
+            sku: p.sku || '',
+            name: p.name || '',
+            category: p.category || '',
+            warehouse: p.warehouse || '',
+            satuan: p.satuan || 'PCS',
             satuan_besar: p.satuanBesar || '',
-            rasio_konversi: p.rasioKonversi || 1,
-            min_stock: p.minStock || 10,
-            stock: p.stock || 0,
-            avg_hpp: p.avgHpp || 0,
-            sell_price: p.sellPrice || 0,
+            rasio_konversi: Number(p.rasioKonversi || 1),
+            min_stock: Number(p.minStock || 10),
+            stock: Number(p.stock || 0),
+            avg_hpp: Number(p.avgHpp || 0),
+            sell_price: Number(p.sellPrice || 0),
             barcode: p.barcode || ''
           }));
-          await supabaseClient.from('products').upsert(dbProducts, { onConflict: 'id' });
+          const { error: errP } = await supabaseClient.from('products').upsert(dbProducts, { onConflict: 'id' });
+          if (errP) { alert("Gagal Sync Barang: " + errP.message); return; }
         }
 
-        if(appData.mutasi.length > 0) {
+        // Sync Data Mutasi
+        if(appData.mutasi && appData.mutasi.length > 0) {
           const dbMutasi = appData.mutasi.map(m => ({
             id: String(m.id),
             date: m.date,
             type: m.type,
             product_id: String(m.productId),
             name: m.name,
-            qty: m.qty,
+            qty: Number(m.qty),
             tx_unit: m.txUnit,
-            input_qty: m.inputQty,
-            unitCost: m.unitCost,
+            input_qty: Number(m.inputQty),
+            unit_cost: Number(m.unitCost),
             batch_no: m.batchNo,
             expire_date: m.expireDate,
             notes: m.notes,
             user_name: m.user
           }));
-          await supabaseClient.from('mutasi').upsert(dbMutasi, { onConflict: 'id' });
+          const { error: errM } = await supabaseClient.from('mutasi').upsert(dbMutasi, { onConflict: 'id' });
+          if (errM) { alert("Gagal Sync Mutasi: " + errM.message); return; }
         }
 
-        if(appData.opname.length > 0) {
+        // Sync Data Opname
+        if(appData.opname && appData.opname.length > 0) {
           const dbOpname = appData.opname.map(o => ({
             id: String(o.id),
             date: o.date,
             name: o.name,
-            system_qty: o.systemQty,
-            actual_qty: o.actualQty,
-            diff_qty: o.diffQty,
+            system_qty: Number(o.systemQty),
+            actual_qty: Number(o.actualQty),
+            diff_qty: Number(o.diffQty),
             reason: o.reason,
             user_name: o.user
           }));
-          await supabaseClient.from('opname').upsert(dbOpname, { onConflict: 'id' });
+          const { error: errO } = await supabaseClient.from('opname').upsert(dbOpname, { onConflict: 'id' });
+          if (errO) { alert("Gagal Sync Opname: " + errO.message); return; }
         }
 
+        // Sync Profile
         if(appData.profile) {
-          await supabaseClient.from('profile').upsert({
+          const { error: errProf } = await supabaseClient.from('profile').upsert({
             id: 1,
             store_name: appData.profile.storeName,
             address: appData.profile.address,
@@ -946,12 +953,13 @@
             phone: appData.profile.phone,
             license_key: appData.profile.licenseKey
           }, { onConflict: 'id' });
+          if (errProf) { alert("Gagal Sync Profile: " + errProf.message); return; }
         }
 
         const txtStatus = document.getElementById('txtCloudStatus');
         if(txtStatus) txtStatus.innerText = "SUPABASE SYNCED";
       } catch(err) {
-        console.warn("Sync failed:", err);
+        console.warn("Sync error:", err);
       } finally {
         if(iconSync) iconSync.classList.remove('fa-spin');
       }
@@ -962,9 +970,9 @@
         alert("Koneksi offline! Gagal terhubung ke Supabase Cloud.");
         return;
       }
-      await fetchDataFromCloud();
       await syncDataToCloud();
-      alert("Sinkronisasi 2-Arah dengan Supabase Cloud Berhasil!");
+      await fetchDataFromCloud();
+      alert("Sinkronisasi Cloud Berhasil!");
     }
 
     function updateNetworkStatus() {
@@ -1003,7 +1011,7 @@
         }, 200);
 
       } else {
-        if (confirm(`BARCODE BELUM TERDAFTAR!\n\nKode Barcode: ${cleanCode}\nApakah Abah mau mendaftarkan sebagai BARANG BARU sekarang?`)) {
+        if (confirm(`BARCODE BELUM TERDAFTAR!\n\nKode Barcode: ${cleanCode}\nApakah mau mendaftarkan sebagai BARANG BARU sekarang?`)) {
           openModal('tambahBarang');
           document.getElementById('barangBarcode').value = cleanCode;
           document.getElementById('barangSku').value = cleanCode;
@@ -1402,7 +1410,7 @@
         html += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-3 font-mono text-xs font-semibold">
-              <div onclick="clickEditProduct('${p.id}')" class="cursor-pointer text-indigo-600 hover:text-indigo-900 hover:underline flex items-center space-x-1" title="Klik untuk Edit Barang (Khusus Admin)">
+              <div onclick="clickEditProduct('${p.id}')" class="cursor-pointer text-indigo-600 hover:text-indigo-900 hover:underline flex items-center space-x-1" title="Klik untuk Edit Barang">
                 <span>${p.sku || ''}</span>
                 <i class="fa-solid fa-pen-to-square text-[10px] ml-1 opacity-70"></i>
               </div>
@@ -2603,7 +2611,7 @@
       updateNetworkStatus();
       renderAll();
 
-      // ALUR OTOMATIS: Tarik data terbaru dari Cloud dulu, baru simpan balik
+      // ALUR SYNC SINKRON
       await fetchDataFromCloud();
       await syncDataToCloud();
 
