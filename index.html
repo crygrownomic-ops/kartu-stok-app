@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.6.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.7.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.6.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.7.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -72,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.6.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.7.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -288,7 +288,7 @@
         </div>
       </section>
 
-      <!-- VIEW 5: STOK OPNAME MASSAL (DENGAN FILTER BARU & PAGINASI SMART MEMORY) -->
+      <!-- VIEW 5: STOK OPNAME MASSAL -->
       <section id="view-opname" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
@@ -303,7 +303,7 @@
             </div>
           </div>
 
-          <!-- OPSI FILTER & PENCARIAN CERDAS OPNAME -->
+          <!-- OPSI FILTER OPNAME -->
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">CARI BARANG / RAK</label>
@@ -342,14 +342,24 @@
             </table>
           </div>
 
-          <!-- ELEMENT PAGINASI OPNAME -->
           <div id="opnamePagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
 
+        <!-- RIWAYAT AUDIT STOK OPNAME DENGAN FITUR CETAK & ADJUST ULANG -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-3">
-          <h5 class="font-bold text-slate-900 text-sm">Riwayat Audit Stok Opname Terakhir</h5>
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b gap-2">
+            <div>
+              <h5 class="font-bold text-slate-900 text-sm">Riwayat Audit Stok Opname Terakhir</h5>
+              <p class="text-xs text-slate-500">Rekam jejak penyesuaian stok opname dan barang yang mengalami selisih.</p>
+            </div>
+            <button onclick="printOpnameAuditHistory()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-semibold flex items-center space-x-1 shadow-sm">
+              <i class="fa-solid fa-print"></i>
+              <span>Cetak Laporan Selisih (A4)</span>
+            </button>
+          </div>
+
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm border min-w-[500px]">
+            <table class="w-full text-left text-sm border min-w-[600px]">
               <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600">
                 <tr>
                   <th class="p-2 border">Tanggal</th>
@@ -358,6 +368,7 @@
                   <th class="p-2 border text-right">Stok Fisik</th>
                   <th class="p-2 border text-right">Selisih</th>
                   <th class="p-2 border">Alasan Penyesuaian</th>
+                  <th class="p-2 border text-center">Aksi Re-Adjust</th>
                 </tr>
               </thead>
               <tbody id="tableOpnameAuditBody" class="divide-y"></tbody>
@@ -481,7 +492,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.6.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.7.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -536,7 +547,7 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.6.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.7.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
@@ -709,14 +720,15 @@
       categories: ['SEMBAKO', 'KEMASAN', 'MINUMAN', 'SABUN & DETERJEN', 'MAKANAN RINGAN'],
       units: ['PCS', 'BUNGKUS', 'BOTOL', 'KALENG', 'KG', 'KARTON', 'DUS', 'PACK', 'BAL', 'IKAT', 'SACHET'],
       products: [
-        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 50, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 25, minStock: 50, stock: 40, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 25, minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
         { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 50, txUnit: 'BUNGKUS', inputQty: 50, unitCost: 14000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'STOK INITIAL', user: 'ADMIN' }
       ],
       opname: [
-        { id: 'ADJ-1', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
+        { id: 'ADJ-1', date: '2026-08-19', name: 'MINYAK GORENG 1L', systemQty: 50, actualQty: 48, diffQty: -2, reason: 'HASIL OPNAME FISIK', user: 'ADMIN' },
+        { id: 'ADJ-2', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
       ]
     };
 
@@ -728,15 +740,12 @@
     if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
     if(!appData.units) appData.units = DEFAULT_DATA.units;
 
-    // STATE VARIABLE UNTUK PAGINASI & SMART DRAFT MEMORY
     let mutasiPage = 1;
     let ledgerPage = 1;
     let opnamePage = 1;
     const PAGE_SIZE = 10;
     
-    // MEMORI SEMENTARA UNTUK MENGINGAT INPUT OPNAME ANTA-HALAMAN SBLM DISIMPAN
     let opnameDrafts = {};
-
     let html5QrcodeScanner = null;
 
     function generateLicenseKey(storeName) {
@@ -1350,7 +1359,6 @@
       window.print();
     }
 
-    /* LOGIC FILTER DROPDOWN DITINGKATKAN UNTUK OPNAME */
     function populateOpnameFilterOptions() {
       const selCat = document.getElementById('filterOpnameCat');
       const selRak = document.getElementById('filterOpnameRak');
@@ -1370,7 +1378,6 @@
       selRak.value = currentRak;
     }
 
-    /* MENYIMPAN HASIL KETIKAN DRAFT OPNAME SUPAYA TIDAK HILANG SAAT PINDAH PAGE/FILTER */
     function handleOpnameInputChange(pId) {
       const actualInput = document.getElementById(`opnameActual_${pId}`);
       const reasonInput = document.getElementById(`opnameReason_${pId}`);
@@ -1390,7 +1397,6 @@
       calculateOpnameDiff(pId, p.stock);
     }
 
-    /* RENDER OPNAME MASSAL CERDAS DENGAN FILTER & PAGINASI */
     function renderMassOpnameTable() {
       const tbody = document.getElementById('tableOpnameMassBody');
       const pagEl = document.getElementById('opnamePagination');
@@ -1401,7 +1407,6 @@
       const selectedRak = (document.getElementById('filterOpnameRak')?.value || '').toUpperCase();
       const onlyDiff = document.getElementById('filterOpnameOnlyDiff')?.checked || false;
 
-      // Filter produk berdasarkan kriteria pencarian, kategori, rak, dan opsi selisih
       const filtered = (appData.products || []).filter(p => {
         const matchSearch = (p.name || '').toUpperCase().includes(search) || 
                             (p.sku || '').toUpperCase().includes(search) || 
@@ -1430,7 +1435,6 @@
       pagedProducts.forEach(p => {
         const baseSat = (p.satuan || 'PCS').toUpperCase();
         
-        // Ambil dari draft memori jika ada, jika tidak default = p.stock
         const draft = opnameDrafts[p.id];
         const actualQty = draft !== undefined ? draft.actualQty : p.stock;
         const reasonVal = draft !== undefined ? draft.reason : '';
@@ -1499,7 +1503,6 @@
       const today = new Date().toISOString().slice(0, 10);
 
       appData.products.forEach(p => {
-        // Ambil angka dari memori draft (lintas halaman)
         const draft = opnameDrafts[p.id];
         const actualQty = draft !== undefined ? draft.actualQty : p.stock;
         const reasonVal = draft !== undefined ? draft.reason : '';
@@ -1524,7 +1527,7 @@
       });
 
       if(adjustmentCount > 0) {
-        opnameDrafts = {}; // Reset draft setelah berhasil disimpan
+        opnameDrafts = {}; 
         saveData();
         alert(`Berhasil menyesuaikan ${adjustmentCount} barang yang memiliki selisih!`);
       } else {
@@ -1532,6 +1535,7 @@
       }
     }
 
+    /* RENDER AUDIT OPNAME DENGAN AKSES RE-ADJUST ULANG */
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
       if(!tbody) return;
@@ -1539,18 +1543,85 @@
 
       (appData.opname || []).slice().reverse().forEach(o => {
         html += `
-          <tr>
-            <td class="p-2 border text-xs">${o.date || ''}</td>
-            <td class="p-2 border font-semibold">${(o.name || '').toUpperCase()}</td>
-            <td class="p-2 border text-right font-mono">${o.systemQty || 0}</td>
-            <td class="p-2 border text-right font-mono">${o.actualQty || 0}</td>
+          <tr class="hover:bg-slate-50">
+            <td class="p-2 border text-xs font-mono">${o.date || ''}</td>
+            <td class="p-2 border font-semibold text-slate-800">${(o.name || '').toUpperCase()}</td>
+            <td class="p-2 border text-right font-mono text-slate-500">${o.systemQty || 0}</td>
+            <td class="p-2 border text-right font-mono font-bold">${o.actualQty || 0}</td>
             <td class="p-2 border text-right font-mono font-bold ${o.diffQty < 0 ? 'text-rose-600' : 'text-emerald-600'}">${o.diffQty > 0 ? '+' : ''}${o.diffQty || 0}</td>
-            <td class="p-2 border text-xs text-slate-500 uppercase-input">${(o.reason || '-').toUpperCase()}</td>
+            <td class="p-2 border text-xs text-slate-600 uppercase-input">${(o.reason || '-').toUpperCase()}</td>
+            <td class="p-2 border text-center">
+              <button onclick="quickReAdjustProduct('${o.name}')" class="px-2 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white border border-indigo-200 rounded text-[10px] font-bold transition">
+                <i class="fa-solid fa-arrows-rotate mr-1"></i>Adjust Ulang
+              </button>
+            </td>
           </tr>
         `;
       });
 
-      tbody.innerHTML = html;
+      tbody.innerHTML = html || `<tr><td colspan="7" class="p-3 text-center border text-slate-400 text-xs">Belum ada riwayat audit.</td></tr>`;
+    }
+
+    /* TAUTAN LANGSUNG UNTUK RE-ADJUST BARANG SELISIH */
+    function quickReAdjustProduct(productName) {
+      document.getElementById('filterOpnameSearch').value = productName.toUpperCase();
+      opnamePage = 1;
+      renderMassOpnameTable();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* FITUR BARU: CETAK DOKUMEN FISIK LAPORAN SELISIH AUDIT */
+    function printOpnameAuditHistory() {
+      const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
+      const today = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const auditRows = (appData.opname || []).slice().reverse().map((o, idx) => `
+        <tr>
+          <td class="p-2 border border-black text-center font-mono">${idx + 1}</td>
+          <td class="p-2 border border-black font-mono">${o.date || ''}</td>
+          <td class="p-2 border border-black font-bold uppercase">${o.name}</td>
+          <td class="p-2 border border-black text-right font-mono">${o.systemQty}</td>
+          <td class="p-2 border border-black text-right font-mono font-bold">${o.actualQty}</td>
+          <td class="p-2 border border-black text-right font-mono font-bold ${o.diffQty < 0 ? 'text-rose-600' : ''}">${o.diffQty > 0 ? '+' : ''}${o.diffQty}</td>
+          <td class="p-2 border border-black text-xs uppercase">${o.reason}</td>
+          <td class="p-2 border border-black text-center text-[10px]">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td>
+        </tr>
+      `).join('');
+
+      area.innerHTML = `
+        <div class="space-y-4">
+          <div class="text-center border-b-2 border-black pb-3">
+            <h1 class="text-xl font-bold uppercase tracking-wide">LAPORAN SELISIH & AUDIT STOK OPNAME</h1>
+            <p class="text-sm font-bold uppercase text-slate-900 mt-1">${prof.storeName || 'PERUSAHAAN'}</p>
+            <p class="text-xs text-slate-600">Dicetak Pada: ${today} | ${prof.city || ''} ${prof.phone ? '| Telp: ' + prof.phone : ''}</p>
+          </div>
+
+          <table class="w-full text-left text-xs border border-black border-collapse">
+            <thead>
+              <tr class="bg-slate-100 border-b border-black font-bold uppercase">
+                <th class="p-2 border border-black text-center">NO</th>
+                <th class="p-2 border border-black">TANGGAL</th>
+                <th class="p-2 border border-black">NAMA BARANG</th>
+                <th class="p-2 border border-black text-right">STOK SISTEM</th>
+                <th class="p-2 border border-black text-right">STOK FISIK</th>
+                <th class="p-2 border border-black text-right">SELISIH</th>
+                <th class="p-2 border border-black">ALASAN / CATATAN</th>
+                <th class="p-2 border border-black text-center">PARAF CHECKER</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${auditRows || '<tr><td colspan="8" class="p-3 text-center border border-black">Belum ada catatan selisih</td></tr>'}
+            </tbody>
+          </table>
+
+          <div class="flex justify-between text-xs pt-8">
+            <div><p>Checker / Petugas Lapangan:</p><br><br><p class="font-bold underline">( ________________________ )</p></div>
+            <div><p>Kepala Gudang / Supervisor:</p><br><br><p class="font-bold underline">( ________________________ )</p></div>
+          </div>
+        </div>
+      `;
+      window.print();
     }
 
     function printSuratJalan() {
