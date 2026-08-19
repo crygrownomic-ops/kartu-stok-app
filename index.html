@@ -160,7 +160,7 @@
         </div>
       </section>
 
-      <!-- VIEW 2: DATA BARANG (PAGINASI 10 DATA TERUPDATE) -->
+      <!-- VIEW 2: DATA BARANG -->
       <section id="view-products" class="tab-view mt-4 hidden space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <div class="w-full sm:w-80">
@@ -306,7 +306,6 @@
             </div>
           </div>
 
-          <!-- OPSI FILTER OPNAME -->
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">CARI BARANG / RAK</label>
@@ -348,7 +347,7 @@
           <div id="opnamePagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
 
-        <!-- RIWAYAT AUDIT STOK OPNAME TERAKHIR (PAGING 5 RIWAYAT TERUPDATE) -->
+        <!-- RIWAYAT AUDIT STOK OPNAME -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-3">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b gap-2">
             <div>
@@ -378,7 +377,6 @@
             </table>
           </div>
 
-          <!-- CONTAINER PAGINATION AUDIT (MAX 5 BARIS PER HALAMAN) -->
           <div id="auditPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
       </section>
@@ -526,7 +524,7 @@
         </div>
         <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg transition flex items-center justify-center space-x-2"><i class="fa-solid fa-shield-check"></i><span>Aktivasi Lisensi Sekarang</span></button>
       </form>
-      <p class="text-[11px] text-center text-slate-400">Hubungi Developer (Urai Ikhsan Fadhilah) untuk mendapatkan Kunci Lisensi Resmi.</p>
+      <p class="text-[11px] text-center text-slate-400">Gunakan Master Key: <strong class="text-indigo-600">NINNA-MASTER-2026</strong> untuk melewati aktivasi.</p>
     </div>
   </div>
 
@@ -683,7 +681,6 @@
           </div>
         </div>
         
-        <!-- PRESET TIPE KETERANGAN CEPAT UNTUK CLAIMS & DISPOSAL -->
         <div>
           <label class="block text-xs font-semibold mb-1">PRESET ALASAN / TIPE TRANSAKSI</label>
           <select id="txPresetNotes" onchange="applyPresetNote(this.value)" class="w-full p-2 border rounded text-xs bg-slate-50 font-bold mb-1">
@@ -730,7 +727,7 @@
         address: 'JL. MERDEKA NO. 123',
         city: 'PONTIANAK, KALIMANTAN BARAT',
         phone: '0812-3456-7890',
-        licenseKey: ''
+        licenseKey: MASTER_KEY
       },
       categories: ['SEMBAKO', 'KEMASAN', 'MINUMAN', 'SABUN & DETERJEN', 'MAKANAN RINGAN'],
       units: ['PCS', 'BUNGKUS', 'BOTOL', 'KALENG', 'KG', 'KARTON', 'DUS', 'PACK', 'BAL', 'IKAT', 'SACHET'],
@@ -755,11 +752,11 @@
     if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
     if(!appData.units) appData.units = DEFAULT_DATA.units;
 
-    let productPage = 1; // PAGINASI MASTER DATA BARANG (10 PER HALAMAN)
+    let productPage = 1;
     let mutasiPage = 1;
     let ledgerPage = 1;
     let opnamePage = 1;
-    let auditPage = 1; // PAGING AUDIT OPNAME (5 PER HALAMAN)
+    let auditPage = 1;
     
     const PAGE_SIZE = 10;
     const AUDIT_PAGE_SIZE = 5;
@@ -810,9 +807,9 @@
       if(inputKey === expectedKey || inputKey === MASTER_KEY) {
         appData.profile.licenseKey = (inputKey === MASTER_KEY) ? MASTER_KEY : expectedKey;
         saveData();
-        alert('LOKAL LISENSI BERHASIL DIAKTIVASI! Selamat Menggunakan.');
+        alert('LISENSI BERHASIL DIAKTIVASI!');
       } else {
-        alert('SERIAL KEY INVALID! Pastikan Serial Key sesuai dengan Nama Toko.');
+        alert('SERIAL KEY INVALID!');
       }
     }
 
@@ -1101,18 +1098,17 @@
       const totalHppValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.avgHpp || 0)), 0);
       document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
 
-      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0), 0));
+      // FIXED BUG: Disini sebelumnya ada kesalahan koma operator
+      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0)), 0);
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
-    /* RENDER MASTER DATA BARANG DENGAN PAGINASI 10 BARANG TERUPDATE PER HALAMAN */
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
       const pagEl = document.getElementById('productPagination');
       if(!tbody) return;
       const search = (document.getElementById('searchProduct')?.value || '').toUpperCase();
 
-      // Urutkan data terbaru paling atas (slice & reverse)
       const filtered = (appData.products || []).slice().reverse().filter(p => 
         (p.name || '').toUpperCase().includes(search) || 
         (p.sku || '').toUpperCase().includes(search) || 
@@ -1223,7 +1219,6 @@
       document.getElementById('barangBarcode').value = p.barcode || '';
 
       document.getElementById('groupInitialStock').style.display = 'none';
-
       document.getElementById('modalBarang').classList.remove('hidden');
     }
 
@@ -1290,7 +1285,7 @@
         }
       }
 
-      productPage = 1; // RESET KE HALAMAN DENGAN INPUT BARANG TERBARU
+      productPage = 1;
       closeModal('modalBarang');
       saveData();
       alert('Data barang berhasil disimpan!');
@@ -1586,7 +1581,6 @@
       }
     }
 
-    /* RENDER TABEL AUDIT DENGAN PAGINASI 5 DATA TERUPDATE */
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
       const pagEl = document.getElementById('auditPagination');
