@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.4.1 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.5.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.4.1</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.5.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -72,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.4.1</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.5.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -260,12 +260,12 @@
         </div>
       </section>
 
-      <!-- VIEW 4: MUTASI & BATCH -->
+      <!-- VIEW 4: MUTASI & BATCH (DENGAN PAGINASI 10 ITEM) -->
       <section id="view-mutasi" class="tab-view mt-4 hidden space-y-4">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-2 border-b pb-3">
             <h4 class="font-bold text-slate-800 text-sm">Riwayat Mutasi Stok, Batch & Expiration Date</h4>
-            <input type="text" id="searchMutasi" onkeyup="renderMutasi()" placeholder="Cari barang, no batch, atau catatan..." class="p-1.5 border rounded text-xs w-full sm:w-64 uppercase-input">
+            <input type="text" id="searchMutasi" onkeyup="mutasiPage=1; renderMutasi()" placeholder="Cari barang, no batch, atau catatan..." class="p-1.5 border rounded text-xs w-full sm:w-64 uppercase-input">
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm min-w-[700px]">
@@ -284,6 +284,8 @@
               <tbody id="tableMutasiBody" class="divide-y divide-slate-100"></tbody>
             </table>
           </div>
+          <!-- ELEMENT PAGINASI MUTASI -->
+          <div id="mutasiPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
       </section>
 
@@ -340,15 +342,24 @@
         </div>
       </section>
 
-      <!-- VIEW 6: KARTU STOK LEDGER -->
+      <!-- VIEW 6: KARTU STOK LEDGER (DENGAN TOMBOL EXCEL & PAGINASI 10 ITEM) -->
       <section id="view-ledger" class="tab-view mt-4 hidden space-y-4">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
           <div class="flex flex-col sm:flex-row justify-between gap-3 no-print">
             <div class="w-full sm:w-80">
               <label class="block text-xs font-semibold mb-1">Pilih Barang Ledger</label>
-              <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
+              <select id="ledgerProductSelect" onchange="ledgerPage=1; renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
             </div>
-            <button onclick="printLedgerDoc()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Kartu Stok</span></button>
+            <div class="flex items-center space-x-2 self-end w-full sm:w-auto">
+              <button onclick="exportLedgerCSV()" class="flex-1 sm:flex-initial px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-sm font-medium flex items-center justify-center space-x-2 shadow-sm">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Ekspor Excel (.csv)</span>
+              </button>
+              <button onclick="printLedgerDoc()" class="flex-1 sm:flex-initial px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-sm font-medium flex items-center justify-center space-x-2 shadow-sm">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Kartu Stok</span>
+              </button>
+            </div>
           </div>
 
           <div id="ledgerPrintArea" class="border rounded-lg p-4 sm:p-5 bg-white overflow-x-auto">
@@ -368,6 +379,8 @@
               </thead>
               <tbody id="tableLedgerBody"></tbody>
             </table>
+            <!-- ELEMENT PAGINASI LEDGER -->
+            <div id="ledgerPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2 no-print"></div>
           </div>
         </div>
       </section>
@@ -445,7 +458,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.4.1 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.5.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -500,13 +513,13 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.4.1</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.5.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (DENGAN INPUT STOK AWAL DILENGKAPI) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -549,7 +562,6 @@
           </div>
         </div>
 
-        <!-- KOLOM INPUT STOK AWAL LANSUNG SAAT BARANG BARU DIBUAT -->
         <div id="groupInitialStock" class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg">
           <label class="block text-xs font-bold text-emerald-900 mb-1">STOK AWAL SAAT INI (DALAM SATUAN ECERAN)</label>
           <input type="number" id="barangInitialStock" value="0" min="0" class="w-full p-2 border border-emerald-300 rounded text-sm font-bold font-mono text-emerald-900 bg-white">
@@ -692,6 +704,11 @@
     if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
     if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
     if(!appData.units) appData.units = DEFAULT_DATA.units;
+
+    // VARIABLE STATE PAGINASI (10 ITEM PER HALAMAN)
+    let mutasiPage = 1;
+    let ledgerPage = 1;
+    const PAGE_SIZE = 10;
 
     let html5QrcodeScanner = null;
 
@@ -849,7 +866,8 @@
         currentNav.classList.remove('text-slate-400');
       }
 
-      if(tabId === 'ledger') populateLedgerSelect();
+      if(tabId === 'ledger') { ledgerPage = 1; populateLedgerSelect(); }
+      if(tabId === 'mutasi') { mutasiPage = 1; renderMutasi(); }
       if(tabId === 'opname') renderMassOpnameTable();
       if(tabId === 'settings') loadProfileInputs();
       if(tabId === 'refmaster') renderRefMasterTables();
@@ -1118,7 +1136,7 @@
       document.getElementById('barangMinStock').value = p.minStock || 10;
       document.getElementById('barangBarcode').value = p.barcode || '';
 
-      document.getElementById('groupInitialStock').style.display = 'none'; // Sembunyikan stok awal jika mode edit
+      document.getElementById('groupInitialStock').style.display = 'none';
 
       document.getElementById('modalBarang').classList.remove('hidden');
     }
@@ -1191,19 +1209,30 @@
       alert('Data barang berhasil disimpan!');
     }
 
+    /* RENDER MUTASI DENGAN PAGINASI 10 ITEM TERUPDATE */
     function renderMutasi() {
       const tbody = document.getElementById('tableMutasiBody');
+      const pagEl = document.getElementById('mutasiPagination');
       if(!tbody) return;
       const search = (document.getElementById('searchMutasi')?.value || '').toUpperCase();
-      let html = '';
 
-      const filtered = (appData.mutasi || []).slice().reverse().filter(m => 
+      const allFiltered = (appData.mutasi || []).slice().reverse().filter(m => 
         (m.name || '').toUpperCase().includes(search) || 
         (m.batchNo || '').toUpperCase().includes(search) || 
         (m.notes || '').toUpperCase().includes(search)
       );
 
-      filtered.forEach(m => {
+      const totalItems = allFiltered.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+      if(mutasiPage > totalPages) mutasiPage = totalPages;
+      if(mutasiPage < 1) mutasiPage = 1;
+
+      const startIdx = (mutasiPage - 1) * PAGE_SIZE;
+      const pagedItems = allFiltered.slice(startIdx, startIdx + PAGE_SIZE);
+
+      let html = '';
+      pagedItems.forEach(m => {
         const isIn = m.type === 'IN';
         const product = appData.products.find(p => p.id === m.productId);
         const baseSat = product ? (product.satuan || 'PCS') : 'PCS';
@@ -1239,7 +1268,23 @@
         `;
       });
 
-      tbody.innerHTML = html;
+      tbody.innerHTML = html || `<tr><td colspan="8" class="p-4 text-center text-slate-400 text-xs">Belum ada data mutasi.</td></tr>`;
+
+      if(pagEl) {
+        pagEl.innerHTML = `
+          <div>Menampilkan <strong>${totalItems > 0 ? startIdx + 1 : 0}</strong> - <strong>${Math.min(startIdx + PAGE_SIZE, totalItems)}</strong> dari <strong>${totalItems}</strong> mutasi</div>
+          <div class="flex items-center space-x-1">
+            <button onclick="changeMutasiPage(-1)" ${mutasiPage === 1 ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Prev</button>
+            <span class="px-3 font-bold text-indigo-600">Halaman ${mutasiPage} / ${totalPages}</span>
+            <button onclick="changeMutasiPage(1)" ${mutasiPage === totalPages ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Next</button>
+          </div>
+        `;
+      }
+    }
+
+    function changeMutasiPage(delta) {
+      mutasiPage += delta;
+      renderMutasi();
     }
 
     function printThermalReceipt(txId) {
@@ -1552,6 +1597,116 @@
       window.print();
     }
 
+    function populateLedgerSelect() {
+      const sel = document.getElementById('ledgerProductSelect');
+      if(!sel) return;
+      sel.innerHTML = '';
+      (appData.products || []).forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()}</option>`;
+      });
+      renderLedger();
+    }
+
+    /* RENDER KARTU STOK LEDGER DENGAN PAGINASI 10 ITEM TERUPDATE */
+    function renderLedger() {
+      const pId = document.getElementById('ledgerProductSelect')?.value;
+      const product = (appData.products || []).find(p => p.id === pId);
+      if(!product) return;
+
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase() + ` (${baseSat})`;
+      const tbody = document.getElementById('tableLedgerBody');
+      const pagEl = document.getElementById('ledgerPagination');
+      if(!tbody) return;
+
+      // Hitung akumulasi saldo secara kronologis menyeluruh lebih dahulu
+      let runningStock = 0;
+      const allItemMutasi = (appData.mutasi || []).filter(m => m.productId === pId).map(m => {
+        if(m.type === 'IN') runningStock += Number(m.qty);
+        else runningStock -= Number(m.qty);
+        return { ...m, balanceAfter: runningStock };
+      });
+
+      // Urutkan dari yang paling baru (terupdate)
+      const reversedMutasi = allItemMutasi.slice().reverse();
+
+      const totalItems = reversedMutasi.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+      if(ledgerPage > totalPages) ledgerPage = totalPages;
+      if(ledgerPage < 1) ledgerPage = 1;
+
+      const startIdx = (ledgerPage - 1) * PAGE_SIZE;
+      const pagedItems = reversedMutasi.slice(startIdx, startIdx + PAGE_SIZE);
+
+      let html = '';
+      pagedItems.forEach(m => {
+        html += `
+          <tr>
+            <td class="p-2 border text-xs">${m.date}</td>
+            <td class="p-2 border text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
+            <td class="p-2 border text-right font-semibold text-emerald-600">${m.type === 'IN' ? m.qty + ' ' + baseSat : '-'}</td>
+            <td class="p-2 border text-right font-semibold text-rose-600">${m.type === 'OUT' ? m.qty + ' ' + baseSat : '-'}</td>
+            <td class="p-2 border text-right font-bold font-mono">${m.balanceAfter} ${baseSat}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html || `<tr><td colspan="5" class="p-3 text-center border text-slate-400 text-xs">Belum ada mutasi untuk barang ini</td></tr>`;
+
+      if(pagEl) {
+        pagEl.innerHTML = `
+          <div>Menampilkan <strong>${totalItems > 0 ? startIdx + 1 : 0}</strong> - <strong>${Math.min(startIdx + PAGE_SIZE, totalItems)}</strong> dari <strong>${totalItems}</strong> transaksi ledger</div>
+          <div class="flex items-center space-x-1">
+            <button onclick="changeLedgerPage(-1)" ${ledgerPage === 1 ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Prev</button>
+            <span class="px-3 font-bold text-indigo-600">Halaman ${ledgerPage} / ${totalPages}</span>
+            <button onclick="changeLedgerPage(1)" ${ledgerPage === totalPages ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Next</button>
+          </div>
+        `;
+      }
+    }
+
+    function changeLedgerPage(delta) {
+      ledgerPage += delta;
+      renderLedger();
+    }
+
+    /* FITUR BARU: EKSPOR LEDGER PRODUCT KE EXCEL (.CSV) */
+    function exportLedgerCSV() {
+      const pId = document.getElementById('ledgerProductSelect')?.value;
+      const product = (appData.products || []).find(p => p.id === pId);
+      if(!product) return alert('Pilih barang terlebih dahulu!');
+
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      let csvContent = "\uFEFF"; 
+      csvContent += `KARTU STOK LEDGER - ${product.sku} (${product.name.toUpperCase()})\n`;
+      csvContent += "WAKTU;KETERANGAN / TRANSAKSI;NO BATCH;MASUK;KELUAR;SALDO STOK\n";
+
+      let runningStock = 0;
+      const allItemMutasi = (appData.mutasi || []).filter(m => m.productId === pId);
+      
+      allItemMutasi.forEach(m => {
+        if(m.type === 'IN') runningStock += Number(m.qty);
+        else runningStock -= Number(m.qty);
+
+        const masuk = m.type === 'IN' ? `${m.qty} ${baseSat}` : '-';
+        const keluar = m.type === 'OUT' ? `${m.qty} ${baseSat}` : '-';
+        const ket = `${(m.notes || '').toUpperCase()}`;
+        const batch = (m.batchNo || '-').toUpperCase();
+
+        csvContent += `"${m.date}";"${ket}";"${batch}";"${masuk}";"${keluar}";"${runningStock} ${baseSat}"\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `LEDGER_${product.sku}_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
     function printLedgerDoc() {
       const pId = document.getElementById('ledgerProductSelect').value;
       const product = (appData.products || []).find(p => p.id === pId);
@@ -1728,7 +1883,7 @@
         document.getElementById('modalBarangTitle').innerText = 'TAMBAH BARANG BARU';
         document.getElementById('barangId').value = '';
         document.getElementById('formBarang').reset();
-        document.getElementById('groupInitialStock').style.display = 'block'; // Tampilkan stok awal untuk barang baru
+        document.getElementById('groupInitialStock').style.display = 'block';
         document.getElementById('modalBarang').classList.remove('hidden');
       } else if(type === 'stokMasuk' || type === 'stokKeluar') {
         const isMasuk = type === 'stokMasuk';
@@ -1796,47 +1951,6 @@
           html5QrcodeScanner = null;
         }).catch(() => { html5QrcodeScanner = null; });
       }
-    }
-
-    function populateLedgerSelect() {
-      const sel = document.getElementById('ledgerProductSelect');
-      if(!sel) return;
-      sel.innerHTML = '';
-      (appData.products || []).forEach(p => {
-        sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()}</option>`;
-      });
-      renderLedger();
-    }
-
-    function renderLedger() {
-      const pId = document.getElementById('ledgerProductSelect')?.value;
-      const product = (appData.products || []).find(p => p.id === pId);
-      if(!product) return;
-
-      const baseSat = (product.satuan || 'PCS').toUpperCase();
-      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase() + ` (${baseSat})`;
-      const tbody = document.getElementById('tableLedgerBody');
-      if(!tbody) return;
-      let html = '';
-
-      let runningStock = 0;
-      const itemMutasi = (appData.mutasi || []).filter(m => m.productId === pId);
-      itemMutasi.forEach(m => {
-        if(m.type === 'IN') runningStock += Number(m.qty);
-        else runningStock -= Number(m.qty);
-
-        html += `
-          <tr>
-            <td class="p-2 border text-xs">${m.date}</td>
-            <td class="p-2 border text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
-            <td class="p-2 border text-right font-semibold text-emerald-600">${m.type === 'IN' ? m.qty + ' ' + baseSat : '-'}</td>
-            <td class="p-2 border text-right font-semibold text-rose-600">${m.type === 'OUT' ? m.qty + ' ' + baseSat : '-'}</td>
-            <td class="p-2 border text-right font-bold font-mono">${runningStock} ${baseSat}</td>
-          </tr>
-        `;
-      });
-
-      tbody.innerHTML = html;
     }
 
     function exportCSV(type) {
