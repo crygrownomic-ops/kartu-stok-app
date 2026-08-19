@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v3.0.0</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.0.0 Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -15,9 +15,9 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ISOLASI TOTAL MEDIA PRINT A4 */
+    /* ISOLASI TOTAL MEDIA PRINT A4 & STRUK THERMAL */
     @media print {
-      body > aside, body > main, #mobileTopBar, #modalLogin, .no-print {
+      body > aside, body > main, #mobileTopBar, #modalLogin, #modalActivation, .no-print {
         display: none !important;
       }
       #printableDocArea {
@@ -35,8 +35,8 @@
         visibility: visible !important;
       }
       @page {
-        size: A4 portrait;
-        margin: 12mm;
+        size: auto;
+        margin: 5mm;
       }
     }
     .print-only { display: none; }
@@ -48,9 +48,9 @@
   <!-- TOP BAR KHUSUS MOBILE (< md) -->
   <header id="mobileTopBar" class="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between no-print z-40 sticky top-0 shadow-md">
     <div class="flex items-center space-x-2">
-      <i class="fa-solid fa-boxes-stacked text-indigo-400"></i>
-      <h1 class="font-bold text-base tracking-tight">Kartu Stok</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v3.0.0</span>
+      <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+      <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.0.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -75,7 +75,7 @@
       <button onclick="switchTab('opname')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Stok Opname Massal</button>
       <button onclick="switchTab('ledger')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Kartu Stok Ledger</button>
       <button onclick="switchTab('reports')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Laporan & Dokumen Fisik</button>
-      <button onclick="switchTab('settings')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Pengaturan & Profil Bisnis</button>
+      <button onclick="switchTab('settings')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Pengaturan & Aktivasi Lisensi</button>
     </nav>
   </div>
 
@@ -85,9 +85,9 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v3.0.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.0.0</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">Sistem Manajerial Inventaris</p>
+        <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
 
       <!-- ACTIVE USER STATUS & LOGOUT -->
@@ -123,7 +123,7 @@
           Laporan & Dokumen Fisik
         </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">
-          Pengaturan & Profil Bisnis
+          Pengaturan & Lisensi
         </button>
       </nav>
     </div>
@@ -132,7 +132,7 @@
     <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
       <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
       <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">Inventory Ops System</p>
+      <p class="text-[10px] text-slate-500">Licensed Software Edition</p>
     </div>
   </aside>
 
@@ -145,9 +145,9 @@
         <div>
           <div class="flex items-center space-x-2">
             <h2 id="pageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Overview</h2>
-            <span class="text-[10px] sm:text-xs font-mono bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-semibold">Build 2026.08</span>
+            <span id="badgeStoreActive" class="text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold">TERAKTIVASI</span>
           </div>
-          <p id="pageSub" class="text-xs sm:text-sm text-slate-500 mt-0.5">Ringkasan status barang, analisis modal HPP, harga jual, dan valuasi aset</p>
+          <p id="pageSub" class="text-xs sm:text-sm text-slate-500 mt-0.5">Ringkasan status barang, lokasi rak, analisis HPP, dan valuasi aset</p>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
           <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center">
@@ -162,7 +162,7 @@
         </div>
       </header>
 
-      <!-- NOTIFICATION BANNERS -->
+      <!-- NOTIFICATION BANNERS (STOK & EXPIRED WARNING) -->
       <div id="alertContainer" class="mt-4 space-y-3 no-print"></div>
 
       <!-- VIEW 1: DASHBOARD -->
@@ -206,7 +206,7 @@
       <section id="view-products" class="tab-view mt-4 hidden space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <div class="w-full sm:w-80">
-            <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA BARANG, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
+            <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA, RAK, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
           </div>
           <div class="flex items-center space-x-2 w-full sm:w-auto">
             <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition w-full sm:w-auto">
@@ -216,12 +216,12 @@
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm min-w-[650px]">
+          <table class="w-full text-left border-collapse text-sm min-w-[750px]">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
-                <th class="p-3">SKU / BARCODE (KLIK EDIT)</th>
+                <th class="p-3">SKU / BARCODE (EDIT)</th>
                 <th class="p-3">NAMA BARANG</th>
-                <th class="p-3">KATEGORI & GUDANG</th>
+                <th class="p-3">KATEGORI & LOKASI RAK</th>
                 <th class="p-3 text-right">STOK FISIK</th>
                 <th class="p-3 text-right">HARGA BELI (HPP)</th>
                 <th class="p-3 text-right">HARGA JUAL</th>
@@ -236,10 +236,13 @@
 
       <!-- VIEW 3: MUTASI & BATCH -->
       <section id="view-mutasi" class="tab-view mt-4 hidden space-y-4">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-          <h4 class="font-bold text-slate-800 mb-3 text-sm">Riwayat Mutasi Stok & Tanggal Expired</h4>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-2 border-b pb-3">
+            <h4 class="font-bold text-slate-800 text-sm">Riwayat Mutasi Stok, Batch & Expiration Date</h4>
+            <input type="text" id="searchMutasi" onkeyup="renderMutasi()" placeholder="Cari barang, no batch, atau catatan..." class="p-1.5 border rounded text-xs w-full sm:w-64 uppercase-input">
+          </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm min-w-[600px]">
+            <table class="w-full text-left border-collapse text-sm min-w-[650px]">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
                   <th class="p-3">Waktu</th>
@@ -249,7 +252,7 @@
                   <th class="p-3">Exp. Date</th>
                   <th class="p-3 text-right">Jumlah</th>
                   <th class="p-3 text-right">Harga Unit</th>
-                  <th class="p-3">Petugas</th>
+                  <th class="p-3 text-center">Cetak Struk</th>
                 </tr>
               </thead>
               <tbody id="tableMutasiBody" class="divide-y divide-slate-100"></tbody>
@@ -285,7 +288,7 @@
             <table class="w-full text-left border-collapse text-sm min-w-[650px]">
               <thead>
                 <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold uppercase text-xs">
-                  <th class="p-3">SKU / BARCODE</th>
+                  <th class="p-3">SKU / RAK</th>
                   <th class="p-3">NAMA BARANG</th>
                   <th class="p-3">KATEGORI & GUDANG</th>
                   <th class="p-3 text-right">STOK SISTEM</th>
@@ -387,17 +390,17 @@
         </div>
       </section>
 
-      <!-- VIEW 7: PENGATURAN & PROFIL BISNIS -->
+      <!-- VIEW 7: PENGATURAN & LISENSI (PROTEKSI MANAJEMEN) -->
       <section id="view-settings" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
-            <h4 class="font-bold text-slate-900 text-lg">Profil Perusahaan / Owner</h4>
-            <p class="text-xs text-slate-500">Data ini akan otomatis muncul sebagai Kop Surat dan Identitas Resmi pada seluruh dokumen yang dicetak.</p>
+            <h4 class="font-bold text-slate-900 text-lg">Profil Perusahaan & Lisensi Toko Terikat</h4>
+            <p class="text-xs text-slate-500">Data profil ini terikat secara kriptografi dengan Serial Key Lisensi. Mengubah nama toko tanpa lisensi baru akan mengunci aplikasi.</p>
           </div>
           <form onsubmit="saveProfileConfig(event)" class="space-y-3 max-w-xl">
             <div>
-              <label class="block text-xs font-semibold mb-1">NAMA BISNIS / TOKO / PERUSAHAAN</label>
-              <input type="text" id="cfgStoreName" required placeholder="NAMA TOKO ABAN..." class="w-full p-2 border rounded text-sm uppercase-input">
+              <label class="block text-xs font-semibold mb-1">NAMA BISNIS / TOKO / PERUSAHAAN (LISENSI)</label>
+              <input type="text" id="cfgStoreName" required placeholder="NAMA TOKO KLIEN..." class="w-full p-2 border rounded text-sm uppercase-input font-bold text-indigo-900">
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1">ALAMAT LENGKAP</label>
@@ -420,6 +423,28 @@
           </form>
         </div>
 
+        <!-- KEY GENERATOR TOOL KHUSUS ABAH (ADMIN ONLY) -->
+        <div class="bg-slate-900 text-white p-5 sm:p-6 rounded-xl shadow-md space-y-4 admin-only border border-indigo-500/30">
+          <div class="flex items-center space-x-2 text-amber-300">
+            <i class="fa-solid fa-key text-lg"></i>
+            <h4 class="font-bold text-base uppercase tracking-wide">Alat Pembuat Serial Key (Khusus Abah / Developer)</h4>
+          </div>
+          <p class="text-xs text-slate-300">Gunakan alat ini untuk menghasilkan Serial Key resmi yang dijual ke klien berdasarkan Nama Toko mereka.</p>
+          <div class="space-y-2 max-w-xl bg-slate-800 p-4 rounded-lg border border-slate-700">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">MASUKKAN NAMA TOKO KLIEN:</label>
+              <input type="text" id="genStoreInput" placeholder="CONTOH: TOKO SEMBAKO ABAN" oninput="generateDevKey()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-sm text-white font-mono uppercase-input">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-amber-400 mb-1">SERIAL KEY HASIL GENERATE (BERIKAN KE KLIEN):</label>
+              <div class="flex space-x-2">
+                <input type="text" id="genResultKey" readonly class="w-full p-2 bg-slate-950 border border-amber-500/50 rounded text-sm text-amber-300 font-mono font-bold tracking-widest text-center" value="----">
+                <button onclick="copyGeneratedKey()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded">Salin</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
           <div>
             <h4 class="font-bold text-slate-900 text-lg">Cadangan & Pemulihan Manual (JSON)</h4>
@@ -440,7 +465,7 @@
     <!-- FOOTER RESMI ENTERPRISE BRANDING -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
       <div>
-        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v3.0.0</span>
+        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.0.0 Enterprise</span>
       </div>
       <div>
         Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
@@ -449,10 +474,41 @@
 
   </main>
 
-  <!-- AREA DOKUMEN CETAK RESMI A4 -->
-  <div id="printableDocArea" class="print-only p-8 bg-white font-sans text-black"></div>
+  <!-- AREA DOKUMEN CETAK RESMI A4 & STRUK THERMAL -->
+  <div id="printableDocArea" class="print-only p-4 bg-white font-sans text-black"></div>
 
-  <!-- MODAL: LOGIN USER (V3.0.0 FLEXIBLE MOBILE MODAL) -->
+  <!-- MODAL PROTEKSI: AKTIVASI SERIAL KEY LISENSI -->
+  <div id="modalActivation" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-[100] no-print hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-indigo-100">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-lg">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <h3 class="font-bold text-xl text-slate-900">AKTIVASI SERIAL LISENSI</h3>
+        <p class="text-xs text-slate-500">Aplikasi ini membutuhkan Serial Key terdaftar untuk dapat digunakan.</p>
+      </div>
+
+      <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs space-y-1">
+        <p class="text-slate-500">Terdaftar Atas Nama Toko:</p>
+        <p id="lblActStoreName" class="font-bold text-indigo-900 text-sm">-- BELUM TERDAFTAR --</p>
+      </div>
+
+      <form onsubmit="handleActivationSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1 text-slate-700">MASUKKAN SERIAL KEY ACTIVATOR</label>
+          <input type="text" id="inputSerialKey" required placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full p-3 border-2 border-indigo-300 rounded-xl text-center font-mono font-bold text-lg text-indigo-900 tracking-wider focus:ring-2 focus:ring-indigo-600 outline-none uppercase-input">
+        </div>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg transition flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-shield-check"></i>
+          <span>Aktivasi Lisensi Sekarang</span>
+        </button>
+      </form>
+
+      <p class="text-[11px] text-center text-slate-400">Hubungi Pengembang (Urai Ikhsan Fadhilah) untuk mendapatkan Kunci Lisensi Resmi.</p>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN USER -->
   <div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-4 z-50 no-print overflow-y-auto">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <div class="text-center space-y-1">
@@ -479,13 +535,13 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v3.0.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.0.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (V3.0.0 FLEXIBLE MOBILE MODAL) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -505,8 +561,8 @@
             <input type="text" id="barangKategori" required placeholder="BAHAN BAKU" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">GUDANG</label>
-            <input type="text" id="barangGudang" required placeholder="GUDANG UTAMA" class="w-full p-2 border rounded text-sm uppercase-input">
+            <label class="block text-xs font-semibold mb-1">GUDANG / LOKASI RAK</label>
+            <input type="text" id="barangGudang" required placeholder="RAK A-01" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -560,8 +616,8 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">NO. BATCH</label>
-            <input type="text" id="txBatchNo" placeholder="BATCH-001" class="w-full p-2 border rounded text-sm uppercase-input">
+            <label class="block text-xs font-semibold mb-1">NO. BATCH (KOSONG = AUTO)</label>
+            <input type="text" id="txBatchNo" placeholder="AUTO GENERATE" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">TANGGAL EXPIRED</label>
@@ -593,8 +649,10 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC (V4.0.0 PROTECTED & HYBRID BATCH EDITION) -->
   <script>
+    const SECRET_SALT = "NINNA_KARTUSTOK_SECRET_2026";
+
     const USER_DATABASE = [
       { username: 'admin', password: 'admin123', role: 'admin', name: 'ADMINISTRATOR' },
       { username: 'staf', password: 'staf123', role: 'staff', name: 'STAF GUDANG' }
@@ -603,17 +661,18 @@
     const DEFAULT_DATA = {
       currentUser: null,
       profile: {
-        storeName: 'NAMA PERUSAHAAN / TOKO',
+        storeName: 'TOKO GUDANG UTAMA',
         address: 'JL. MERDEKA NO. 123',
         city: 'PONTIANAK, KALIMANTAN BARAT',
-        phone: '0812-3456-7890'
+        phone: '0812-3456-7890',
+        licenseKey: ''
       },
       products: [
-        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'GUDANG UTAMA', minStock: 20, stock: 45, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'GUDANG UTAMA', minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', minStock: 20, stock: 45, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
-        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 45, unitCost: 14000, batchNo: 'BATCH-A1', expireDate: '2027-08-18', notes: 'SUPPLIER A', user: 'ADMIN' }
+        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 45, unitCost: 14000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'SUPPLIER A', user: 'ADMIN' }
       ],
       opname: [
         { id: 'ADJ-1', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
@@ -627,6 +686,68 @@
     if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
 
     let html5QrcodeScanner = null;
+
+    /* ALGORITMA KRIPTOGRAFI LISENSI SERIAL KEY */
+    function generateLicenseKey(storeName) {
+      const str = (storeName || '').toUpperCase().trim() + SECRET_SALT;
+      let h1 = 0, h2 = 0;
+      for (let i = 0; i < str.length; i++) {
+        let ch = str.charCodeAt(i);
+        h1 = ((h1 << 5) - h1) + ch; h1 |= 0;
+        h2 = ((h2 << 7) - h2) + ch; h2 |= 0;
+      }
+      const hex1 = Math.abs(h1).toString(16).toUpperCase().padStart(8, '9');
+      const hex2 = Math.abs(h2).toString(16).toUpperCase().padStart(8, '7');
+      const combined = (hex1 + hex2).slice(0, 16);
+      return `${combined.slice(0,4)}-${combined.slice(4,8)}-${combined.slice(8,12)}-${combined.slice(12,16)}`;
+    }
+
+    function verifyActivation() {
+      const store = appData.profile.storeName;
+      const expectedKey = generateLicenseKey(store);
+      const currentKey = (appData.profile.licenseKey || '').trim();
+
+      const modal = document.getElementById('modalActivation');
+      document.getElementById('lblActStoreName').innerText = (store || 'BELUM TERDAFTAR').toUpperCase();
+
+      if(currentKey === expectedKey && store.trim().length > 0) {
+        modal.classList.add('hidden');
+        document.getElementById('badgeStoreActive').innerText = "LISENSI VALID";
+        document.getElementById('badgeStoreActive').className = "text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold";
+        return true;
+      } else {
+        modal.classList.remove('hidden');
+        document.getElementById('badgeStoreActive').innerText = "TIDAK TERAKTIVASI";
+        document.getElementById('badgeStoreActive').className = "text-[10px] sm:text-xs font-mono bg-rose-100 text-rose-800 border border-rose-300 px-2 py-0.5 rounded font-bold";
+        return false;
+      }
+    }
+
+    function handleActivationSubmit(e) {
+      e.preventDefault();
+      const inputKey = document.getElementById('inputSerialKey').value.trim().toUpperCase();
+      const expectedKey = generateLicenseKey(appData.profile.storeName);
+
+      if(inputKey === expectedKey) {
+        appData.profile.licenseKey = inputKey;
+        saveData();
+        alert('LOKAL LISENSI BERHASIL DIAKTIVASI! Selamat Menggunakan.');
+      } else {
+        alert('SERIAL KEY INVALID! Pastikan Serial Key sesuai dengan Nama Toko.');
+      }
+    }
+
+    function generateDevKey() {
+      const val = document.getElementById('genStoreInput').value;
+      document.getElementById('genResultKey').value = generateLicenseKey(val);
+    }
+
+    function copyGeneratedKey() {
+      const keyInput = document.getElementById('genResultKey');
+      keyInput.select();
+      navigator.clipboard.writeText(keyInput.value);
+      alert('Serial Key disalin ke clipboard!');
+    }
 
     function toggleMobileMenu(forceState) {
       const nav = document.getElementById('mobileNav');
@@ -660,6 +781,9 @@
     }
 
     function checkAuthSession() {
+      const isActivated = verifyActivation();
+      if(!isActivated) return;
+
       const modal = document.getElementById('modalLogin');
       if(!appData.currentUser) {
         modal.classList.remove('hidden');
@@ -736,6 +860,7 @@
     }
 
     function renderAll() {
+      verifyActivation();
       renderAlerts();
       renderStats();
       renderProducts();
@@ -757,29 +882,52 @@
 
     function saveProfileConfig(e) {
       e.preventDefault();
-      appData.profile = {
-        storeName: document.getElementById('cfgStoreName').value.toUpperCase(),
-        address: document.getElementById('cfgAddress').value.toUpperCase(),
-        city: document.getElementById('cfgCity').value.toUpperCase(),
-        phone: document.getElementById('cfgPhone').value
-      };
+      const newStore = document.getElementById('cfgStoreName').value.toUpperCase().trim();
+      appData.profile.storeName = newStore;
+      appData.profile.address = document.getElementById('cfgAddress').value.toUpperCase();
+      appData.profile.city = document.getElementById('cfgCity').value.toUpperCase();
+      appData.profile.phone = document.getElementById('cfgPhone').value;
+      
       saveData();
       alert('Profil Usaha Berhasil Disimpan!');
     }
 
+    /* SISTEM ALERT STOK MINIMUM & EXPIRED BARANG (< 30 HARI) */
     function renderAlerts() {
       const container = document.getElementById('alertContainer');
       if(!container) return;
       container.innerHTML = '';
+      
       const lowStockItems = (appData.products || []).filter(p => p.stock <= p.minStock);
+      
+      const today = new Date();
+      const expItems = (appData.mutasi || []).filter(m => {
+        if(!m.expireDate || m.expireDate === '-') return false;
+        const expDate = new Date(m.expireDate);
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+        return diffDays > 0 && diffDays <= 30;
+      });
+
+      let alertHtml = '';
       if(lowStockItems.length > 0) {
-        container.innerHTML = `
+        alertHtml += `
           <div class="p-3 sm:p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg flex items-center justify-between text-amber-800 text-xs sm:text-sm">
             <div><strong>PERINGATAN STOK MENIPIS!</strong> Terdapat ${lowStockItems.length} barang di bawah batas minimum.</div>
             <button onclick="switchTab('products')" class="font-bold underline text-[10px] sm:text-xs uppercase ml-2 whitespace-nowrap">Lihat Barang</button>
           </div>
         `;
       }
+
+      if(expItems.length > 0) {
+        alertHtml += `
+          <div class="p-3 sm:p-4 bg-rose-50 border-l-4 border-rose-500 rounded-r-lg flex items-center justify-between text-rose-800 text-xs sm:text-sm">
+            <div><strong>PERINGATAN EXPIRED DATE!</strong> Terdapat ${expItems.length} batch barang mendekati kadaluarsa (&lt; 30 Hari).</div>
+            <button onclick="switchTab('mutasi')" class="font-bold underline text-[10px] sm:text-xs uppercase ml-2 whitespace-nowrap">Lihat Batch</button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = alertHtml;
     }
 
     function renderStats() {
@@ -804,6 +952,7 @@
       const filtered = (appData.products || []).filter(p => 
         (p.name || '').toUpperCase().includes(search) || 
         (p.sku || '').toUpperCase().includes(search) || 
+        (p.warehouse || '').toUpperCase().includes(search) ||
         (p.barcode && p.barcode.toUpperCase().includes(search))
       );
 
@@ -821,7 +970,7 @@
               <div onclick="clickEditProduct('${p.id}')" class="text-slate-400 text-[10px] cursor-pointer hover:underline" title="Klik Barcode untuk Edit">${p.barcode || '-'}</div>
             </td>
             <td class="p-3 font-semibold text-slate-800">${(p.name || '').toUpperCase()}</td>
-            <td class="p-3 text-xs font-sans text-slate-500">${(p.category || '').toUpperCase()} / ${(p.warehouse || '').toUpperCase()}</td>
+            <td class="p-3 text-xs font-sans text-slate-500">${(p.category || '').toUpperCase()} / <span class="font-semibold text-slate-700">${(p.warehouse || '').toUpperCase()}</span></td>
             <td class="p-3 text-right font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">
               ${p.stock} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
             </td>
@@ -903,9 +1052,16 @@
     function renderMutasi() {
       const tbody = document.getElementById('tableMutasiBody');
       if(!tbody) return;
+      const search = (document.getElementById('searchMutasi')?.value || '').toUpperCase();
       let html = '';
 
-      (appData.mutasi || []).slice().reverse().forEach(m => {
+      const filtered = (appData.mutasi || []).slice().reverse().filter(m => 
+        (m.name || '').toUpperCase().includes(search) || 
+        (m.batchNo || '').toUpperCase().includes(search) || 
+        (m.notes || '').toUpperCase().includes(search)
+      );
+
+      filtered.forEach(m => {
         const isIn = m.type === 'IN';
         html += `
           <tr class="hover:bg-slate-50">
@@ -916,18 +1072,56 @@
               </span>
             </td>
             <td class="p-3 font-semibold">${(m.name || '').toUpperCase()}</td>
-            <td class="p-3 text-xs font-mono">${(m.batchNo || '-').toUpperCase()}</td>
+            <td class="p-3 text-xs font-mono font-bold text-indigo-700">${(m.batchNo || '-').toUpperCase()}</td>
             <td class="p-3 text-xs text-slate-500">${m.expireDate || '-'}</td>
             <td class="p-3 text-right font-bold ${isIn ? 'text-emerald-600' : 'text-rose-600'}">
               ${isIn ? '+' : '-'}${m.qty || 0}
             </td>
             <td class="p-3 text-right text-xs font-mono">${m.unitCost ? 'Rp ' + Number(m.unitCost).toLocaleString('id-ID') : '-'}</td>
-            <td class="p-3 text-xs text-slate-500">${(m.user || 'System').toUpperCase()}</td>
+            <td class="p-3 text-center">
+              <button onclick="printThermalReceipt('${m.id}')" class="px-2 py-1 bg-slate-800 text-white rounded text-[10px] hover:bg-slate-700" title="Cetak Struk Kasir Thermal">
+                <i class="fa-solid fa-print mr-1"></i>Struk
+              </button>
+            </td>
           </tr>
         `;
       });
 
       tbody.innerHTML = html;
+    }
+
+    function printThermalReceipt(txId) {
+      const m = appData.mutasi.find(item => item.id === txId);
+      if(!m) return;
+      const area = document.getElementById('printableDocArea');
+      const prof = appData.profile || {};
+
+      area.innerHTML = `
+        <div style="width: 58mm; font-family: monospace; font-size: 11px; margin: 0 auto; text-align: center;">
+          <h2 style="font-weight: bold; font-size: 13px; text-transform: uppercase; margin:0;">${prof.storeName || 'NAMA TOKO'}</h2>
+          <p style="margin:2px 0;">${prof.address || ''}</p>
+          <p style="margin:2px 0;">TELP: ${prof.phone || '-'}</p>
+          <p style="margin: 5px 0;">--------------------------------</p>
+          <p style="text-align: left; margin:2px 0;">NO. BUKTI: ${m.id}</p>
+          <p style="text-align: left; margin:2px 0;">TANGGAL: ${m.date}</p>
+          <p style="text-align: left; margin:2px 0;">TIPE: ${m.type === 'IN' ? 'STOK MASUK' : 'STOK KELUAR'}</p>
+          <p style="margin: 5px 0;">--------------------------------</p>
+          <table style="width: 100%; text-align: left; font-size: 11px;">
+            <tr>
+              <td colspan="2" style="font-weight: bold;">${m.name.toUpperCase()}</td>
+            </tr>
+            <tr>
+              <td>${m.qty} x Rp ${Number(m.unitCost || 0).toLocaleString('id-ID')}</td>
+              <td style="text-align: right;">Rp ${Number((m.qty || 0) * (m.unitCost || 0)).toLocaleString('id-ID')}</td>
+            </tr>
+          </table>
+          <p style="margin: 5px 0;">--------------------------------</p>
+          <p style="text-align: left; margin:2px 0;">BATCH: ${m.batchNo}</p>
+          <p style="text-align: left; margin:2px 0;">CATATAN: ${m.notes}</p>
+          <p style="margin: 10px 0 0 0; font-size: 10px;">TERIMA KASIH</p>
+        </div>
+      `;
+      window.print();
     }
 
     function renderMassOpnameTable() {
@@ -938,9 +1132,9 @@
       (appData.products || []).forEach(p => {
         html += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono text-xs font-semibold">${p.sku || ''}</td>
+            <td class="p-3 font-mono text-xs font-semibold">${p.sku || ''}<br><span class="text-[10px] text-slate-400 font-sans">${p.warehouse || ''}</span></td>
             <td class="p-3 font-semibold text-slate-900">${(p.name || '').toUpperCase()}</td>
-            <td class="p-3 text-xs text-slate-500">${(p.category || '').toUpperCase()} - ${(p.warehouse || '').toUpperCase()}</td>
+            <td class="p-3 text-xs text-slate-500">${(p.category || '').toUpperCase()}</td>
             <td class="p-3 text-right font-bold text-slate-700 bg-slate-50 font-mono">${p.stock}</td>
             <td class="p-3 text-right">
               <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-24 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
@@ -1123,9 +1317,9 @@
             <thead>
               <tr class="bg-slate-100 border-b border-black font-bold uppercase">
                 <th class="p-2 border border-black text-center">NO</th>
-                <th class="p-2 border border-black">SKU</th>
+                <th class="p-2 border border-black">SKU / RAK</th>
                 <th class="p-2 border border-black">NAMA BARANG</th>
-                <th class="p-2 border border-black">KATEGORI & GUDANG</th>
+                <th class="p-2 border border-black">KATEGORI</th>
                 <th class="p-2 border border-black text-right">STOK SISTEM</th>
                 <th class="p-2 border border-black text-center w-28">HITUNG FISIK</th>
                 <th class="p-2 border border-black">CATATAN LAPANGAN</th>
@@ -1135,9 +1329,9 @@
               ${(appData.products || []).map((p, idx) => `
                 <tr>
                   <td class="p-2 border border-black text-center font-mono">${idx + 1}</td>
-                  <td class="p-2 border border-black font-mono">${p.sku}</td>
+                  <td class="p-2 border border-black font-mono">${p.sku} / ${p.warehouse}</td>
                   <td class="p-2 border border-black font-bold">${p.name.toUpperCase()}</td>
-                  <td class="p-2 border border-black">${p.category.toUpperCase()} / ${p.warehouse.toUpperCase()}</td>
+                  <td class="p-2 border border-black">${p.category.toUpperCase()}</td>
                   <td class="p-2 border border-black text-right font-mono font-bold">${p.stock}</td>
                   <td class="p-2 border border-black text-center">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td>
                   <td class="p-2 border border-black text-xs">________________________</td>
@@ -1270,6 +1464,14 @@
       window.print();
     }
 
+    /* OPSI NATIVE BATCH GENERATOR OTOMATIS (V4.0.0 HYBRID) */
+    function getAutoBatchNo() {
+      const d = new Date();
+      const yyyymmdd = d.getFullYear().toString() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      return `BTC-${yyyymmdd}-${rand}`;
+    }
+
     function handleTxSubmit(e) {
       e.preventDefault();
       const pId = document.getElementById('txProductId').value;
@@ -1294,6 +1496,11 @@
         product.stock -= qty;
       }
 
+      let batchVal = document.getElementById('txBatchNo').value.trim().toUpperCase();
+      if(!batchVal) {
+        batchVal = getAutoBatchNo();
+      }
+
       appData.mutasi.push({
         id: 'TX-' + Date.now().toString().slice(-5),
         date: new Date().toISOString().replace('T', ' ').slice(0, 16),
@@ -1302,7 +1509,7 @@
         name: product.name.toUpperCase(),
         qty: qty,
         unitCost: unitCost || product.avgHpp,
-        batchNo: (document.getElementById('txBatchNo').value || '-').toUpperCase(),
+        batchNo: batchVal,
         expireDate: document.getElementById('txExpireDate').value || '-',
         notes: (document.getElementById('txNotes').value || '-').toUpperCase(),
         user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
@@ -1434,7 +1641,7 @@
       let csvContent = "\uFEFF"; 
 
       if(type === 'products') {
-        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
         (appData.products || []).forEach(p => {
           const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
           csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.avgHpp};${p.sellPrice};${margin}\n`;
@@ -1445,7 +1652,7 @@
           csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
         });
       } else if(type === 'opname_template') {
-        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
         (appData.products || []).forEach(p => {
           csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.stock};0;""\n`;
         });
