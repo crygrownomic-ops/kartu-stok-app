@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v5.2.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -16,7 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @media print {
-      body > aside, body > main, #mobileTopBar, #modalLogin, #modalActivation, .no-print { display: none !important; }
+      body > aside, body > main > div > header, #mobileTopBar, #modalLogin, #modalActivation, #modalGenerator, .no-print { display: none !important; }
       #printableDocArea {
         display: block !important;
         position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0;
@@ -36,9 +36,10 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v5.0.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v5.2.0</span>
     </div>
     <div class="flex items-center space-x-2">
+      <button onclick="openKeyGeneratorPrompt()" class="px-2 py-1 bg-amber-500/20 border border-amber-400/40 text-amber-300 rounded text-[10px] font-bold">🔑 Gen Key</button>
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
       <button onclick="toggleMobileMenu()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg focus:outline-none">
         <i class="fa-solid fa-bars text-lg"></i>
@@ -62,17 +63,18 @@
       <button onclick="switchTab('opname')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Stok Opname Massal</button>
       <button onclick="switchTab('ledger')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Kartu Stok Ledger</button>
       <button onclick="switchTab('reports')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Laporan & Dokumen Fisik</button>
+      <button onclick="switchTab('promosi')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-bold text-amber-400 hover:bg-slate-800">🔥 Promosi & Penjualan</button>
       <button onclick="switchTab('settings')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Pengaturan Profil</button>
     </nav>
   </div>
 
   <!-- DESKTOP SIDEBAR -->
-  <aside class="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex-col justify-between no-print">
+  <aside id="mainSidebar" class="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex-col justify-between no-print">
     <div>
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v5.0.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v5.2.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -96,21 +98,31 @@
         <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Stok Opname Massal</button>
         <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Kartu Stok Ledger</button>
         <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Laporan & Dokumen Fisik</button>
+        <button onclick="switchTab('promosi')" id="nav-promosi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-bold transition text-amber-400 hover:bg-slate-800 hover:text-white flex items-center justify-between">
+          <span>🔥 Halaman Promosi</span>
+          <span class="bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.5 rounded font-mono">PUBLIC</span>
+        </button>
         <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">Pengaturan Profil</button>
       </nav>
     </div>
 
-    <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
-      <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
-      <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">FMCG Licensed Edition</p>
+    <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-2">
+      <button onclick="openKeyGeneratorPrompt()" class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold rounded-lg text-xs shadow transition flex items-center justify-center space-x-1.5">
+        <i class="fa-solid fa-key"></i>
+        <span>Generator Key Toko</span>
+      </button>
+      <div class="pt-1">
+        <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
+        <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
+        <p class="text-[10px] text-slate-500">FMCG Licensed Edition</p>
+      </div>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 min-w-0 p-4 md:p-8 flex flex-col justify-between">
     <div>
-      <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 sm:pb-6 border-b border-slate-200 gap-3 no-print">
+      <header id="mainHeader" class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 sm:pb-6 border-b border-slate-200 gap-3 no-print">
         <div>
           <div class="flex items-center space-x-2">
             <h2 id="pageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Overview</h2>
@@ -160,7 +172,7 @@
         </div>
       </section>
 
-      <!-- VIEW 2: DATA BARANG (PAGINASI 10 DATA TERUPDATE) -->
+      <!-- VIEW 2: DATA BARANG -->
       <section id="view-products" class="tab-view mt-4 hidden space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <div class="w-full sm:w-80">
@@ -306,7 +318,6 @@
             </div>
           </div>
 
-          <!-- OPSI FILTER OPNAME -->
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 mb-1">CARI BARANG / RAK</label>
@@ -348,7 +359,6 @@
           <div id="opnamePagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
 
-        <!-- RIWAYAT AUDIT STOK OPNAME TERAKHIR (PAGING 5 RIWAYAT TERUPDATE) -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-3">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b gap-2">
             <div>
@@ -378,7 +388,6 @@
             </table>
           </div>
 
-          <!-- CONTAINER PAGINATION AUDIT (MAX 5 BARIS PER HALAMAN) -->
           <div id="auditPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
       </section>
@@ -449,7 +458,131 @@
         </div>
       </section>
 
-      <!-- VIEW 8: PENGATURAN PROFIL -->
+      <!-- VIEW 8: LANDING PAGE PROMOSI & SALES (MODE GENERATOR / PROMOSI STANDALONE) -->
+      <section id="view-promosi" class="tab-view mt-4 hidden space-y-6">
+        <!-- HERO BANNER -->
+        <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden border border-indigo-800/50">
+          <div class="max-w-2xl space-y-3 relative z-10">
+            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full text-xs font-bold tracking-wider uppercase font-mono">SOLUSI MANAJEMEN GUDANG MODERN</span>
+            <h3 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">GUDANG RAPI, STOK AKURAT, BISNIS BEBAS RUGI!</h3>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+              Solusi praktis kelola stok gudang, audit selisih, dan cetak dokumen resmi untuk toko grosir, minimarket, distributor FMCG, hingga UMKM. <strong>Sekali bayar, tanpa biaya server bulanan!</strong>
+            </p>
+            <div class="pt-2 flex flex-wrap items-center gap-3">
+              <a href="https://wa.me/6282254127596?text=Halo%20Abah,%20saya%20tertarik%20dengan%20Aplikasi%20Kartu%20Stok%20Gudang%20Pro" target="_blank" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-xs sm:text-sm shadow-lg transition flex items-center space-x-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Hubungi Penjualan Via WhatsApp</span>
+              </a>
+              <button onclick="printPromoFlyer()" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-semibold border border-white/20 transition flex items-center space-x-2">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Poster Promo (A4)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- FITUR UNGGULAN GRID -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-lg mb-3">6 Alasan Mengapa Aplikasi Ini Pilihan Terbaik:</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-boxes-packing"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Konversi Dus ke Pcs</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Bebas input transaksi grosir (Dus/Karton) atau eceran (Pcs/Bungkus) dengan konversi otomatis tanpa perlu hitung manual.</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-clipboard-check"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Audit Selisih & Claims</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Catat selisih opname lengkap dengan fitur Tukar Guling Distributor, Retur Supplier, hingga Pemutihan Barang Rusak.</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-print"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Cetak Struk & Dokumen A4</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Dukungan cetak Struk Thermal 58mm kasir serta dokumen A4 standar usaha (Surat Jalan, Lembar Opname, & Valuasi HPP).</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-barcode"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Scan Barcode Kamera</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Cari dan filter barang secara cepat langsung menggunakan kamera HP/Tablet tanpa perlu membeli alat scanner fisik mahal.</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-key"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Sekali Bayar (Tanpa Sewa)</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Aplikasi menjadi hak milik selamanya dengan lisensi terikat nama toko. Bebas tagihan bulanan atau tahunan!</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+              <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center font-bold text-lg"><i class="fa-solid fa-bolt"></i></div>
+              <h5 class="font-bold text-slate-900 text-sm">Paginasi Cepat & Ringan</h5>
+              <p class="text-xs text-slate-500 leading-relaxed">Dioptimalkan dengan sistem paginasi otomatis 10 baris terupdate sehingga tetap super cepat walau mengelola ribuan SKU.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRICING PACKAGES -->
+        <div>
+          <h4 class="font-bold text-slate-900 text-lg mb-3">Pilihan Paket Hemat Usaha:</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl border-2 border-indigo-200 p-6 shadow-sm flex flex-col justify-between space-y-4">
+              <div>
+                <span class="px-2.5 py-1 bg-indigo-100 text-indigo-800 text-[10px] font-bold rounded-full uppercase tracking-wide">BEST SELLER</span>
+                <h5 class="font-extrabold text-slate-900 text-xl mt-2">PAKET SOFTWARE LISENSI</h5>
+                <p class="text-xs text-slate-500">Cocok untuk pemilik toko yang sudah memiliki komputer/laptop sendiri.</p>
+                <div class="my-4 pb-4 border-b">
+                  <span class="text-3xl font-extrabold text-slate-900">Rp 2.500.000</span>
+                  <span class="text-xs text-slate-400 font-semibold"> / Sekali Bayar</span>
+                </div>
+                <ul class="text-xs text-slate-600 space-y-2">
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Software Full Version v5.2.0 Enterprise</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Serial Key Activator Terikat Nama Toko</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Panduan Penggunaan & Garansi Setup</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-500 mr-2"></i> Bebas Biaya Langganan Bulanan</li>
+                </ul>
+              </div>
+              <a href="https://wa.me/6282254127596?text=Halo%20Abah,%20saya%20mau%20pesan%20Paket%20Software%20Lisensi%20Rp%202.500.000" target="_blank" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-center rounded-xl text-xs transition block">Pesan Paket Lisensi</a>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-6 text-white shadow-md flex flex-col justify-between space-y-4 border border-indigo-500/30">
+              <div>
+                <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold rounded-full uppercase tracking-wide">READY TO USE</span>
+                <h5 class="font-extrabold text-white text-xl mt-2">PAKET BUNDLE COMPLETE</h5>
+                <p class="text-xs text-slate-300">Solusi lengkap siap pakai langsung terhubung ke alat cetak & scanner.</p>
+                <div class="my-4 pb-4 border-b border-slate-700">
+                  <span class="text-3xl font-extrabold text-emerald-400">Rp 4.500.000</span>
+                  <span class="text-xs text-slate-400 font-semibold"> / Siap Pakai</span>
+                </div>
+                <ul class="text-xs text-slate-300 space-y-2">
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Semua Fitur Paket Software Lisensi</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-2"></i> 1x Printer Thermal 58mm Bluetooth/USB</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-2"></i> 1x Barcode Scanner Laser High-Speed</li>
+                  <li class="flex items-center"><i class="fa-solid fa-check text-emerald-400 mr-2"></i> Pemasangan & Pelatihan Karyawan Gudang</li>
+                </ul>
+              </div>
+              <a href="https://wa.me/6282254127596?text=Halo%20Abah,%20saya%20mau%20pesan%20Paket%20Bundle%20Complete%20Rp%204.500.000" target="_blank" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-center rounded-xl text-xs transition block">Pesan Paket Bundle Complete</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="space-y-1 text-center sm:text-left">
+            <h5 class="font-bold text-slate-900 text-base">Tertarik Coba Demo atau Konsultasi Gratis?</h5>
+            <p class="text-xs text-slate-500">Layanan pemasangan dan konsultasi siap melayani wilayah Pontianak & sekitarnya.</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="text-right text-xs">
+              <p class="font-bold text-slate-900"><i class="fa-solid fa-phone mr-1 text-indigo-600"></i>0822 5412 7596</p>
+              <p class="text-slate-500"><i class="fa-solid fa-location-dot mr-1 text-rose-500"></i>Pontianak, Kalimantan Barat</p>
+            </div>
+            <a href="https://wa.me/6282254127596" target="_blank" class="p-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow transition"><i class="fa-brands fa-whatsapp text-xl"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: PENGATURAN PROFIL -->
       <section id="view-settings" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
@@ -498,14 +631,47 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v5.0.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v5.2.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
 
   <div id="printableDocArea" class="print-only p-4 bg-white font-sans text-black"></div>
 
-  <!-- MODAL: AKTIVASI -->
+  <!-- MODAL: GENERATOR KEY LISENSI TERKUNCI PASSWORD (KHUSUS ABAH) -->
+  <div id="modalGenerator" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-[110] no-print hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 border border-amber-200">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-amber-500 text-slate-950 rounded-lg flex items-center justify-center font-bold"><i class="fa-solid fa-key"></i></div>
+          <h3 class="font-bold text-lg text-slate-900">GENERATOR KEY TOKO KLIEN</h3>
+        </div>
+        <button onclick="closeModal('modalGenerator')" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+      </div>
+
+      <p class="text-xs text-slate-500">Masukkan Nama Toko Klien untuk menghasilkan Serial Activation Key resmi.</p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">NAMA TOKO KLIEN (PERUSAHAAN)</label>
+          <input type="text" id="genClientStoreName" oninput="generateClientKeyRealtime()" placeholder="Contoh: TOKO BERKAH JAYA" class="w-full p-2.5 border rounded-lg text-sm font-bold uppercase-input focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">RESULT SERIAL ACTIVATION KEY</label>
+          <div class="relative">
+            <input type="text" id="genResultKey" readonly placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full p-3 border-2 border-amber-300 bg-amber-50 rounded-xl text-center font-mono font-bold text-base text-indigo-900 tracking-wider">
+            <button onclick="copyGeneratedKey()" class="mt-2 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-copy"></i>
+              <span>Salin Key Aktivasi</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AKTIVASI LISENSI -->
   <div id="modalActivation" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-[100] no-print hidden">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-indigo-100">
       <div class="text-center space-y-2">
@@ -553,7 +719,7 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v5.0.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v5.2.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
@@ -683,7 +849,6 @@
           </div>
         </div>
         
-        <!-- PRESET TIPE KETERANGAN CEPAT UNTUK CLAIMS & DISPOSAL -->
         <div>
           <label class="block text-xs font-semibold mb-1">PRESET ALASAN / TIPE TRANSAKSI</label>
           <select id="txPresetNotes" onchange="applyPresetNote(this.value)" class="w-full p-2 border rounded text-xs bg-slate-50 font-bold mb-1">
@@ -717,6 +882,7 @@
   <script>
     const SECRET_SALT = "NINNA_KARTUSTOK_SECRET_2026";
     const MASTER_KEY = "NINNA-MASTER-2026";
+    const GENERATOR_PASSWORD = "10111992Oke";
 
     const USER_DATABASE = [
       { username: 'admin', password: 'admin123', role: 'admin', name: 'ADMINISTRATOR' },
@@ -755,17 +921,68 @@
     if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
     if(!appData.units) appData.units = DEFAULT_DATA.units;
 
-    let productPage = 1; // PAGINASI MASTER DATA BARANG (10 PER HALAMAN)
+    let productPage = 1; 
     let mutasiPage = 1;
     let ledgerPage = 1;
     let opnamePage = 1;
-    let auditPage = 1; // PAGING AUDIT OPNAME (5 PER HALAMAN)
+    let auditPage = 1;
+    let isPublicPromoMode = false;
     
     const PAGE_SIZE = 10;
     const AUDIT_PAGE_SIZE = 5;
     
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
+
+    function checkPromoRouteMode() {
+      const hash = window.location.hash.toLowerCase();
+      const path = window.location.pathname.toLowerCase();
+      const search = new URLSearchParams(window.location.search).get('page');
+
+      if(hash === '#promosi' || path.endsWith('/promosi') || search === 'promosi') {
+        isPublicPromoMode = true;
+        document.getElementById('mainSidebar').classList.add('hidden');
+        document.getElementById('mobileTopBar').classList.add('hidden');
+        document.getElementById('mainHeader').classList.add('hidden');
+        document.getElementById('modalLogin').classList.add('hidden');
+        document.getElementById('modalActivation').classList.add('hidden');
+
+        switchTab('promosi');
+        return true;
+      }
+      return false;
+    }
+
+    function openKeyGeneratorPrompt() {
+      const pass = prompt('Masukkan Password Akses Generator (Khusus Developer/Abah):');
+      if(pass === GENERATOR_PASSWORD) {
+        document.getElementById('modalGenerator').classList.remove('hidden');
+        document.getElementById('genClientStoreName').value = '';
+        document.getElementById('genResultKey').value = '';
+      } else if(pass !== null) {
+        alert('Akses Ditolak! Password Generator Salah.');
+      }
+    }
+
+    function generateClientKeyRealtime() {
+      const store = document.getElementById('genClientStoreName').value.toUpperCase().trim();
+      if(store) {
+        document.getElementById('genResultKey').value = generateLicenseKey(store);
+      } else {
+        document.getElementById('genResultKey').value = '';
+      }
+    }
+
+    function copyGeneratedKey() {
+      const keyInput = document.getElementById('genResultKey');
+      if(keyInput.value) {
+        keyInput.select();
+        navigator.clipboard.writeText(keyInput.value);
+        alert('Key Aktivasi berhasil disalin ke clipboard!');
+      } else {
+        alert('Masukkan Nama Toko terlebih dahulu!');
+      }
+    }
 
     function generateLicenseKey(storeName) {
       const str = (storeName || '').toUpperCase().trim() + SECRET_SALT;
@@ -782,6 +999,8 @@
     }
 
     function verifyActivation() {
+      if(isPublicPromoMode) return true;
+
       const store = appData.profile.storeName;
       const expectedKey = generateLicenseKey(store);
       const currentKey = (appData.profile.licenseKey || '').trim();
@@ -848,6 +1067,8 @@
     }
 
     function checkAuthSession() {
+      if(checkPromoRouteMode()) return;
+
       const isActivated = verifyActivation();
       if(!isActivated) return;
 
@@ -930,6 +1151,7 @@
     }
 
     function renderAll() {
+      if(checkPromoRouteMode()) return;
       verifyActivation();
       renderAlerts();
       renderStats();
@@ -1101,18 +1323,16 @@
       const totalHppValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.avgHpp || 0)), 0);
       document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
 
-      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0), 0));
+      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0)), 0);
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
-    /* RENDER MASTER DATA BARANG DENGAN PAGINASI 10 BARANG TERUPDATE PER HALAMAN */
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
       const pagEl = document.getElementById('productPagination');
       if(!tbody) return;
       const search = (document.getElementById('searchProduct')?.value || '').toUpperCase();
 
-      // Urutkan data terbaru paling atas (slice & reverse)
       const filtered = (appData.products || []).slice().reverse().filter(p => 
         (p.name || '').toUpperCase().includes(search) || 
         (p.sku || '').toUpperCase().includes(search) || 
@@ -1290,7 +1510,7 @@
         }
       }
 
-      productPage = 1; // RESET KE HALAMAN DENGAN INPUT BARANG TERBARU
+      productPage = 1;
       closeModal('modalBarang');
       saveData();
       alert('Data barang berhasil disimpan!');
@@ -1586,7 +1806,6 @@
       }
     }
 
-    /* RENDER TABEL AUDIT DENGAN PAGINASI 5 DATA TERUPDATE */
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
       const pagEl = document.getElementById('auditPagination');
@@ -1648,25 +1867,52 @@
       renderOpnameAuditTable();
     }
 
-    function openClaimsModal(pId, txType, presetNote) {
-      if(!pId) return alert('Data barang tidak ditemukan!');
-      openModal(txType === 'IN' ? 'stokMasuk' : 'stokKeluar');
-      document.getElementById('txProductId').value = pId;
-      updateTxUnitDropdown();
-      applyPresetNote(presetNote);
-    }
+    function printPromoFlyer() {
+      const area = document.getElementById('printableDocArea');
+      area.innerHTML = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 3px solid #1e1b4b; border-radius: 12px; max-width: 800px; margin: 0 auto;">
+          <div style="text-align: center; border-bottom: 2px solid #1e1b4b; padding-bottom: 15px; margin-bottom: 20px;">
+            <h1 style="font-size: 24px; font-weight: 900; color: #1e1b4b; margin: 0;">GUDANG RAPI, STOK AKURAT, BISNIS BEBAS RUGI!</h1>
+            <p style="font-size: 14px; font-weight: bold; color: #4f46e5; margin: 5px 0 0 0;">Aplikasi Kartu Stok Gudang Pro v5.2 (FMCG Enterprise Edition)</p>
+            <p style="font-size: 12px; color: #64748b; margin-top: 2px;">Solusi Praktis Kelola Stok Gudang & Audit Selisih Tanpa Biaya Server Bulanan!</p>
+          </div>
 
-    function applyPresetNote(noteVal) {
-      if(noteVal) {
-        document.getElementById('txNotes').value = noteVal;
-      }
-    }
+          <h3 style="font-size: 14px; font-weight: bold; color: #1e1b4b; margin-bottom: 10px;">FITUR UNGGULAN APLIKASI:</h3>
+          <ul style="font-size: 12px; line-height: 1.8; color: #334155; margin-bottom: 20px;">
+            <li><strong>Konversi Otomatis Dus ke Pcs:</strong> Input transaksi grosir atau eceran secara instan tanpa hitung manual.</li>
+            <li><strong>Audit Selisih & Claims:</strong> Catat stok opname, Tukar Guling Distributor, Retur Supplier, hingga Pemutihan Barang.</li>
+            <li><strong>Cetak Dokumen Fisik Lengkap:</strong> Cetak Struk Thermal 58mm kasir & Dokumen A4 (Surat Jalan, Hitung Opname, Valuasi HPP).</li>
+            <li><strong>Scan Barcode Kamera HP:</strong> Cari & input transaksi langsung pakai kamera smartphone/tablet tanpa scanner mahal.</li>
+            <li><strong>Sekali Bayar (Hak Milik Selamanya):</strong> Tanpa sewa bulanan, lisensi terikat resmi atas nama toko Anda.</li>
+          </ul>
 
-    function quickReAdjustProduct(productName) {
-      document.getElementById('filterOpnameSearch').value = productName.toUpperCase();
-      opnamePage = 1;
-      renderMassOpnameTable();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+          <h3 style="font-size: 14px; font-weight: bold; color: #1e1b4b; margin-bottom: 10px;">PILIHAN PAKET HEMAT USAHA:</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 25px;">
+            <tr style="background-color: #f1f5f9;">
+              <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Nama Paket</th>
+              <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Kelengkapan Paket</th>
+              <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: right;">Harga Promo</th>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">Paket Software Lisensi</td>
+              <td style="border: 1px solid #cbd5e1; padding: 8px;">Software Full Version + Serial Key Toko + Garansi Setup</td>
+              <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right; font-weight: bold; color: #4f46e5;">Rp 2.500.000</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #cbd5e1; padding: 8px; font-weight: bold;">Paket Bundle Complete</td>
+              <td style="border: 1px solid #cbd5e1; padding: 8px;">Software Lisensi + Printer Thermal 58mm + Barcode Scanner</td>
+              <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right; font-weight: bold; color: #059669;">Rp 4.500.000</td>
+            </tr>
+          </table>
+
+          <div style="text-align: center; background-color: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1;">
+            <h4 style="font-size: 14px; font-weight: bold; margin: 0 0 5px 0;">HUBUNGI KAMI UNTUK DEMO & KONSULTASI GRATIS:</h4>
+            <p style="font-size: 16px; font-weight: font-bold; color: #059669; margin: 0;">WhatsApp / Telepon: 0822 5412 7596</p>
+            <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Layanan Pemasangan: Pontianak, Kalimantan Barat</p>
+          </div>
+        </div>
+      `;
+      window.print();
     }
 
     function printOpnameAuditHistory() {
