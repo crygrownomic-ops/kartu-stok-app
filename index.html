@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.0.1 Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.3.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -15,29 +15,15 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ISOLASI TOTAL MEDIA PRINT A4 & STRUK THERMAL */
     @media print {
-      body > aside, body > main, #mobileTopBar, #modalLogin, #modalActivation, .no-print {
-        display: none !important;
-      }
+      body > aside, body > main, #mobileTopBar, #modalLogin, #modalActivation, .no-print { display: none !important; }
       #printableDocArea {
         display: block !important;
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background: #ffffff !important;
-        color: #000000 !important;
+        position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0;
+        background: #ffffff !important; color: #000000 !important;
       }
-      #printableDocArea * {
-        visibility: visible !important;
-      }
-      @page {
-        size: auto;
-        margin: 5mm;
-      }
+      #printableDocArea * { visibility: visible !important; }
+      @page { size: auto; margin: 5mm; }
     }
     .print-only { display: none; }
     .uppercase-input { text-transform: uppercase; }
@@ -45,12 +31,12 @@
 </head>
 <body class="min-h-full text-slate-800 antialiased flex flex-col md:flex-row overflow-x-hidden">
 
-  <!-- TOP BAR KHUSUS MOBILE (< md) -->
+  <!-- TOP BAR MOBILE -->
   <header id="mobileTopBar" class="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between no-print z-40 sticky top-0 shadow-md">
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.0.1</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.3.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -60,7 +46,7 @@
     </div>
   </header>
 
-  <!-- MENU DROPDOWN MOBILE NAV (< md) -->
+  <!-- MOBILE NAV -->
   <div id="mobileNav" class="md:hidden hidden bg-slate-900 text-slate-300 border-b border-slate-800 p-4 space-y-2 no-print z-30">
     <div class="flex items-center justify-between pb-2 border-b border-slate-800 text-xs">
       <span class="text-slate-400">Pengguna: <strong id="lblMobileNavUser" class="text-amber-300">ADMINISTRATOR</strong></span>
@@ -75,72 +61,53 @@
       <button onclick="switchTab('opname')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Stok Opname Massal</button>
       <button onclick="switchTab('ledger')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Kartu Stok Ledger</button>
       <button onclick="switchTab('reports')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Laporan & Dokumen Fisik</button>
-      <button onclick="switchTab('settings')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Pengaturan & Aktivasi Lisensi</button>
+      <button onclick="switchTab('settings')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Pengaturan Profil</button>
     </nav>
   </div>
 
-  <!-- SIDEBAR NAVIGATION DESKTOP (>= md) -->
+  <!-- DESKTOP SIDEBAR -->
   <aside class="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex-col justify-between no-print">
     <div>
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.0.1</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.3.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
 
-      <!-- ACTIVE USER STATUS & LOGOUT -->
       <div class="px-5 py-3 bg-slate-800/80 flex items-center justify-between border-b border-slate-800 text-xs">
         <div>
           <p class="text-[10px] text-slate-400">Pengguna Aktif:</p>
           <p id="lblActiveUser" class="font-bold text-amber-300">ADMINISTRATOR</p>
         </div>
-        <button onclick="handleLogout()" class="px-2 py-1 bg-rose-600/30 text-rose-300 hover:bg-rose-600 hover:text-white rounded transition text-[11px] font-semibold flex items-center space-x-1" title="Keluar Akun">
+        <button onclick="handleLogout()" class="px-2 py-1 bg-rose-600/30 text-rose-300 hover:bg-rose-600 hover:text-white rounded transition text-[11px] font-semibold flex items-center space-x-1">
           <i class="fa-solid fa-right-from-bracket"></i>
           <span>Keluar</span>
         </button>
       </div>
 
-      <!-- MENU ITEMS -->
       <nav class="p-4 space-y-1 text-sm">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">
-          Dashboard Overview
-        </button>
-        <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Master Data Barang
-        </button>
-        <button onclick="switchTab('mutasi')" id="nav-mutasi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Riwayat Mutasi & Batch
-        </button>
-        <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Stok Opname Massal
-        </button>
-        <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Kartu Stok Ledger
-        </button>
-        <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">
-          Laporan & Dokumen Fisik
-        </button>
-        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">
-          Pengaturan & Lisensi
-        </button>
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">Dashboard Overview</button>
+        <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Master Data Barang</button>
+        <button onclick="switchTab('mutasi')" id="nav-mutasi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Riwayat Mutasi & Batch</button>
+        <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Stok Opname Massal</button>
+        <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Kartu Stok Ledger</button>
+        <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Laporan & Dokumen Fisik</button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">Pengaturan Profil</button>
       </nav>
     </div>
 
-    <!-- BRANDING DEVELOPER SIDEBAR -->
     <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
       <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
       <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">Licensed Software Edition</p>
+      <p class="text-[10px] text-slate-500">FMCG Licensed Edition</p>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT AREA -->
+  <!-- MAIN CONTENT -->
   <main class="flex-1 min-w-0 p-4 md:p-8 flex flex-col justify-between">
-    
     <div>
-      <!-- TOP HEADER -->
       <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 sm:pb-6 border-b border-slate-200 gap-3 no-print">
         <div>
           <div class="flex items-center space-x-2">
@@ -150,19 +117,12 @@
           <p id="pageSub" class="text-xs sm:text-sm text-slate-500 mt-0.5">Ringkasan status barang, lokasi rak, analisis HPP, dan valuasi aset</p>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center">
-            Scan Barcode
-          </button>
-          <button onclick="openModal('stokMasuk')" class="flex-1 sm:flex-initial px-3 py-2 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition text-center">
-            + Stok Masuk
-          </button>
-          <button onclick="openModal('stokKeluar')" class="flex-1 sm:flex-initial px-3 py-2 bg-rose-700 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition text-center">
-            - Stok Keluar
-          </button>
+          <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center">Scan Barcode</button>
+          <button onclick="openModal('stokMasuk')" class="flex-1 sm:flex-initial px-3 py-2 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition text-center">+ Stok Masuk</button>
+          <button onclick="openModal('stokKeluar')" class="flex-1 sm:flex-initial px-3 py-2 bg-rose-700 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition text-center">- Stok Keluar</button>
         </div>
       </header>
 
-      <!-- NOTIFICATION BANNERS (STOK & EXPIRED WARNING) -->
       <div id="alertContainer" class="mt-4 space-y-3 no-print"></div>
 
       <!-- VIEW 1: DASHBOARD -->
@@ -189,15 +149,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
             <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Sebaran Stok Per Kategori</h4>
-            <div class="relative h-56 sm:h-64 w-full">
-              <canvas id="chartCategory"></canvas>
-            </div>
+            <div class="relative h-56 sm:h-64 w-full"><canvas id="chartCategory"></canvas></div>
           </div>
           <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
             <h4 class="font-bold text-slate-800 mb-4 text-xs uppercase tracking-wider">Tren Mutasi Stok</h4>
-            <div class="relative h-56 sm:h-64 w-full">
-              <canvas id="chartMutasi"></canvas>
-            </div>
+            <div class="relative h-56 sm:h-64 w-full"><canvas id="chartMutasi"></canvas></div>
           </div>
         </div>
       </section>
@@ -216,12 +172,13 @@
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm min-w-[750px]">
+          <table class="w-full text-left border-collapse text-sm min-w-[800px]">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
                 <th class="p-3">SKU / BARCODE (EDIT)</th>
                 <th class="p-3">NAMA BARANG</th>
                 <th class="p-3">KATEGORI & LOKASI RAK</th>
+                <th class="p-3 text-center">SATUAN DEFAULT SKU</th>
                 <th class="p-3 text-right">STOK FISIK</th>
                 <th class="p-3 text-right">HARGA BELI (HPP)</th>
                 <th class="p-3 text-right">HARGA JUAL</th>
@@ -242,7 +199,7 @@
             <input type="text" id="searchMutasi" onkeyup="renderMutasi()" placeholder="Cari barang, no batch, atau catatan..." class="p-1.5 border rounded text-xs w-full sm:w-64 uppercase-input">
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm min-w-[650px]">
+            <table class="w-full text-left border-collapse text-sm min-w-[700px]">
               <thead>
                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
                   <th class="p-3">Waktu</th>
@@ -250,7 +207,7 @@
                   <th class="p-3">Barang</th>
                   <th class="p-3">No. Batch</th>
                   <th class="p-3">Exp. Date</th>
-                  <th class="p-3 text-right">Jumlah</th>
+                  <th class="p-3 text-right">Jumlah Transaksi</th>
                   <th class="p-3 text-right">Harga Unit</th>
                   <th class="p-3 text-center">Cetak Struk</th>
                 </tr>
@@ -267,20 +224,12 @@
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
             <div>
               <h4 class="font-bold text-slate-900 text-base sm:text-lg">Lembar Hitung Stok Opname Fisik</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Masukkan hasil hitungan fisik lapangan.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Masukkan hasil hitungan fisik lapangan (dalam Satuan Terkecil / Eceran).</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-              <button onclick="exportCSV('opname_template')" class="flex-1 sm:flex-none px-3 py-2 bg-emerald-700 text-white rounded text-xs font-medium">
-                Template (.csv)
-              </button>
-              <button onclick="printOpnameAuditSheet()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center justify-center space-x-1">
-                <i class="fa-solid fa-print"></i>
-                <span>Cetak Fisik</span>
-              </button>
-              <button onclick="saveBulkOpname()" class="w-full sm:w-auto px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center justify-center space-x-1 hover:bg-indigo-500 admin-only">
-                <i class="fa-solid fa-floppy-disk"></i>
-                <span>Simpan All Adjustment</span>
-              </button>
+              <button onclick="exportCSV('opname_template')" class="flex-1 sm:flex-none px-3 py-2 bg-emerald-700 text-white rounded text-xs font-medium">Template (.csv)</button>
+              <button onclick="printOpnameAuditSheet()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-800 text-white rounded text-xs font-medium flex items-center justify-center space-x-1"><i class="fa-solid fa-print"></i><span>Cetak Fisik</span></button>
+              <button onclick="saveBulkOpname()" class="w-full sm:w-auto px-3 py-2 bg-indigo-600 text-white rounded text-xs font-medium flex items-center justify-center space-x-1 hover:bg-indigo-500 admin-only"><i class="fa-solid fa-floppy-disk"></i><span>Simpan All Adjustment</span></button>
             </div>
           </div>
 
@@ -330,10 +279,7 @@
               <label class="block text-xs font-semibold mb-1">Pilih Barang Ledger</label>
               <select id="ledgerProductSelect" onchange="renderLedger()" class="w-full p-2 border rounded text-sm bg-white uppercase-input"></select>
             </div>
-            <button onclick="printLedgerDoc()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2">
-              <i class="fa-solid fa-print"></i>
-              <span>Cetak Kartu Stok</span>
-            </button>
+            <button onclick="printLedgerDoc()" class="px-4 py-2 bg-slate-800 text-white rounded text-sm font-medium self-end flex items-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Kartu Stok</span></button>
           </div>
 
           <div id="ledgerPrintArea" class="border rounded-lg p-4 sm:p-5 bg-white overflow-x-auto">
@@ -373,24 +319,15 @@
             <h4 class="font-bold text-slate-900 text-base">Cetak Template Dokumen Resmi Fisik A4</h4>
             <p class="text-xs text-slate-500">Cetak dokumen fisik berformat standar perusahaan untuk operasional gudang dan bukti arsip.</p>
             <div class="space-y-2 pt-2">
-              <button onclick="printSuratJalan()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-print"></i>
-                <span>Cetak Template Surat Jalan / Serah Terima</span>
-              </button>
-              <button onclick="printOpnameAuditSheet()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-print"></i>
-                <span>Cetak Lembar Hitung Stok Opname Fisik</span>
-              </button>
-              <button onclick="printLaporanRekapitulasi()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-print"></i>
-                <span>Cetak Laporan Rekapitulasi & Valuasi Aset</span>
-              </button>
+              <button onclick="printSuratJalan()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Template Surat Jalan / Serah Terima</span></button>
+              <button onclick="printOpnameAuditSheet()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Lembar Hitung Stok Opname Fisik</span></button>
+              <button onclick="printLaporanRekapitulasi()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium hover:bg-slate-700 flex items-center justify-center space-x-2"><i class="fa-solid fa-print"></i><span>Cetak Laporan Rekapitulasi & Valuasi Aset</span></button>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- VIEW 7: PENGATURAN & LISENSI (PROTEKSI MANAJEMEN) -->
+      <!-- VIEW 7: PENGATURAN PROFIL -->
       <section id="view-settings" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
@@ -416,33 +353,8 @@
                 <input type="text" id="cfgPhone" required placeholder="0812-3456-7890" class="w-full p-2 border rounded text-sm">
               </div>
             </div>
-            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500 flex items-center space-x-2">
-              <i class="fa-solid fa-floppy-disk"></i>
-              <span>Simpan Profil Usaha</span>
-            </button>
+            <button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded text-sm font-medium hover:bg-emerald-500 flex items-center space-x-2"><i class="fa-solid fa-floppy-disk"></i><span>Simpan Profil Usaha</span></button>
           </form>
-        </div>
-
-        <!-- KEY GENERATOR TOOL KHUSUS ABAH (ADMIN ONLY) -->
-        <div class="bg-slate-900 text-white p-5 sm:p-6 rounded-xl shadow-md space-y-4 admin-only border border-indigo-500/30">
-          <div class="flex items-center space-x-2 text-amber-300">
-            <i class="fa-solid fa-key text-lg"></i>
-            <h4 class="font-bold text-base uppercase tracking-wide">Alat Pembuat Serial Key (Khusus Abah / Developer)</h4>
-          </div>
-          <p class="text-xs text-slate-300">Gunakan alat ini untuk menghasilkan Serial Key resmi yang dijual ke klien berdasarkan Nama Toko mereka.</p>
-          <div class="space-y-2 max-w-xl bg-slate-800 p-4 rounded-lg border border-slate-700">
-            <div>
-              <label class="block text-[11px] font-semibold text-slate-300 mb-1">MASUKKAN NAMA TOKO KLIEN:</label>
-              <input type="text" id="genStoreInput" placeholder="CONTOH: TOKO SEMBAKO ABAN" oninput="generateDevKey()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-sm text-white font-mono uppercase-input">
-            </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-amber-400 mb-1">SERIAL KEY HASIL GENERATE (BERIKAN KE KLIEN):</label>
-              <div class="flex space-x-2">
-                <input type="text" id="genResultKey" readonly class="w-full p-2 bg-slate-950 border border-amber-500/50 rounded text-sm text-amber-300 font-mono font-bold tracking-widest text-center" value="----">
-                <button onclick="copyGeneratedKey()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded">Salin</button>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-6">
@@ -462,28 +374,20 @@
       </section>
     </div>
 
-    <!-- FOOTER RESMI ENTERPRISE BRANDING -->
+    <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>
-        Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.0.1 Enterprise</span>
-      </div>
-      <div>
-        Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026
-      </div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.3.0 Enterprise</span></div>
+      <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
-
   </main>
 
-  <!-- AREA DOKUMEN CETAK RESMI A4 & STRUK THERMAL -->
   <div id="printableDocArea" class="print-only p-4 bg-white font-sans text-black"></div>
 
-  <!-- MODAL PROTEKSI: AKTIVASI SERIAL KEY LISENSI -->
+  <!-- MODAL: AKTIVASI -->
   <div id="modalActivation" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-[100] no-print hidden">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 border border-indigo-100">
       <div class="text-center space-y-2">
-        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-lg">
-          <i class="fa-solid fa-key"></i>
-        </div>
+        <div class="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-lg"><i class="fa-solid fa-key"></i></div>
         <h3 class="font-bold text-xl text-slate-900">AKTIVASI SERIAL LISENSI</h3>
         <p class="text-xs text-slate-500">Aplikasi ini membutuhkan Serial Key terdaftar untuk dapat digunakan.</p>
       </div>
@@ -498,23 +402,17 @@
           <label class="block text-xs font-semibold mb-1 text-slate-700">MASUKKAN SERIAL KEY ACTIVATOR</label>
           <input type="text" id="inputSerialKey" required placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full p-3 border-2 border-indigo-300 rounded-xl text-center font-mono font-bold text-lg text-indigo-900 tracking-wider focus:ring-2 focus:ring-indigo-600 outline-none uppercase-input">
         </div>
-        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg transition flex items-center justify-center space-x-2">
-          <i class="fa-solid fa-shield-check"></i>
-          <span>Aktivasi Lisensi Sekarang</span>
-        </button>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm shadow-lg transition flex items-center justify-center space-x-2"><i class="fa-solid fa-shield-check"></i><span>Aktivasi Lisensi Sekarang</span></button>
       </form>
-
-      <p class="text-[11px] text-center text-slate-400">Hubungi Pengembang (Urai Ikhsan Fadhilah) untuk mendapatkan Kunci Lisensi Resmi.</p>
+      <p class="text-[11px] text-center text-slate-400">Hubungi Developer (Urai Ikhsan Fadhilah) untuk mendapatkan Kunci Lisensi Resmi.</p>
     </div>
   </div>
 
-  <!-- MODAL: LOGIN USER -->
+  <!-- MODAL: LOGIN -->
   <div id="modalLogin" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-4 z-50 no-print overflow-y-auto">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <div class="text-center space-y-1">
-        <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center mx-auto text-xl shadow-md">
-          <i class="fa-solid fa-lock"></i>
-        </div>
+        <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center mx-auto text-xl shadow-md"><i class="fa-solid fa-lock"></i></div>
         <h3 class="font-bold text-xl text-slate-900 pt-1">MASUK SISTEM GUDANG</h3>
         <p class="text-xs text-slate-500">Masukkan Username & Password Akun Anda</p>
       </div>
@@ -528,14 +426,12 @@
           <label class="block text-xs font-semibold mb-1 text-slate-700">PASSWORD</label>
           <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
-        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-sm shadow-md transition">
-          Masuk Akun
-        </button>
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-sm shadow-md transition">Masuk Akun</button>
       </form>
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.0.1</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.3.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
@@ -558,26 +454,45 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-xs font-semibold mb-1">KATEGORI</label>
-            <input type="text" id="barangKategori" required placeholder="BAHAN BAKU" class="w-full p-2 border rounded text-sm uppercase-input">
+            <input type="text" id="barangKategori" required placeholder="SEMBAKO" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">GUDANG / LOKASI RAK</label>
             <input type="text" id="barangGudang" required placeholder="RAK A-01" class="w-full p-2 border rounded text-sm uppercase-input">
           </div>
         </div>
+
+        <div class="bg-indigo-50/70 border border-indigo-200 p-3 rounded-lg space-y-2">
+          <p class="text-[11px] font-bold text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-boxes-packing mr-1"></i> Satuan Default SKU</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN ECERAN (TERKECIL)</label>
+              <input type="text" id="barangSatuan" required placeholder="PCS / BUNGKUS / BOTOL" class="w-full p-1.5 border rounded text-xs uppercase-input bg-white">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN GROSIR (DUS/GROSS)</label>
+              <input type="text" id="barangSatuanBesar" placeholder="KARTON / DUS / PACK" class="w-full p-1.5 border rounded text-xs uppercase-input bg-white">
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">ISI DEFAULT PER DUS (KONVERSI SKU)</label>
+            <input type="number" id="barangRasio" required value="1" min="1" placeholder="Contoh: Indomie = 40, Aqua = 24" class="w-full p-1.5 border rounded text-xs bg-white font-mono font-bold">
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">HARGA BELI MODAL (HPP)</label>
+            <label class="block text-xs font-semibold mb-1">HARGA BELI MODAL HPP (ECERAN)</label>
             <input type="text" id="barangCostPrice" required placeholder="14.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-bold font-mono">
           </div>
           <div>
-            <label class="block text-xs font-semibold mb-1">HARGA JUAL</label>
+            <label class="block text-xs font-semibold mb-1">HARGA JUAL (ECERAN)</label>
             <input type="text" id="barangSellPrice" required placeholder="18.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-bold font-mono text-emerald-700">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">BATAS MIN. STOK</label>
+            <label class="block text-xs font-semibold mb-1">BATAS MIN. STOK (ECERAN)</label>
             <input type="number" id="barangMinStock" required value="10" class="w-full p-2 border rounded text-sm">
           </div>
           <div>
@@ -587,16 +502,13 @@
         </div>
         <div class="flex justify-end space-x-2 pt-3">
           <button type="button" onclick="closeModal('modalBarang')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm font-medium">Batal</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-medium flex items-center space-x-1">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Simpan Data Barang</span>
-          </button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded text-sm font-medium flex items-center space-x-1"><i class="fa-solid fa-floppy-disk"></i><span>Simpan Data Barang</span></button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR -->
+  <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR (WITH MANUAL FMCG OVERRIDE) -->
   <div id="modalTx" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalTxTitle" class="font-bold text-lg text-slate-900">INPUT STOK MASUK</h3>
@@ -604,14 +516,33 @@
         <input type="hidden" id="txType" value="IN">
         <div>
           <label class="block text-xs font-semibold mb-1">PILIH BARANG</label>
-          <select id="txProductId" required class="w-full p-2 border rounded text-sm uppercase-input"></select>
+          <select id="txProductId" required onchange="updateTxUnitDropdown()" class="w-full p-2 border rounded text-sm uppercase-input"></select>
         </div>
-        <div>
-          <label class="block text-xs font-semibold mb-1">JUMLAH (QTY)</label>
-          <input type="number" id="txQty" min="1" required class="w-full p-2 border rounded text-sm">
+        
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold mb-1">JUMLAH TRANSAKSI (QTY)</label>
+            <input type="number" id="txQty" min="1" required oninput="calculateTxConversionPreview()" class="w-full p-2 border rounded text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">SATUAN TRANSAKSI</label>
+            <select id="txUnitType" onchange="calculateTxConversionPreview()" class="w-full p-2 border rounded text-sm font-bold bg-indigo-50 text-indigo-900 uppercase-input"></select>
+          </div>
         </div>
+
+        <!-- INPUT EDITABLE ISI PER KARTON KHUSUS TRANSAKSI GROSIR -->
+        <div id="boxCustomRatioGroup" class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg hidden">
+          <label class="block text-[11px] font-bold text-amber-900 mb-1">
+            <i class="fa-solid fa-pen-to-square mr-1"></i>ISI PER DUS KHUSUS TRANSAKSI INI (MANUAL):
+          </label>
+          <input type="number" id="txCustomRatio" min="1" value="1" oninput="calculateTxConversionPreview()" class="w-full p-2 border border-amber-300 rounded text-sm font-bold font-mono bg-white text-slate-900">
+          <p class="text-[10px] text-amber-700 mt-1">Ubah angka di atas jika dus promo/rusak memiliki isi berbeda dengan standar SKU.</p>
+        </div>
+
+        <div id="txConversionPreview" class="text-[11px] font-mono font-bold text-indigo-700 bg-indigo-100/60 p-2 rounded text-center border border-indigo-200 hidden"></div>
+
         <div id="txPriceGroup">
-          <label class="block text-xs font-semibold mb-1">HARGA BELI PER UNIT BARU (RP)</label>
+          <label class="block text-xs font-semibold mb-1">HARGA BELI MODAL PER SATUAN TRANSAKSI (RP)</label>
           <input type="text" id="txUnitCost" placeholder="15.000" oninput="formatCurrencyInput(this)" class="w-full p-2 border rounded text-sm font-mono">
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -630,10 +561,7 @@
         </div>
         <div class="flex justify-end space-x-2 pt-3">
           <button type="button" onclick="closeModal('modalTx')" class="px-4 py-2 bg-slate-200 text-slate-700 rounded text-sm font-medium">Batal</button>
-          <button type="submit" id="btnTxSubmit" class="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-medium flex items-center space-x-1">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Simpan Transaksi</span>
-          </button>
+          <button type="submit" id="btnTxSubmit" class="px-4 py-2 bg-emerald-600 text-white rounded text-sm font-medium flex items-center space-x-1"><i class="fa-solid fa-floppy-disk"></i><span>Simpan Transaksi</span></button>
         </div>
       </form>
     </div>
@@ -649,7 +577,7 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC (V4.0.1 MASTER KEY SUPPORTED) -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const SECRET_SALT = "NINNA_KARTUSTOK_SECRET_2026";
     const MASTER_KEY = "NINNA-MASTER-2026";
@@ -669,14 +597,14 @@
         licenseKey: ''
       },
       products: [
-        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', minStock: 20, stock: 45, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'INDOMIE GORENG 85G', category: 'SEMBAKO', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 40, minStock: 50, stock: 120, avgHpp: 2800, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
-        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 45, unitCost: 14000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'SUPPLIER A', user: 'ADMIN' }
+        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 48, txUnit: 'KARTON', inputQty: 4, unitCost: 168000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'SUPPLIER A (4 KARTON ISI 12)', user: 'ADMIN' }
       ],
       opname: [
-        { id: 'ADJ-1', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
+        { id: 'ADJ-1', date: '2026-08-17', name: 'INDOMIE GORENG 85G', systemQty: 123, actualQty: 120, diffQty: -3, reason: 'DUS RUSAK', user: 'ADMIN' }
       ]
     };
 
@@ -688,7 +616,6 @@
 
     let html5QrcodeScanner = null;
 
-    /* ALGORITMA KRIPTOGRAFI LISENSI SERIAL KEY */
     function generateLicenseKey(storeName) {
       const str = (storeName || '').toUpperCase().trim() + SECRET_SALT;
       let h1 = 0, h2 = 0;
@@ -736,18 +663,6 @@
       } else {
         alert('SERIAL KEY INVALID! Pastikan Serial Key sesuai dengan Nama Toko.');
       }
-    }
-
-    function generateDevKey() {
-      const val = document.getElementById('genStoreInput').value;
-      document.getElementById('genResultKey').value = generateLicenseKey(val);
-    }
-
-    function copyGeneratedKey() {
-      const keyInput = document.getElementById('genResultKey');
-      keyInput.select();
-      navigator.clipboard.writeText(keyInput.value);
-      alert('Serial Key disalin ke clipboard!');
     }
 
     function toggleMobileMenu(forceState) {
@@ -959,6 +874,22 @@
       filtered.forEach(p => {
         const isLow = p.stock <= p.minStock;
         const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
+        
+        const baseSat = (p.satuan || 'PCS').toUpperCase();
+        const bigSat = (p.satuanBesar || '').toUpperCase();
+        const ratio = Number(p.rasioKonversi || 1);
+
+        let unitDisplay = `<span class="font-bold text-slate-800">${baseSat}</span>`;
+        if(bigSat && ratio > 1) {
+          unitDisplay += `<br><span class="text-[10px] text-indigo-600 font-sans font-semibold">1 ${bigSat} = ${ratio} ${baseSat}</span>`;
+        }
+
+        let convertStockText = '';
+        if(bigSat && ratio > 1) {
+          const dusQty = Math.floor(p.stock / ratio);
+          const remPcs = p.stock % ratio;
+          convertStockText = `<div class="text-[10px] text-slate-400 font-sans font-normal">(${dusQty} ${bigSat}${remPcs > 0 ? ' + ' + remPcs + ' ' + baseSat : ''})</div>`;
+        }
 
         html += `
           <tr class="hover:bg-slate-50 transition">
@@ -971,8 +902,10 @@
             </td>
             <td class="p-3 font-semibold text-slate-800">${(p.name || '').toUpperCase()}</td>
             <td class="p-3 text-xs font-sans text-slate-500">${(p.category || '').toUpperCase()} / <span class="font-semibold text-slate-700">${(p.warehouse || '').toUpperCase()}</span></td>
+            <td class="p-3 text-center text-xs font-sans">${unitDisplay}</td>
             <td class="p-3 text-right font-bold ${isLow ? 'text-rose-600' : 'text-slate-800'}">
-              ${p.stock} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
+              ${p.stock} ${baseSat} ${isLow ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-1 rounded ml-1">LOW</span>' : ''}
+              ${convertStockText}
             </td>
             <td class="p-3 text-right text-xs font-mono">Rp ${Number(p.avgHpp || 0).toLocaleString('id-ID')}</td>
             <td class="p-3 text-right text-xs font-mono font-bold text-emerald-700">Rp ${Number(p.sellPrice || 0).toLocaleString('id-ID')}</td>
@@ -1003,6 +936,9 @@
       document.getElementById('barangNama').value = p.name || '';
       document.getElementById('barangKategori').value = p.category || '';
       document.getElementById('barangGudang').value = p.warehouse || '';
+      document.getElementById('barangSatuan').value = p.satuan || 'PCS';
+      document.getElementById('barangSatuanBesar').value = p.satuanBesar || '';
+      document.getElementById('barangRasio').value = p.rasioKonversi || 1;
       document.getElementById('barangCostPrice').value = p.avgHpp ? Number(p.avgHpp).toLocaleString('id-ID') : '';
       document.getElementById('barangSellPrice').value = p.sellPrice ? Number(p.sellPrice).toLocaleString('id-ID') : '';
       document.getElementById('barangMinStock').value = p.minStock || 10;
@@ -1017,6 +953,10 @@
       const costPrice = parseCurrencyNumber(document.getElementById('barangCostPrice').value);
       const sellPrice = parseCurrencyNumber(document.getElementById('barangSellPrice').value);
 
+      const satuanSmall = (document.getElementById('barangSatuan').value || 'PCS').toUpperCase().trim();
+      const satuanBig = (document.getElementById('barangSatuanBesar').value || '').toUpperCase().trim();
+      const rasio = Number(document.getElementById('barangRasio').value) || 1;
+
       if(existingId) {
         const product = appData.products.find(p => p.id === existingId);
         if(product) {
@@ -1024,6 +964,9 @@
           product.name = document.getElementById('barangNama').value.toUpperCase();
           product.category = document.getElementById('barangKategori').value.toUpperCase();
           product.warehouse = document.getElementById('barangGudang').value.toUpperCase();
+          product.satuan = satuanSmall;
+          product.satuanBesar = satuanBig;
+          product.rasioKonversi = rasio;
           product.avgHpp = costPrice;
           product.sellPrice = sellPrice;
           product.minStock = Number(document.getElementById('barangMinStock').value);
@@ -1036,6 +979,9 @@
           name: document.getElementById('barangNama').value.toUpperCase(),
           category: document.getElementById('barangKategori').value.toUpperCase(),
           warehouse: document.getElementById('barangGudang').value.toUpperCase(),
+          satuan: satuanSmall,
+          satuanBesar: satuanBig,
+          rasioKonversi: rasio,
           minStock: Number(document.getElementById('barangMinStock').value),
           stock: 0,
           avgHpp: costPrice,
@@ -1063,6 +1009,16 @@
 
       filtered.forEach(m => {
         const isIn = m.type === 'IN';
+        const product = appData.products.find(p => p.id === m.productId);
+        const baseSat = product ? (product.satuan || 'PCS') : 'PCS';
+        const txUnit = m.txUnit || baseSat;
+        const inputQty = m.inputQty || m.qty;
+
+        let txQtyDisplay = `${isIn ? '+' : '-'}${inputQty} ${txUnit}`;
+        if(txUnit !== baseSat) {
+          txQtyDisplay += ` <span class="text-[10px] text-slate-500 font-normal">(${m.qty} ${baseSat})</span>`;
+        }
+
         html += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 text-xs text-slate-500">${m.date || ''}</td>
@@ -1075,7 +1031,7 @@
             <td class="p-3 text-xs font-mono font-bold text-indigo-700">${(m.batchNo || '-').toUpperCase()}</td>
             <td class="p-3 text-xs text-slate-500">${m.expireDate || '-'}</td>
             <td class="p-3 text-right font-bold ${isIn ? 'text-emerald-600' : 'text-rose-600'}">
-              ${isIn ? '+' : '-'}${m.qty || 0}
+              ${txQtyDisplay}
             </td>
             <td class="p-3 text-right text-xs font-mono">${m.unitCost ? 'Rp ' + Number(m.unitCost).toLocaleString('id-ID') : '-'}</td>
             <td class="p-3 text-center">
@@ -1095,6 +1051,8 @@
       if(!m) return;
       const area = document.getElementById('printableDocArea');
       const prof = appData.profile || {};
+      const product = appData.products.find(p => p.id === m.productId);
+      const baseSat = product ? (product.satuan || 'PCS') : 'PCS';
 
       area.innerHTML = `
         <div style="width: 58mm; font-family: monospace; font-size: 11px; margin: 0 auto; text-align: center;">
@@ -1111,8 +1069,8 @@
               <td colspan="2" style="font-weight: bold;">${m.name.toUpperCase()}</td>
             </tr>
             <tr>
-              <td>${m.qty} x Rp ${Number(m.unitCost || 0).toLocaleString('id-ID')}</td>
-              <td style="text-align: right;">Rp ${Number((m.qty || 0) * (m.unitCost || 0)).toLocaleString('id-ID')}</td>
+              <td>${m.inputQty || m.qty} ${m.txUnit || baseSat} x Rp ${Number(m.unitCost || 0).toLocaleString('id-ID')}</td>
+              <td style="text-align: right;">Rp ${Number((m.inputQty || m.qty) * (m.unitCost || 0)).toLocaleString('id-ID')}</td>
             </tr>
           </table>
           <p style="margin: 5px 0;">--------------------------------</p>
@@ -1130,14 +1088,18 @@
       let html = '';
 
       (appData.products || []).forEach(p => {
+        const baseSat = (p.satuan || 'PCS').toUpperCase();
         html += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-mono text-xs font-semibold">${p.sku || ''}<br><span class="text-[10px] text-slate-400 font-sans">${p.warehouse || ''}</span></td>
             <td class="p-3 font-semibold text-slate-900">${(p.name || '').toUpperCase()}</td>
             <td class="p-3 text-xs text-slate-500">${(p.category || '').toUpperCase()}</td>
-            <td class="p-3 text-right font-bold text-slate-700 bg-slate-50 font-mono">${p.stock}</td>
+            <td class="p-3 text-right font-bold text-slate-700 bg-slate-50 font-mono">${p.stock} ${baseSat}</td>
             <td class="p-3 text-right">
-              <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-24 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
+              <div class="flex items-center justify-end space-x-1">
+                <input type="number" id="opnameActual_${p.id}" value="${p.stock}" oninput="calculateOpnameDiff('${p.id}', ${p.stock})" class="w-20 p-1.5 border rounded text-right font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500">
+                <span class="text-xs font-bold text-slate-500">${baseSat}</span>
+              </div>
             </td>
             <td class="p-3 text-right font-bold font-mono text-slate-400" id="opnameDiff_${p.id}">0</td>
             <td class="p-3">
@@ -1271,7 +1233,7 @@
                   <td class="p-2 border border-black text-center">${idx + 1}</td>
                   <td class="p-2 border border-black font-mono">${p.sku}</td>
                   <td class="p-2 border border-black font-bold">${p.name.toUpperCase()}</td>
-                  <td class="p-2 border border-black text-right font-bold">______</td>
+                  <td class="p-2 border border-black text-right font-bold">______ ${p.satuan || 'PCS'}</td>
                   <td class="p-2 border border-black text-xs">Pengiriman Barang</td>
                 </tr>
               `).join('')}
@@ -1279,21 +1241,9 @@
           </table>
 
           <div class="grid grid-cols-3 gap-4 text-center text-xs pt-12">
-            <div>
-              <p>Pengirim / Gudang</p>
-              <br><br><br>
-              <p class="font-bold underline">( _________________ )</p>
-            </div>
-            <div>
-              <p>Sopir / Kurir</p>
-              <br><br><br>
-              <p class="font-bold underline">( _________________ )</p>
-            </div>
-            <div>
-              <p>Penerima Barang</p>
-              <br><br><br>
-              <p class="font-bold underline">( _________________ )</p>
-            </div>
+            <div><p>Pengirim / Gudang</p><br><br><br><p class="font-bold underline">( _________________ )</p></div>
+            <div><p>Sopir / Kurir</p><br><br><br><p class="font-bold underline">( _________________ )</p></div>
+            <div><p>Penerima Barang</p><br><br><br><p class="font-bold underline">( _________________ )</p></div>
           </div>
         </div>
       `;
@@ -1319,7 +1269,7 @@
                 <th class="p-2 border border-black text-center">NO</th>
                 <th class="p-2 border border-black">SKU / RAK</th>
                 <th class="p-2 border border-black">NAMA BARANG</th>
-                <th class="p-2 border border-black">KATEGORI</th>
+                <th class="p-2 border border-black">SATUAN ECERAN</th>
                 <th class="p-2 border border-black text-right">STOK SISTEM</th>
                 <th class="p-2 border border-black text-center w-28">HITUNG FISIK</th>
                 <th class="p-2 border border-black">CATATAN LAPANGAN</th>
@@ -1331,7 +1281,7 @@
                   <td class="p-2 border border-black text-center font-mono">${idx + 1}</td>
                   <td class="p-2 border border-black font-mono">${p.sku} / ${p.warehouse}</td>
                   <td class="p-2 border border-black font-bold">${p.name.toUpperCase()}</td>
-                  <td class="p-2 border border-black">${p.category.toUpperCase()}</td>
+                  <td class="p-2 border border-black">${p.satuan || 'PCS'}</td>
                   <td class="p-2 border border-black text-right font-mono font-bold">${p.stock}</td>
                   <td class="p-2 border border-black text-center">[ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]</td>
                   <td class="p-2 border border-black text-xs">________________________</td>
@@ -1341,16 +1291,8 @@
           </table>
 
           <div class="flex justify-between text-xs pt-8">
-            <div>
-              <p>Auditor / Petugas Gudang:</p>
-              <br><br>
-              <p class="font-bold underline">( ________________________ )</p>
-            </div>
-            <div>
-              <p>Mengetahui / Supervisor:</p>
-              <br><br>
-              <p class="font-bold underline">( ________________________ )</p>
-            </div>
+            <div><p>Auditor / Petugas Gudang:</p><br><br><p class="font-bold underline">( ________________________ )</p></div>
+            <div><p>Mengetahui / Supervisor:</p><br><br><p class="font-bold underline">( ________________________ )</p></div>
           </div>
         </div>
       `;
@@ -1401,7 +1343,7 @@
                   <tr>
                     <td class="p-2 border border-black font-mono">${p.sku}</td>
                     <td class="p-2 border border-black font-bold">${p.name.toUpperCase()}</td>
-                    <td class="p-2 border border-black text-right font-bold">${p.stock}</td>
+                    <td class="p-2 border border-black text-right font-bold">${p.stock} ${p.satuan || 'PCS'}</td>
                     <td class="p-2 border border-black text-right font-mono">Rp ${Number(p.avgHpp||0).toLocaleString('id-ID')}</td>
                     <td class="p-2 border border-black text-right font-mono font-bold">Rp ${totalAsset.toLocaleString('id-ID')}</td>
                   </tr>
@@ -1432,9 +1374,9 @@
           <tr>
             <td class="p-2 border border-black text-xs">${m.date}</td>
             <td class="p-2 border border-black text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
-            <td class="p-2 border border-black text-right font-semibold">${m.type === 'IN' ? m.qty : '-'}</td>
-            <td class="p-2 border border-black text-right font-semibold">${m.type === 'OUT' ? m.qty : '-'}</td>
-            <td class="p-2 border border-black text-right font-bold font-mono">${runningStock}</td>
+            <td class="p-2 border border-black text-right font-semibold">${m.type === 'IN' ? m.qty + ' ' + (product.satuan||'PCS') : '-'}</td>
+            <td class="p-2 border border-black text-right font-semibold">${m.type === 'OUT' ? m.qty + ' ' + (product.satuan||'PCS') : '-'}</td>
+            <td class="p-2 border border-black text-right font-bold font-mono">${runningStock} ${product.satuan || 'PCS'}</td>
           </tr>
         `;
       }).join('');
@@ -1471,34 +1413,97 @@
       return `BTC-${yyyymmdd}-${rand}`;
     }
 
+    function updateTxUnitDropdown() {
+      const pId = document.getElementById('txProductId').value;
+      const product = appData.products.find(p => p.id === pId);
+      const selUnit = document.getElementById('txUnitType');
+      selUnit.innerHTML = '';
+
+      if(!product) return;
+
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      const bigSat = (product.satuanBesar || '').toUpperCase();
+      const defaultRatio = Number(product.rasioKonversi || 1);
+
+      selUnit.innerHTML += `<option value="${baseSat}">${baseSat} (ECERAN)</option>`;
+      if(bigSat && defaultRatio > 1) {
+        selUnit.innerHTML += `<option value="${bigSat}">${bigSat} (GROSIR)</option>`;
+      }
+
+      document.getElementById('txCustomRatio').value = defaultRatio;
+      calculateTxConversionPreview();
+    }
+
+    function calculateTxConversionPreview() {
+      const pId = document.getElementById('txProductId').value;
+      const inputQty = Number(document.getElementById('txQty').value || 0);
+      const selectedUnit = document.getElementById('txUnitType').value;
+      const previewEl = document.getElementById('txConversionPreview');
+      const customRatioGroup = document.getElementById('boxCustomRatioGroup');
+      const product = appData.products.find(p => p.id === pId);
+
+      if(!product || inputQty <= 0) {
+        previewEl.classList.add('hidden');
+        if(customRatioGroup) customRatioGroup.classList.add('hidden');
+        return;
+      }
+
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      const bigSat = (product.satuanBesar || '').toUpperCase();
+
+      if(selectedUnit === bigSat && bigSat !== '') {
+        customRatioGroup.classList.remove('hidden');
+        const activeRatio = Number(document.getElementById('txCustomRatio').value || 1);
+        const totalBase = inputQty * activeRatio;
+        previewEl.innerText = `KONVERSI: ${inputQty} ${bigSat} (${activeRatio} ${baseSat}/DUS) = ${totalBase} ${baseSat} DITAMBAHKAN`;
+        previewEl.classList.remove('hidden');
+      } else {
+        customRatioGroup.classList.add('hidden');
+        previewEl.innerText = `TRANSAKSI: ${inputQty} ${baseSat}`;
+        previewEl.classList.remove('hidden');
+      }
+    }
+
     function handleTxSubmit(e) {
       e.preventDefault();
       const pId = document.getElementById('txProductId').value;
       const type = document.getElementById('txType').value;
-      const qty = Number(document.getElementById('txQty').value);
-      const unitCost = parseCurrencyNumber(document.getElementById('txUnitCost').value);
+      const inputQty = Number(document.getElementById('txQty').value);
+      const selectedUnit = document.getElementById('txUnitType').value;
+      const rawUnitCost = parseCurrencyNumber(document.getElementById('txUnitCost').value);
 
       const product = appData.products.find(p => p.id === pId);
       if(!product) return;
 
-      if(type === 'OUT' && product.stock < qty) {
-        alert('Stok tidak mencukupi!');
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      const bigSat = (product.satuanBesar || '').toUpperCase();
+
+      let activeRatio = 1;
+      if(selectedUnit === bigSat && bigSat !== '') {
+        activeRatio = Number(document.getElementById('txCustomRatio').value || 1);
+      }
+
+      const finalBaseQty = inputQty * activeRatio;
+      const unitCostPerBase = activeRatio > 1 ? Math.round(rawUnitCost / activeRatio) : rawUnitCost;
+
+      if(type === 'OUT' && product.stock < finalBaseQty) {
+        alert(`Stok tidak mencukupi! Stok saat ini: ${product.stock} ${baseSat}`);
         return;
       }
 
-      if(type === 'IN' && unitCost > 0) {
+      if(type === 'IN' && unitCostPerBase > 0) {
         const currentTotalVal = product.stock * (product.avgHpp || 0);
-        const newTotalVal = currentTotalVal + (qty * unitCost);
-        product.avgHpp = Math.round(newTotalVal / (product.stock + qty));
-        product.stock += qty;
+        const newTotalVal = currentTotalVal + (finalBaseQty * unitCostPerBase);
+        product.avgHpp = Math.round(newTotalVal / (product.stock + finalBaseQty));
+        product.stock += finalBaseQty;
+      } else if(type === 'IN') {
+        product.stock += finalBaseQty;
       } else if(type === 'OUT') {
-        product.stock -= qty;
+        product.stock -= finalBaseQty;
       }
 
       let batchVal = document.getElementById('txBatchNo').value.trim().toUpperCase();
-      if(!batchVal) {
-        batchVal = getAutoBatchNo();
-      }
+      if(!batchVal) batchVal = getAutoBatchNo();
 
       appData.mutasi.push({
         id: 'TX-' + Date.now().toString().slice(-5),
@@ -1506,11 +1511,13 @@
         type: type,
         productId: product.id,
         name: product.name.toUpperCase(),
-        qty: qty,
-        unitCost: unitCost || product.avgHpp,
+        qty: finalBaseQty,
+        txUnit: selectedUnit,
+        inputQty: inputQty,
+        unitCost: rawUnitCost || product.avgHpp,
         batchNo: batchVal,
         expireDate: document.getElementById('txExpireDate').value || '-',
-        notes: (document.getElementById('txNotes').value || '-').toUpperCase(),
+        notes: (document.getElementById('txNotes').value || '-').toUpperCase() + (selectedUnit === bigSat ? ` (${inputQty} ${bigSat} ISI ${activeRatio})` : ''),
         user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
       });
 
@@ -1533,15 +1540,15 @@
         const sel = document.getElementById('txProductId');
         sel.innerHTML = '';
         (appData.products || []).forEach(p => {
-          sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()} (STOK: ${p.stock})</option>`;
+          sel.innerHTML += `<option value="${p.id}">${p.sku} - ${p.name.toUpperCase()} (STOK: ${p.stock} ${p.satuan || 'PCS'})</option>`;
         });
+        
+        updateTxUnitDropdown();
         document.getElementById('modalTx').classList.remove('hidden');
       }
     }
 
-    function closeModal(id) {
-      document.getElementById(id).classList.add('hidden');
-    }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     function deleteProduct(id) {
       if(confirm('Hapus barang ini dari database?')) {
@@ -1562,9 +1569,7 @@
         } else {
           initScanner();
         }
-      } catch(err) {
-        console.error(err);
-      }
+      } catch(err) { console.error(err); }
     }
 
     function initScanner() {
@@ -1590,9 +1595,7 @@
         html5QrcodeScanner.stop().then(() => {
           html5QrcodeScanner.clear();
           html5QrcodeScanner = null;
-        }).catch(() => {
-          html5QrcodeScanner = null;
-        });
+        }).catch(() => { html5QrcodeScanner = null; });
       }
     }
 
@@ -1611,7 +1614,8 @@
       const product = (appData.products || []).find(p => p.id === pId);
       if(!product) return;
 
-      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase();
+      const baseSat = (product.satuan || 'PCS').toUpperCase();
+      document.getElementById('ledgerItemName').innerText = product.sku + ' - ' + product.name.toUpperCase() + ` (${baseSat})`;
       const tbody = document.getElementById('tableLedgerBody');
       if(!tbody) return;
       let html = '';
@@ -1626,9 +1630,9 @@
           <tr>
             <td class="p-2 border text-xs">${m.date}</td>
             <td class="p-2 border text-xs">${(m.notes || '').toUpperCase()} (BATCH: ${(m.batchNo || '').toUpperCase()})</td>
-            <td class="p-2 border text-right font-semibold text-emerald-600">${m.type === 'IN' ? m.qty : '-'}</td>
-            <td class="p-2 border text-right font-semibold text-rose-600">${m.type === 'OUT' ? m.qty : '-'}</td>
-            <td class="p-2 border text-right font-bold font-mono">${runningStock}</td>
+            <td class="p-2 border text-right font-semibold text-emerald-600">${m.type === 'IN' ? m.qty + ' ' + baseSat : '-'}</td>
+            <td class="p-2 border text-right font-semibold text-rose-600">${m.type === 'OUT' ? m.qty + ' ' + baseSat : '-'}</td>
+            <td class="p-2 border text-right font-bold font-mono">${runningStock} ${baseSat}</td>
           </tr>
         `;
       });
@@ -1640,20 +1644,20 @@
       let csvContent = "\uFEFF"; 
 
       if(type === 'products') {
-        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;SATUAN ECERAN;SATUAN DUS;RASIO KONVERSI;STOK FISIK;HARGA BELI (HPP);HARGA JUAL;POTENSI MARGIN\n";
         (appData.products || []).forEach(p => {
           const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
-          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.avgHpp};${p.sellPrice};${margin}\n`;
+          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";"${p.satuan||'PCS'}";"${p.satuanBesar||''}";${p.rasioKonversi||1};${p.stock};${p.avgHpp};${p.sellPrice};${margin}\n`;
         });
       } else if(type === 'mutasi') {
-        csvContent += "WAKTU;TIPE;NAMA BARANG;QTY;HARGA UNIT;NO BATCH;TANGGAL EXPIRED;KETERANGAN;PETUGAS\n";
+        csvContent += "WAKTU;TIPE;NAMA BARANG;QTY DASAR;SATUAN TRANSAKSI;QTY TRANSAKSI;HARGA UNIT;NO BATCH;TANGGAL EXPIRED;KETERANGAN;PETUGAS\n";
         (appData.mutasi || []).forEach(m => {
-          csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
+          csvContent += `"${m.date}";"${m.type}";"${m.name.toUpperCase()}";${m.qty};"${m.txUnit||'PCS'}";${m.inputQty||m.qty};${m.unitCost};"${(m.batchNo||'').toUpperCase()}";"${m.expireDate}";"${(m.notes||'').toUpperCase()}";"${(m.user||'').toUpperCase()}"\n`;
         });
       } else if(type === 'opname_template') {
-        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
+        csvContent += "SKU;NAMA BARANG;KATEGORI;GUDANG/RAK;SATUAN ECERAN;STOK SISTEM;STOK FISIK (HITUNG LAPANGAN);SELISIH;CATATAN\n";
         (appData.products || []).forEach(p => {
-          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";${p.stock};${p.stock};0;""\n`;
+          csvContent += `"${p.sku}";"${p.name.toUpperCase()}";"${p.category.toUpperCase()}";"${p.warehouse.toUpperCase()}";"${p.satuan||'PCS'}";${p.stock};${p.stock};0;""\n`;
         });
       }
 
@@ -1720,11 +1724,7 @@
             labels: Object.keys(catMap),
             datasets: [{ data: Object.values(catMap), backgroundColor: ['#4f46e5', '#059669', '#d97706', '#dc2626', '#7c3aed'] }]
           },
-          options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            resizeDelay: 200
-          }
+          options: { responsive: true, maintainAspectRatio: false, resizeDelay: 200 }
         });
 
         const ctxMut = mutCanvas.getContext('2d');
@@ -1742,15 +1742,9 @@
               backgroundColor: ['#059669', '#dc2626']
             }]
           },
-          options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            resizeDelay: 200
-          }
+          options: { responsive: true, maintainAspectRatio: false, resizeDelay: 200 }
         });
-      } catch(e) {
-        console.warn("Chart render skipped on mobile device:", e);
-      }
+      } catch(e) { console.warn("Chart render skipped:", e); }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
