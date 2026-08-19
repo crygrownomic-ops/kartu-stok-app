@@ -1,33 +1,60 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full bg-slate-900 text-white">
+<html lang="id" class="h-full bg-[#0b1329]">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Developer Serial Key Generator - Kartu Stok Pro</title>
+  <title>Key Generator - Panel Developer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .uppercase-input { text-transform: uppercase; }
+  </style>
 </head>
-<body class="min-h-full flex items-center justify-center p-4 antialiased">
-  <div class="w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl space-y-5">
-    <div class="text-center space-y-1">
-      <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto text-xl text-amber-300 shadow-md">
+<body class="min-h-full bg-[#0b1329] text-white flex items-center justify-center p-4">
+
+  <!-- GERBANG PASSWORD -->
+  <div id="genLockGate" class="bg-[#131d38] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5 text-center">
+    <div class="w-14 h-14 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-lg">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <div>
+      <h3 class="font-bold text-xl tracking-tight">AKSES GENERATOR TERKUNCI</h3>
+      <p class="text-xs text-slate-400 mt-1">Halaman ini khusus Developer. Masukkan password untuk melanjutkan.</p>
+    </div>
+
+    <form onsubmit="unlockGenerator(event)" class="space-y-4">
+      <div>
+        <input type="password" id="inputGenPassword" required placeholder="Masukkan Password Akses..." class="w-full p-3 bg-[#0b1329] border border-slate-700 rounded-xl text-center text-white font-mono font-bold text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-key"></i>
+        <span>Buka Panel Generator</span>
+      </button>
+    </form>
+    <p id="genLockError" class="text-xs text-rose-400 font-bold hidden">Password Salah! Akses Ditolak.</p>
+  </div>
+
+  <!-- PANEL GENERATOR FORM -->
+  <div id="genPanelContent" class="bg-[#131d38] border border-slate-700/60 rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-6 hidden">
+    <div class="text-center space-y-2">
+      <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto text-xl shadow-lg">
         <i class="fa-solid fa-key"></i>
       </div>
-      <h1 class="text-xl font-bold tracking-tight pt-2">KEY GENERATOR</h1>
+      <h3 class="font-extrabold text-xl tracking-wide uppercase">KEY GENERATOR</h3>
       <p class="text-xs text-slate-400">Panel Khusus Developer / Lisensi Sistem</p>
     </div>
 
-    <div class="space-y-4 pt-2">
+    <div class="space-y-4">
       <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">MASUKKAN NAMA TOKO KLIEN:</label>
-        <input type="text" id="storeInput" oninput="generateKey()" placeholder="CONTOH: TOKO SEMBAKO JAYA" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-sm font-bold text-white uppercase tracking-wide focus:ring-2 focus:ring-indigo-500 outline-none">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">MASUKKAN NAMA TOKO KLIEN:</label>
+        <input type="text" id="storeName" oninput="generateKeyRealtime()" placeholder="CONTOH: TOKO SEMBAKO JAYA" class="w-full p-3 bg-[#0b1329] border border-slate-700 rounded-xl text-white font-bold text-sm uppercase-input focus:ring-2 focus:ring-indigo-500 outline-none">
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-amber-400 mb-1">SERIAL KEY HASIL GENERATE:</label>
-        <div class="flex space-x-2">
-          <input type="text" id="resultKey" readonly value="----" class="w-full p-3 bg-slate-950 border border-amber-500/50 rounded-xl text-center font-mono font-bold text-amber-300 text-base tracking-widest outline-none">
-          <button onclick="copyKey()" class="px-4 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1">
+        <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">SERIAL KEY HASIL GENERATE:</label>
+        <div class="flex items-center gap-2">
+          <input type="text" id="resultKey" readonly placeholder="- - - -" class="flex-1 p-3 bg-[#0b1329] border border-slate-700 rounded-xl text-center font-mono font-bold text-base text-amber-400 tracking-wider">
+          <button onclick="copyKey()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition flex items-center justify-center space-x-1 whitespace-nowrap shadow-md">
             <i class="fa-solid fa-copy"></i>
             <span>Salin</span>
           </button>
@@ -35,13 +62,28 @@
       </div>
     </div>
 
-    <div class="border-t border-slate-700/60 pt-4 text-center text-[11px] text-slate-500">
-      Sistem Kartu Stok Enterprise &copy; Developer Panel
+    <div class="border-t border-slate-800 pt-3 text-center">
+      <p class="text-[10px] text-slate-500 font-mono">Sistem Kartu Stok Enterprise &copy; Developer Panel</p>
     </div>
   </div>
 
   <script>
     const SECRET_SALT = "NINNA_KARTUSTOK_SECRET_2026";
+    const GENERATOR_PASSWORD = "10111992Oke";
+
+    function unlockGenerator(e) {
+      e.preventDefault();
+      const inputPass = document.getElementById('inputGenPassword').value.trim();
+      const errEl = document.getElementById('genLockError');
+
+      if(inputPass === GENERATOR_PASSWORD) {
+        errEl.classList.add('hidden');
+        document.getElementById('genLockGate').classList.add('hidden');
+        document.getElementById('genPanelContent').classList.remove('hidden');
+      } else {
+        errEl.classList.remove('hidden');
+      }
+    }
 
     function generateLicenseKey(storeName) {
       const str = (storeName || '').toUpperCase().trim() + SECRET_SALT;
@@ -57,17 +99,24 @@
       return `${combined.slice(0,4)}-${combined.slice(4,8)}-${combined.slice(8,12)}-${combined.slice(12,16)}`;
     }
 
-    function generateKey() {
-      const val = document.getElementById('storeInput').value;
-      document.getElementById('resultKey').value = val.trim() ? generateLicenseKey(val) : '----';
+    function generateKeyRealtime() {
+      const store = document.getElementById('storeName').value.toUpperCase().trim();
+      if(store) {
+        document.getElementById('resultKey').value = generateLicenseKey(store);
+      } else {
+        document.getElementById('resultKey').value = '';
+      }
     }
 
     function copyKey() {
       const keyInput = document.getElementById('resultKey');
-      if(keyInput.value === '----') return;
-      keyInput.select();
-      navigator.clipboard.writeText(keyInput.value);
-      alert('Serial Key berhasil disalin!');
+      if(keyInput.value && keyInput.value !== '- - - -') {
+        keyInput.select();
+        navigator.clipboard.writeText(keyInput.value);
+        alert('Serial Key Toko Berhasil Disalin ke Clipboard!');
+      } else {
+        alert('Masukkan Nama Toko terlebih dahulu!');
+      }
     }
   </script>
 </body>
