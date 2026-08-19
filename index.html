@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Cloud Auto-Sync Active)</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Full Cloud Sync Active)</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -795,14 +795,96 @@
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
 
-    // MESIN SINKRONISASI AUTOMATIS SUPABASE
+    // 1. MESIN UNTUK MENYEDOT DATA TERBARU DARI CLOUD SUPABASE
+    async function fetchDataFromCloud() {
+      if (!supabaseClient || !navigator.onLine) return;
+      const iconSync = document.getElementById('iconSync');
+      if(iconSync) iconSync.classList.add('fa-spin');
+
+      try {
+        // Tarik Data Barang
+        const { data: dbProducts } = await supabaseClient.from('products').select('*');
+        if (dbProducts && dbProducts.length > 0) {
+          appData.products = dbProducts.map(p => ({
+            id: String(p.id),
+            sku: p.sku || '',
+            name: p.name || '',
+            category: p.category || '',
+            warehouse: p.warehouse || '',
+            satuan: p.satuan || 'PCS',
+            satuanBesar: p.satuan_besar || '',
+            rasioKonversi: Number(p.rasio_konversi || 1),
+            minStock: Number(p.min_stock || 10),
+            stock: Number(p.stock || 0),
+            avgHpp: Number(p.avg_hpp || 0),
+            sellPrice: Number(p.sell_price || 0),
+            barcode: p.barcode || ''
+          }));
+        }
+
+        // Tarik Data Mutasi
+        const { data: dbMutasi } = await supabaseClient.from('mutasi').select('*');
+        if (dbMutasi && dbMutasi.length > 0) {
+          appData.mutasi = dbMutasi.map(m => ({
+            id: String(m.id),
+            date: m.date,
+            type: m.type,
+            productId: String(m.product_id),
+            name: m.name,
+            qty: Number(m.qty),
+            txUnit: m.tx_unit,
+            inputQty: Number(m.input_qty),
+            unitCost: Number(m.unit_cost),
+            batchNo: m.batch_no,
+            expireDate: m.expire_date,
+            notes: m.notes,
+            user: m.user_name
+          }));
+        }
+
+        // Tarik Data Opname
+        const { data: dbOpname } = await supabaseClient.from('opname').select('*');
+        if (dbOpname && dbOpname.length > 0) {
+          appData.opname = dbOpname.map(o => ({
+            id: String(o.id),
+            date: o.date,
+            name: o.name,
+            systemQty: Number(o.system_qty),
+            actualQty: Number(o.actual_qty),
+            diffQty: Number(o.diff_qty),
+            reason: o.reason,
+            user: o.user_name
+          }));
+        }
+
+        // Tarik Profil
+        const { data: dbProfile } = await supabaseClient.from('profile').select('*').single();
+        if (dbProfile) {
+          appData.profile = {
+            storeName: dbProfile.store_name || '',
+            address: dbProfile.address || '',
+            city: dbProfile.city || '',
+            phone: dbProfile.phone || '',
+            licenseKey: dbProfile.license_key || MASTER_KEY
+          };
+        }
+
+        localStorage.setItem('KARTU_STOK_PRO_DATA', JSON.stringify(appData));
+        renderAll();
+      } catch (err) {
+        console.warn("Gagal menyedot data Cloud:", err);
+      } finally {
+        if(iconSync) iconSync.classList.remove('fa-spin');
+      }
+    }
+
+    // 2. MESIN UNTUK MENGIRIM DATA LOKAL KE CLOUD SUPABASE
     async function syncDataToCloud() {
       if(!supabaseClient || !navigator.onLine) return;
       const iconSync = document.getElementById('iconSync');
       if(iconSync) iconSync.classList.add('fa-spin');
 
       try {
-        // 1. Sync Products
         if(appData.products.length > 0) {
           const dbProducts = appData.products.map(p => ({
             id: String(p.id),
@@ -822,7 +904,6 @@
           await supabaseClient.from('products').upsert(dbProducts, { onConflict: 'id' });
         }
 
-        // 2. Sync Mutasi
         if(appData.mutasi.length > 0) {
           const dbMutasi = appData.mutasi.map(m => ({
             id: String(m.id),
@@ -833,7 +914,7 @@
             qty: m.qty,
             tx_unit: m.txUnit,
             input_qty: m.inputQty,
-            unit_cost: m.unitCost,
+            unitCost: m.unitCost,
             batch_no: m.batchNo,
             expire_date: m.expireDate,
             notes: m.notes,
@@ -842,7 +923,6 @@
           await supabaseClient.from('mutasi').upsert(dbMutasi, { onConflict: 'id' });
         }
 
-        // 3. Sync Opname
         if(appData.opname.length > 0) {
           const dbOpname = appData.opname.map(o => ({
             id: String(o.id),
@@ -857,7 +937,6 @@
           await supabaseClient.from('opname').upsert(dbOpname, { onConflict: 'id' });
         }
 
-        // 4. Sync Profile
         if(appData.profile) {
           await supabaseClient.from('profile').upsert({
             id: 1,
@@ -883,8 +962,9 @@
         alert("Koneksi offline! Gagal terhubung ke Supabase Cloud.");
         return;
       }
+      await fetchDataFromCloud();
       await syncDataToCloud();
-      alert("Seluruh data berhasil disinkronkan ke Supabase Cloud!");
+      alert("Sinkronisasi 2-Arah dengan Supabase Cloud Berhasil!");
     }
 
     function updateNetworkStatus() {
@@ -2518,11 +2598,14 @@
       } catch(e) { console.warn("Chart render skipped:", e); }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       checkAuthSession();
       updateNetworkStatus();
       renderAll();
-      syncDataToCloud();
+
+      // ALUR OTOMATIS: Tarik data terbaru dari Cloud dulu, baru simpan balik
+      await fetchDataFromCloud();
+      await syncDataToCloud();
 
       const searchEl = document.getElementById('searchProduct');
       if(searchEl) {
