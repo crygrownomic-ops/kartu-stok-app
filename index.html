@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.8.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.9.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.8.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.9.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -72,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.8.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.9.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -345,7 +345,7 @@
           <div id="opnamePagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
 
-        <!-- RIWAYAT AUDIT STOK OPNAME DENGAN AKSES RETUR & TUKAR GULING -->
+        <!-- RIWAYAT AUDIT STOK OPNAME TERAKHIR (PAGING 5 RIWAYAT TERUPDATE) -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-3">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b gap-2">
             <div>
@@ -374,6 +374,9 @@
               <tbody id="tableOpnameAuditBody" class="divide-y"></tbody>
             </table>
           </div>
+
+          <!-- CONTAINER PAGINATION AUDIT (MAX 5 BARIS PER HALAMAN) -->
+          <div id="auditPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
       </section>
 
@@ -492,7 +495,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.8.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.9.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -547,7 +550,7 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.8.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.9.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
@@ -752,7 +755,9 @@
     let mutasiPage = 1;
     let ledgerPage = 1;
     let opnamePage = 1;
+    let auditPage = 1; // PAGING AUDIT OPNAME
     const PAGE_SIZE = 10;
+    const AUDIT_PAGE_SIZE = 5; // MAKSIMAL 5 RIWAYAT TERAKHIR PER HALAMAN
     
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
@@ -913,7 +918,7 @@
 
       if(tabId === 'ledger') { ledgerPage = 1; populateLedgerSelect(); }
       if(tabId === 'mutasi') { mutasiPage = 1; renderMutasi(); }
-      if(tabId === 'opname') { opnamePage = 1; populateOpnameFilterOptions(); renderMassOpnameTable(); }
+      if(tabId === 'opname') { opnamePage = 1; auditPage = 1; populateOpnameFilterOptions(); renderMassOpnameTable(); }
       if(tabId === 'settings') loadProfileInputs();
       if(tabId === 'refmaster') renderRefMasterTables();
     }
@@ -1537,6 +1542,7 @@
 
       if(adjustmentCount > 0) {
         opnameDrafts = {}; 
+        auditPage = 1; // RESET KE HALAMAN PERTAMA AUDIT TERBARU
         saveData();
         alert(`Berhasil menyesuaikan ${adjustmentCount} barang yang memiliki selisih!`);
       } else {
@@ -1544,13 +1550,24 @@
       }
     }
 
-    /* RENDER TABEL AUDIT DENGAN OPSI TUKAR GULING / RETUR PADA SETIAP BARIS */
+    /* RENDER TABEL AUDIT DENGAN PAGING (MAKSIMAL 5 DATA TERUPDATE PER HALAMAN) */
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
+      const pagEl = document.getElementById('auditPagination');
       if(!tbody) return;
-      let html = '';
 
-      (appData.opname || []).slice().reverse().forEach(o => {
+      const reversedAudit = (appData.opname || []).slice().reverse();
+      const totalItems = reversedAudit.length;
+      const totalPages = Math.ceil(totalItems / AUDIT_PAGE_SIZE) || 1;
+
+      if(auditPage > totalPages) auditPage = totalPages;
+      if(auditPage < 1) auditPage = 1;
+
+      const startIdx = (auditPage - 1) * AUDIT_PAGE_SIZE;
+      const pagedAudit = reversedAudit.slice(startIdx, startIdx + AUDIT_PAGE_SIZE);
+
+      let html = '';
+      pagedAudit.forEach(o => {
         const product = appData.products.find(p => p.name.toUpperCase() === o.name.toUpperCase());
         const pId = product ? product.id : '';
 
@@ -1577,6 +1594,22 @@
       });
 
       tbody.innerHTML = html || `<tr><td colspan="7" class="p-3 text-center border text-slate-400 text-xs">Belum ada riwayat audit.</td></tr>`;
+
+      if(pagEl) {
+        pagEl.innerHTML = `
+          <div>Menampilkan <strong>${totalItems > 0 ? startIdx + 1 : 0}</strong> - <strong>${Math.min(startIdx + AUDIT_PAGE_SIZE, totalItems)}</strong> dari <strong>${totalItems}</strong> riwayat audit</div>
+          <div class="flex items-center space-x-1">
+            <button onclick="changeAuditPage(-1)" ${auditPage === 1 ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Prev</button>
+            <span class="px-3 font-bold text-indigo-600">Halaman ${auditPage} / ${totalPages}</span>
+            <button onclick="changeAuditPage(1)" ${auditPage === totalPages ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Next</button>
+          </div>
+        `;
+      }
+    }
+
+    function changeAuditPage(delta) {
+      auditPage += delta;
+      renderOpnameAuditTable();
     }
 
     function openClaimsModal(pId, txType, presetNote) {
