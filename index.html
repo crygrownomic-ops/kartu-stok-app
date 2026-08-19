@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Hybrid Ready)</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Smart Scan Active)</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- HTML5 QR Code Scanner -->
   <script src="https://unpkg.com/html5-qrcode"></script>
-  <!-- Supabase JS Client (Siap Digunakan Kapan Saja) -->
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @media print {
@@ -74,7 +74,7 @@
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
           <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v5.0.0</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">Enterprise Hybrid Edition</p>
+        <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
 
       <div class="px-5 py-3 bg-slate-800/80 flex items-center justify-between border-b border-slate-800 text-xs">
@@ -103,7 +103,7 @@
     <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
       <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
       <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">Offline-First Engine Active</p>
+      <p class="text-[10px] text-slate-500">Smart Barcode Workflow</p>
     </div>
   </aside>
 
@@ -115,19 +115,17 @@
           <div class="flex items-center space-x-2 flex-wrap gap-y-1">
             <h2 id="pageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Overview</h2>
             <span id="badgeStoreActive" class="text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold">LISENSI VALID</span>
-            
-            <!-- INDIKATOR MODE HYBRID & KONEKSI NETWORK -->
             <span id="badgeNetworkStatus" class="text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold flex items-center gap-1">
               <i class="fa-solid fa-wifi"></i> <span>ONLINE</span>
-            </span>
-            <span id="badgePendingSync" class="text-[10px] sm:text-xs font-mono bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold hidden flex items-center gap-1" title="Data tersimpan di Drive Lokal & menunggu sinkronisasi cloud">
-              <i class="fa-solid fa-hard-drive"></i> <span id="cntPendingSync">0</span> Data Lokal Belum Sync
             </span>
           </div>
           <p id="pageSub" class="text-xs sm:text-sm text-slate-500 mt-0.5">Ringkasan status barang, lokasi rak, analisis HPP, dan valuasi aset</p>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
-          <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center">Scan Barcode</button>
+          <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center flex items-center justify-center space-x-1">
+            <i class="fa-solid fa-barcode text-amber-400"></i>
+            <span>Scan Barcode</span>
+          </button>
           <button onclick="openModal('stokMasuk')" class="flex-1 sm:flex-initial px-3 py-2 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition text-center">+ Stok Masuk</button>
           <button onclick="openModal('stokKeluar')" class="flex-1 sm:flex-initial px-3 py-2 bg-rose-700 text-white rounded-lg text-xs font-medium hover:bg-rose-600 transition text-center">- Stok Keluar</button>
         </div>
@@ -171,8 +169,9 @@
       <!-- VIEW 2: DATA BARANG -->
       <section id="view-products" class="tab-view mt-4 hidden space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div class="w-full sm:w-80">
-            <input type="text" id="searchProduct" onkeyup="productPage=1; renderProducts()" placeholder="CARI SKU, NAMA, RAK, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
+          <div class="w-full sm:w-80 relative">
+            <input type="text" id="searchProduct" onkeyup="productPage=1; renderProducts()" placeholder="SCAN BARCODE / CARI NAMA..." class="w-full pl-9 pr-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
+            <i class="fa-solid fa-barcode text-slate-400 absolute left-3 top-2.5 text-sm"></i>
           </div>
           <div class="flex items-center space-x-2 w-full sm:w-auto">
             <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition w-full sm:w-auto">
@@ -485,7 +484,6 @@
           </form>
         </div>
 
-        <!-- FITUR SINKRONISASI OFFLINE-FIRST & BACKUP LOKAL (DRIVE C/D) -->
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
             <h4 class="font-bold text-slate-900 text-lg flex items-center space-x-2">
@@ -493,16 +491,6 @@
               <span>Penyimpanan Offline & Cadangan Data Fisik (Drive C / D)</span>
             </h4>
             <p class="text-xs text-slate-500 mt-1">Aplikasi berjalan 100% offline. Amankan database dengan menyimpan file cadangan JSON secara langsung ke folder laptop/komputer Anda (misal: <code class="bg-slate-100 text-indigo-700 px-1 py-0.5 rounded font-mono font-bold">D:\Backup_Gudang\</code>).</p>
-          </div>
-
-          <div class="p-4 bg-indigo-50/60 border border-indigo-200 rounded-xl space-y-3">
-            <div class="flex items-start justify-between">
-              <div>
-                <p class="text-xs font-bold text-indigo-950 uppercase">Status Antrean Offline Lokal</p>
-                <p class="text-[11px] text-indigo-800">Menyimpan record transaksi lokal yang siap di-sync saat cloud diaktifkan nanti.</p>
-              </div>
-              <span id="badgeQueueDetail" class="px-2.5 py-1 bg-indigo-600 text-white text-xs font-bold font-mono rounded-lg">0 Transaksi Pending</span>
-            </div>
           </div>
 
           <div class="flex flex-wrap gap-3 pt-2">
@@ -653,7 +641,7 @@
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">KODE BARCODE</label>
-            <input type="text" id="barangBarcode" placeholder="899..." class="w-full p-2 border rounded text-sm uppercase-input">
+            <input type="text" id="barangBarcode" placeholder="899..." class="w-full p-2 border rounded text-sm uppercase-input font-mono font-bold bg-amber-50 border-amber-300">
           </div>
         </div>
         <div class="flex justify-end space-x-2 pt-3">
@@ -672,13 +660,13 @@
         <input type="hidden" id="txType" value="IN">
         <div>
           <label class="block text-xs font-semibold mb-1">PILIH BARANG</label>
-          <select id="txProductId" required onchange="updateTxUnitDropdown()" class="w-full p-2 border rounded text-sm uppercase-input"></select>
+          <select id="txProductId" required onchange="updateTxUnitDropdown()" class="w-full p-2 border rounded text-sm uppercase-input font-bold"></select>
         </div>
         
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">JUMLAH TRANSAKSI (QTY)</label>
-            <input type="number" id="txQty" min="1" required oninput="calculateTxConversionPreview()" class="w-full p-2 border rounded text-sm font-bold">
+            <label class="block text-xs font-semibold mb-1 text-emerald-800 font-bold">JUMLAH TRANSAKSI (QTY)</label>
+            <input type="number" id="txQty" min="1" required oninput="calculateTxConversionPreview()" class="w-full p-2 border-2 border-emerald-400 rounded text-base font-bold font-mono focus:ring-2 focus:ring-emerald-500">
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">SATUAN TRANSAKSI</label>
@@ -733,7 +721,10 @@
   <!-- MODAL: CAMERA BARCODE SCANNER -->
   <div id="modalScan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 space-y-4 text-center my-auto">
-      <h3 class="font-bold text-slate-900">Scan Barcode Kamera</h3>
+      <h3 class="font-bold text-slate-900 flex items-center justify-center space-x-2">
+        <i class="fa-solid fa-barcode text-indigo-600"></i>
+        <span>Scan Barcode Produk Kamera</span>
+      </h3>
       <div id="reader" class="w-full bg-black rounded-lg overflow-hidden min-h-[220px]"></div>
       <p id="scanResult" class="text-xs text-slate-500 font-mono">Arahkan kamera ke barcode produk...</p>
       <button onclick="closeScanModal()" class="w-full py-2 bg-slate-800 text-white rounded text-sm font-medium">Tutup Scanner</button>
@@ -762,15 +753,15 @@
       categories: ['SEMBAKO', 'KEMASAN', 'MINUMAN', 'SABUN & DETERJEN', 'MAKANAN RINGAN'],
       units: ['PCS', 'BUNGKUS', 'BOTOL', 'KALENG', 'KG', 'KARTON', 'DUS', 'PACK', 'BAL', 'IKAT', 'SACHET'],
       products: [
-        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890', isSynced: true },
-        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 25, minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891', isSynced: true }
+        { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 25, minStock: 50, stock: 12, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
-        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 50, txUnit: 'BUNGKUS', inputQty: 50, unitCost: 14000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'STOK INITIAL', user: 'ADMIN', isSynced: true }
+        { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 50, txUnit: 'BUNGKUS', inputQty: 50, unitCost: 14000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'STOK INITIAL', user: 'ADMIN' }
       ],
       opname: [
-        { id: 'ADJ-1', date: '2026-08-19', name: 'MINYAK GORENG 1L', systemQty: 50, actualQty: 48, diffQty: -2, reason: 'HASIL OPNAME FISIK', user: 'ADMIN', isSynced: true },
-        { id: 'ADJ-2', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN', isSynced: true }
+        { id: 'ADJ-1', date: '2026-08-19', name: 'MINYAK GORENG 1L', systemQty: 50, actualQty: 48, diffQty: -2, reason: 'HASIL OPNAME FISIK', user: 'ADMIN' },
+        { id: 'ADJ-2', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 15, actualQty: 12, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
       ]
     };
 
@@ -794,7 +785,6 @@
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
 
-    // DETEKSI STATUS INTERNET ONLINE/OFFLINE
     function updateNetworkStatus() {
       const isOnline = navigator.onLine;
       const netBadge = document.getElementById('badgeNetworkStatus');
@@ -806,28 +796,46 @@
           ? `<i class="fa-solid fa-wifi"></i> <span>ONLINE</span>`
           : `<i class="fa-solid fa-plane"></i> <span>OFFLINE (DRIVE C/D)</span>`;
       }
-      checkPendingSyncCount();
     }
 
-    // CEK JUMLAH ANTREAN DATA YANG BELUM SYNC
-    function checkPendingSyncCount() {
-      const unsyncedMutasi = (appData.mutasi || []).filter(m => !m.isSynced).length;
-      const unsyncedOpname = (appData.opname || []).filter(o => !o.isSynced).length;
-      const unsyncedProducts = (appData.products || []).filter(p => !p.isSynced).length;
-      const totalPending = unsyncedMutasi + unsyncedOpname + unsyncedProducts;
+    // LOGIKA PINTAR PENANGANAN SCAN BARCODE
+    function handleScannedBarcode(codeStr) {
+      const cleanCode = codeStr.trim().toUpperCase();
+      if(!cleanCode) return;
 
-      const badgePending = document.getElementById('badgePendingSync');
-      const cntPending = document.getElementById('cntPendingSync');
-      const badgeDetail = document.getElementById('badgeQueueDetail');
+      // Cari barang berdasarkan Barcode atau SKU
+      const foundProduct = (appData.products || []).find(p => 
+        (p.barcode && p.barcode.toUpperCase() === cleanCode) || 
+        (p.sku && p.sku.toUpperCase() === cleanCode)
+      );
 
-      if(badgePending && cntPending) {
-        cntPending.innerText = totalPending;
-        if(totalPending > 0) badgePending.classList.remove('hidden');
-        else badgePending.classList.add('hidden');
-      }
+      if (foundProduct) {
+        // BUKA MODAL STOK MASUK DENGAN PRODUK OTOMATIS TERPILIH
+        openModal('stokMasuk');
+        document.getElementById('txProductId').value = foundProduct.id;
+        updateTxUnitDropdown();
+        
+        // FOKUSKAN KURSOR LANGSUNG KE INPUT JUMLAH (QTY)
+        setTimeout(() => {
+          const qtyEl = document.getElementById('txQty');
+          if(qtyEl) {
+            qtyEl.focus();
+            qtyEl.select();
+          }
+        }, 200);
 
-      if(badgeDetail) {
-        badgeDetail.innerText = `${totalPending} Data Belum Sync`;
+      } else {
+        // BARCODE BELUM TERDAFTAR -> DOWNTIME DENGAN OTOMATISASI NAIK BARANG BARU
+        if (confirm(`BARCODE BELUM TERDAFTAR!\n\nKode Barcode: ${cleanCode}\nApakah Abah mau mendaftarkan sebagai BARANG BARU sekarang?`)) {
+          openModal('tambahBarang');
+          document.getElementById('barangBarcode').value = cleanCode;
+          document.getElementById('barangSku').value = cleanCode; // Pre-fill SKU dengan Barcode
+          
+          setTimeout(() => {
+            const namaEl = document.getElementById('barangNama');
+            if(namaEl) namaEl.focus();
+          }, 200);
+        }
       }
     }
 
@@ -908,7 +916,6 @@
 
     function saveData() {
       localStorage.setItem('KARTU_STOK_PRO_DATA', JSON.stringify(appData));
-      checkPendingSyncCount();
       renderAll();
     }
 
@@ -1314,7 +1321,6 @@
           product.sellPrice = sellPrice;
           product.minStock = Number(document.getElementById('barangMinStock').value);
           product.barcode = document.getElementById('barangBarcode').value.toUpperCase();
-          product.isSynced = false;
         }
       } else {
         const initStock = Number(document.getElementById('barangInitialStock').value) || 0;
@@ -1331,8 +1337,7 @@
           stock: initStock,
           avgHpp: costPrice,
           sellPrice: sellPrice,
-          barcode: document.getElementById('barangBarcode').value.toUpperCase(),
-          isSynced: false
+          barcode: document.getElementById('barangBarcode').value.toUpperCase()
         };
         appData.products.push(newProduct);
 
@@ -1350,8 +1355,7 @@
             batchNo: getAutoBatchNo(),
             expireDate: '-',
             notes: 'STOK AWAL SAAT PENDAFTARAN BARANG',
-            user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase(),
-            isSynced: false
+            user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
           });
         }
       }
@@ -1359,7 +1363,7 @@
       productPage = 1;
       closeModal('modalBarang');
       saveData();
-      alert('Data barang berhasil disimpan di database lokal!');
+      alert('Data barang berhasil disimpan!');
     }
 
     function renderMutasi() {
@@ -1635,12 +1639,10 @@
             actualQty: actualQty,
             diffQty: diff,
             reason: (reasonVal || 'HASIL OPNAME FISIK').toUpperCase(),
-            user: (appData.currentUser ? appData.currentUser.name : 'ADMIN').toUpperCase(),
-            isSynced: false
+            user: (appData.currentUser ? appData.currentUser.name : 'ADMIN').toUpperCase()
           });
 
           p.stock = actualQty;
-          p.isSynced = false;
         }
       });
 
@@ -1648,7 +1650,7 @@
         opnameDrafts = {}; 
         auditPage = 1; 
         saveData();
-        alert(`Berhasil menyesuaikan ${adjustmentCount} barang yang memiliki selisih di database lokal!`);
+        alert(`Berhasil menyesuaikan ${adjustmentCount} barang yang memiliki selisih!`);
       } else {
         alert('Tidak ada selisih stok yang diubah.');
       }
@@ -2213,8 +2215,6 @@
         product.stock -= finalBaseQty;
       }
 
-      product.isSynced = false;
-
       let batchVal = document.getElementById('txBatchNo').value.trim().toUpperCase();
       if(!batchVal) batchVal = getAutoBatchNo();
 
@@ -2231,13 +2231,12 @@
         batchNo: batchVal,
         expireDate: document.getElementById('txExpireDate').value || '-',
         notes: (document.getElementById('txNotes').value || '-').toUpperCase() + (selectedUnit === bigSat ? ` (${inputQty} ${bigSat} ISI ${activeRatio})` : ''),
-        user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase(),
-        isSynced: false
+        user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
       });
 
       closeModal('modalTx');
       saveData();
-      alert(`Transaksi Stok ${type === 'IN' ? 'Masuk' : 'Keluar'} Berhasil Disimpan di Database Lokal!`);
+      alert(`Transaksi Stok ${type === 'IN' ? 'Masuk' : 'Keluar'} Berhasil Disimpan!`);
     }
 
     function openModal(type) {
@@ -2268,7 +2267,7 @@
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     function deleteProduct(id) {
-      if(confirm('Hapus barang ini dari database lokal?')) {
+      if(confirm('Hapus barang ini dari database?')) {
         appData.products = appData.products.filter(p => p.id !== id);
         saveData();
       }
@@ -2295,10 +2294,8 @@
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 140 } },
         (decodedText) => {
-          document.getElementById('searchProduct').value = decodedText.toUpperCase();
-          renderProducts();
-          switchTab('products');
           closeScanModal();
+          handleScannedBarcode(decodedText);
         },
         () => {}
       ).catch(() => {
@@ -2347,7 +2344,6 @@
       document.body.removeChild(link);
     }
 
-    // EKSPOR BACKUP UNTUK DISIMPAN PADA DRIVE C ATAU D
     function exportBackupJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
       const dlAnchor = document.createElement('a');
@@ -2424,14 +2420,24 @@
       } catch(e) { console.warn("Chart render skipped:", e); }
     }
 
-    // EVENT LISTENERS UNTUK DETEKSI KONEKSI REAL-TIME
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
-
+    // LISTENER ENTER KEY UNTUK BARCODE SCANNER USB FISIK
     window.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
       updateNetworkStatus();
       renderAll();
+
+      const searchEl = document.getElementById('searchProduct');
+      if(searchEl) {
+        searchEl.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = this.value.trim();
+            if (val) {
+              handleScannedBarcode(val);
+            }
+          }
+        });
+      }
     });
   </script>
 </body>
