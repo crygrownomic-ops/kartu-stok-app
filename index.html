@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Smart Scan Active)</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise (Cloud Auto-Sync Active)</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -74,7 +74,7 @@
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
           <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v5.0.0</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
+        <p class="text-xs text-slate-400 mt-0.5">Enterprise Cloud Edition</p>
       </div>
 
       <div class="px-5 py-3 bg-slate-800/80 flex items-center justify-between border-b border-slate-800 text-xs">
@@ -103,7 +103,7 @@
     <div class="p-4 border-t border-slate-800 text-xs text-slate-400 space-y-1">
       <p class="text-[11px] font-semibold text-slate-300">Pengembang Sistem:</p>
       <p class="font-bold text-indigo-400 text-sm">Urai Ikhsan Fadhilah</p>
-      <p class="text-[10px] text-slate-500">Smart Barcode Workflow</p>
+      <p class="text-[10px] text-slate-500">Supabase Connected ✅</p>
     </div>
   </aside>
 
@@ -116,12 +116,16 @@
             <h2 id="pageTitle" class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Overview</h2>
             <span id="badgeStoreActive" class="text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold">LISENSI VALID</span>
             <span id="badgeNetworkStatus" class="text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold flex items-center gap-1">
-              <i class="fa-solid fa-wifi"></i> <span>ONLINE</span>
+              <i class="fa-solid fa-cloud text-emerald-600"></i> <span id="txtCloudStatus">SUPABASE CONNECTED</span>
             </span>
           </div>
           <p id="pageSub" class="text-xs sm:text-sm text-slate-500 mt-0.5">Ringkasan status barang, lokasi rak, analisis HPP, dan valuasi aset</p>
         </div>
         <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <button onclick="triggerSyncData()" class="px-3 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition text-center flex items-center justify-center space-x-1" title="Sinkronkan data dengan database Supabase Cloud">
+            <i class="fa-solid fa-rotate text-amber-300" id="iconSync"></i>
+            <span>Sync Cloud</span>
+          </button>
           <button onclick="openScanModal()" class="flex-1 sm:flex-initial px-3 py-2 bg-slate-800 text-white rounded-lg text-xs font-medium hover:bg-slate-700 transition text-center flex items-center justify-center space-x-1">
             <i class="fa-solid fa-barcode text-amber-400"></i>
             <span>Scan Barcode</span>
@@ -733,6 +737,12 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // KONEKSI SUPABASE KHUSUS PROJECT ABAH
+    const SUPABASE_URL = "https://wfbclfxnknspamkavqtk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndmYmNsZnhua25zcGFta2F2cXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxODQ4NDQsImV4cCI6MjEwMTc2MDg0NH0.xORViaKJlXYWoXA-fhrQE1_E1I8DGxS7PNthYZoz3nw";
+    
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
     const SECRET_SALT = "NINNA_KARTUSTOK_SECRET_2026";
     const MASTER_KEY = "NINNA-MASTER-2026";
 
@@ -785,6 +795,98 @@
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
 
+    // MESIN SINKRONISASI AUTOMATIS SUPABASE
+    async function syncDataToCloud() {
+      if(!supabaseClient || !navigator.onLine) return;
+      const iconSync = document.getElementById('iconSync');
+      if(iconSync) iconSync.classList.add('fa-spin');
+
+      try {
+        // 1. Sync Products
+        if(appData.products.length > 0) {
+          const dbProducts = appData.products.map(p => ({
+            id: String(p.id),
+            sku: p.sku,
+            name: p.name,
+            category: p.category,
+            warehouse: p.warehouse,
+            satuan: p.satuan,
+            satuan_besar: p.satuanBesar || '',
+            rasio_konversi: p.rasioKonversi || 1,
+            min_stock: p.minStock || 10,
+            stock: p.stock || 0,
+            avg_hpp: p.avgHpp || 0,
+            sell_price: p.sellPrice || 0,
+            barcode: p.barcode || ''
+          }));
+          await supabaseClient.from('products').upsert(dbProducts, { onConflict: 'id' });
+        }
+
+        // 2. Sync Mutasi
+        if(appData.mutasi.length > 0) {
+          const dbMutasi = appData.mutasi.map(m => ({
+            id: String(m.id),
+            date: m.date,
+            type: m.type,
+            product_id: String(m.productId),
+            name: m.name,
+            qty: m.qty,
+            tx_unit: m.txUnit,
+            input_qty: m.inputQty,
+            unit_cost: m.unitCost,
+            batch_no: m.batchNo,
+            expire_date: m.expireDate,
+            notes: m.notes,
+            user_name: m.user
+          }));
+          await supabaseClient.from('mutasi').upsert(dbMutasi, { onConflict: 'id' });
+        }
+
+        // 3. Sync Opname
+        if(appData.opname.length > 0) {
+          const dbOpname = appData.opname.map(o => ({
+            id: String(o.id),
+            date: o.date,
+            name: o.name,
+            system_qty: o.systemQty,
+            actual_qty: o.actualQty,
+            diff_qty: o.diffQty,
+            reason: o.reason,
+            user_name: o.user
+          }));
+          await supabaseClient.from('opname').upsert(dbOpname, { onConflict: 'id' });
+        }
+
+        // 4. Sync Profile
+        if(appData.profile) {
+          await supabaseClient.from('profile').upsert({
+            id: 1,
+            store_name: appData.profile.storeName,
+            address: appData.profile.address,
+            city: appData.profile.city,
+            phone: appData.profile.phone,
+            license_key: appData.profile.licenseKey
+          }, { onConflict: 'id' });
+        }
+
+        const txtStatus = document.getElementById('txtCloudStatus');
+        if(txtStatus) txtStatus.innerText = "SUPABASE SYNCED";
+      } catch(err) {
+        console.warn("Sync failed:", err);
+      } finally {
+        if(iconSync) iconSync.classList.remove('fa-spin');
+      }
+    }
+
+    async function triggerSyncData() {
+      if(!navigator.onLine) {
+        alert("Koneksi offline! Gagal terhubung ke Supabase Cloud.");
+        return;
+      }
+      await syncDataToCloud();
+      alert("Seluruh data berhasil disinkronkan ke Supabase Cloud!");
+    }
+
     function updateNetworkStatus() {
       const isOnline = navigator.onLine;
       const netBadge = document.getElementById('badgeNetworkStatus');
@@ -793,29 +895,25 @@
           ? "text-[10px] sm:text-xs font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold flex items-center gap-1"
           : "text-[10px] sm:text-xs font-mono bg-slate-200 text-slate-700 border border-slate-300 px-2 py-0.5 rounded font-bold flex items-center gap-1";
         netBadge.innerHTML = isOnline 
-          ? `<i class="fa-solid fa-wifi"></i> <span>ONLINE</span>`
+          ? `<i class="fa-solid fa-cloud text-emerald-600"></i> <span id="txtCloudStatus">SUPABASE CONNECTED</span>`
           : `<i class="fa-solid fa-plane"></i> <span>OFFLINE (DRIVE C/D)</span>`;
       }
     }
 
-    // LOGIKA PINTAR PENANGANAN SCAN BARCODE
     function handleScannedBarcode(codeStr) {
       const cleanCode = codeStr.trim().toUpperCase();
       if(!cleanCode) return;
 
-      // Cari barang berdasarkan Barcode atau SKU
       const foundProduct = (appData.products || []).find(p => 
         (p.barcode && p.barcode.toUpperCase() === cleanCode) || 
         (p.sku && p.sku.toUpperCase() === cleanCode)
       );
 
       if (foundProduct) {
-        // BUKA MODAL STOK MASUK DENGAN PRODUK OTOMATIS TERPILIH
         openModal('stokMasuk');
         document.getElementById('txProductId').value = foundProduct.id;
         updateTxUnitDropdown();
         
-        // FOKUSKAN KURSOR LANGSUNG KE INPUT JUMLAH (QTY)
         setTimeout(() => {
           const qtyEl = document.getElementById('txQty');
           if(qtyEl) {
@@ -825,11 +923,10 @@
         }, 200);
 
       } else {
-        // BARCODE BELUM TERDAFTAR -> DOWNTIME DENGAN OTOMATISASI NAIK BARANG BARU
         if (confirm(`BARCODE BELUM TERDAFTAR!\n\nKode Barcode: ${cleanCode}\nApakah Abah mau mendaftarkan sebagai BARANG BARU sekarang?`)) {
           openModal('tambahBarang');
           document.getElementById('barangBarcode').value = cleanCode;
-          document.getElementById('barangSku').value = cleanCode; // Pre-fill SKU dengan Barcode
+          document.getElementById('barangSku').value = cleanCode;
           
           setTimeout(() => {
             const namaEl = document.getElementById('barangNama');
@@ -917,6 +1014,7 @@
     function saveData() {
       localStorage.setItem('KARTU_STOK_PRO_DATA', JSON.stringify(appData));
       renderAll();
+      syncDataToCloud();
     }
 
     function checkAuthSession() {
@@ -2420,11 +2518,11 @@
       } catch(e) { console.warn("Chart render skipped:", e); }
     }
 
-    // LISTENER ENTER KEY UNTUK BARCODE SCANNER USB FISIK
     window.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
       updateNetworkStatus();
       renderAll();
+      syncDataToCloud();
 
       const searchEl = document.getElementById('searchProduct');
       if(searchEl) {
@@ -2439,6 +2537,9 @@
         });
       }
     });
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
   </script>
 </body>
 </html>
