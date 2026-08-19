@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.9.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v5.0.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.9.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v5.0.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -72,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.9.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v5.0.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -160,11 +160,11 @@
         </div>
       </section>
 
-      <!-- VIEW 2: DATA BARANG -->
+      <!-- VIEW 2: DATA BARANG (PAGINASI 10 DATA TERUPDATE) -->
       <section id="view-products" class="tab-view mt-4 hidden space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
           <div class="w-full sm:w-80">
-            <input type="text" id="searchProduct" onkeyup="renderProducts()" placeholder="CARI SKU, NAMA, RAK, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
+            <input type="text" id="searchProduct" onkeyup="productPage=1; renderProducts()" placeholder="CARI SKU, NAMA, RAK, BARCODE..." class="w-full px-4 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 uppercase-input">
           </div>
           <div class="flex items-center space-x-2 w-full sm:w-auto">
             <button onclick="openModal('tambahBarang')" class="admin-only px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition w-full sm:w-auto">
@@ -173,23 +173,26 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
-          <table class="w-full text-left border-collapse text-sm min-w-[800px]">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
-                <th class="p-3">SKU / BARCODE (EDIT)</th>
-                <th class="p-3">NAMA BARANG</th>
-                <th class="p-3">KATEGORI & LOKASI RAK</th>
-                <th class="p-3 text-center">SATUAN DEFAULT SKU</th>
-                <th class="p-3 text-right">STOK FISIK</th>
-                <th class="p-3 text-right">HARGA BELI (HPP)</th>
-                <th class="p-3 text-right">HARGA JUAL</th>
-                <th class="p-3 text-right">POTENSI MARGIN</th>
-                <th class="p-3 text-center admin-only">AKSI</th>
-              </tr>
-            </thead>
-            <tbody id="tableProductBody" class="divide-y divide-slate-100 font-mono"></tbody>
-          </table>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm min-w-[800px]">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-xs">
+                  <th class="p-3">SKU / BARCODE (EDIT)</th>
+                  <th class="p-3">NAMA BARANG</th>
+                  <th class="p-3">KATEGORI & LOKASI RAK</th>
+                  <th class="p-3 text-center">SATUAN DEFAULT SKU</th>
+                  <th class="p-3 text-right">STOK FISIK</th>
+                  <th class="p-3 text-right">HARGA BELI (HPP)</th>
+                  <th class="p-3 text-right">HARGA JUAL</th>
+                  <th class="p-3 text-right">POTENSI MARGIN</th>
+                  <th class="p-3 text-center admin-only">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="tableProductBody" class="divide-y divide-slate-100 font-mono"></tbody>
+            </table>
+          </div>
+          <div id="productPagination" class="flex flex-col sm:flex-row items-center justify-between pt-3 border-t text-xs text-slate-600 gap-2"></div>
         </div>
       </section>
 
@@ -495,7 +498,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.9.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v5.0.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -550,7 +553,7 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.9.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v5.0.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
@@ -752,12 +755,14 @@
     if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
     if(!appData.units) appData.units = DEFAULT_DATA.units;
 
+    let productPage = 1; // PAGINASI MASTER DATA BARANG (10 PER HALAMAN)
     let mutasiPage = 1;
     let ledgerPage = 1;
     let opnamePage = 1;
-    let auditPage = 1; // PAGING AUDIT OPNAME
+    let auditPage = 1; // PAGING AUDIT OPNAME (5 PER HALAMAN)
+    
     const PAGE_SIZE = 10;
-    const AUDIT_PAGE_SIZE = 5; // MAKSIMAL 5 RIWAYAT TERAKHIR PER HALAMAN
+    const AUDIT_PAGE_SIZE = 5;
     
     let opnameDrafts = {};
     let html5QrcodeScanner = null;
@@ -916,6 +921,7 @@
         currentNav.classList.remove('text-slate-400');
       }
 
+      if(tabId === 'products') { productPage = 1; renderProducts(); }
       if(tabId === 'ledger') { ledgerPage = 1; populateLedgerSelect(); }
       if(tabId === 'mutasi') { mutasiPage = 1; renderMutasi(); }
       if(tabId === 'opname') { opnamePage = 1; auditPage = 1; populateOpnameFilterOptions(); renderMassOpnameTable(); }
@@ -1095,24 +1101,36 @@
       const totalHppValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.avgHpp || 0)), 0);
       document.getElementById('statTotalValuation').innerText = 'Rp ' + totalHppValuation.toLocaleString('id-ID');
 
-      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0)), 0);
+      const totalSellValuation = items.reduce((acc, p) => acc + (Number(p.stock || 0) * Number(p.sellPrice || 0), 0));
       document.getElementById('statTotalSellingValuation').innerText = 'Rp ' + totalSellValuation.toLocaleString('id-ID');
     }
 
+    /* RENDER MASTER DATA BARANG DENGAN PAGINASI 10 BARANG TERUPDATE PER HALAMAN */
     function renderProducts() {
       const tbody = document.getElementById('tableProductBody');
+      const pagEl = document.getElementById('productPagination');
       if(!tbody) return;
       const search = (document.getElementById('searchProduct')?.value || '').toUpperCase();
-      let html = '';
 
-      const filtered = (appData.products || []).filter(p => 
+      // Urutkan data terbaru paling atas (slice & reverse)
+      const filtered = (appData.products || []).slice().reverse().filter(p => 
         (p.name || '').toUpperCase().includes(search) || 
         (p.sku || '').toUpperCase().includes(search) || 
         (p.warehouse || '').toUpperCase().includes(search) ||
         (p.barcode && p.barcode.toUpperCase().includes(search))
       );
 
-      filtered.forEach(p => {
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+      if(productPage > totalPages) productPage = totalPages;
+      if(productPage < 1) productPage = 1;
+
+      const startIdx = (productPage - 1) * PAGE_SIZE;
+      const pagedProducts = filtered.slice(startIdx, startIdx + PAGE_SIZE);
+
+      let html = '';
+      pagedProducts.forEach(p => {
         const isLow = p.stock <= p.minStock;
         const margin = (p.sellPrice || 0) - (p.avgHpp || 0);
         
@@ -1158,8 +1176,25 @@
         `;
       });
 
-      tbody.innerHTML = html;
+      tbody.innerHTML = html || `<tr><td colspan="9" class="p-4 text-center text-slate-400 text-xs">Belum ada data barang.</td></tr>`;
+
+      if(pagEl) {
+        pagEl.innerHTML = `
+          <div>Menampilkan <strong>${totalItems > 0 ? startIdx + 1 : 0}</strong> - <strong>${Math.min(startIdx + PAGE_SIZE, totalItems)}</strong> dari <strong>${totalItems}</strong> barang</div>
+          <div class="flex items-center space-x-1">
+            <button onclick="changeProductPage(-1)" ${productPage === 1 ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Prev</button>
+            <span class="px-3 font-bold text-indigo-600">Halaman ${productPage} / ${totalPages}</span>
+            <button onclick="changeProductPage(1)" ${productPage === totalPages ? 'disabled' : ''} class="px-3 py-1 border rounded bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold">Next</button>
+          </div>
+        `;
+      }
+
       applyUserPermissions();
+    }
+
+    function changeProductPage(delta) {
+      productPage += delta;
+      renderProducts();
     }
 
     function clickEditProduct(productId) {
@@ -1255,6 +1290,7 @@
         }
       }
 
+      productPage = 1; // RESET KE HALAMAN DENGAN INPUT BARANG TERBARU
       closeModal('modalBarang');
       saveData();
       alert('Data barang berhasil disimpan!');
@@ -1542,7 +1578,7 @@
 
       if(adjustmentCount > 0) {
         opnameDrafts = {}; 
-        auditPage = 1; // RESET KE HALAMAN PERTAMA AUDIT TERBARU
+        auditPage = 1; 
         saveData();
         alert(`Berhasil menyesuaikan ${adjustmentCount} barang yang memiliki selisih!`);
       } else {
@@ -1550,7 +1586,7 @@
       }
     }
 
-    /* RENDER TABEL AUDIT DENGAN PAGING (MAKSIMAL 5 DATA TERUPDATE PER HALAMAN) */
+    /* RENDER TABEL AUDIT DENGAN PAGINASI 5 DATA TERUPDATE */
     function renderOpnameAuditTable() {
       const tbody = document.getElementById('tableOpnameAuditBody');
       const pagEl = document.getElementById('auditPagination');
