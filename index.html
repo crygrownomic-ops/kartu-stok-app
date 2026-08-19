@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.4.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.4.1 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.4.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.4.1</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -72,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.4.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.4.1</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -193,10 +193,9 @@
         </div>
       </section>
 
-      <!-- VIEW BARU: MASTER SATUAN & KATEGORI (MANAJEMEN MANDIRI) -->
+      <!-- VIEW MASTER SATUAN & KATEGORI -->
       <section id="view-refmaster" class="tab-view mt-4 hidden space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- MANAJEMEN KATEGORI -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b pb-3">
               <div>
@@ -228,7 +227,6 @@
             </div>
           </div>
 
-          <!-- MANAJEMEN SATUAN -->
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b pb-3">
               <div>
@@ -239,7 +237,7 @@
             </div>
             
             <form onsubmit="handleAddUnit(event)" class="flex gap-2">
-              <input type="text" id="inputNewUnit" required placeholder="NAMA SATUAN BARU (E.G. BOTOL, KALENG)..." class="flex-1 p-2 border rounded text-sm uppercase-input">
+              <input type="text" id="inputNewUnit" required placeholder="NAMA SATUAN BARU..." class="flex-1 p-2 border rounded text-sm uppercase-input">
               <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-sm font-bold flex items-center space-x-1">
                 <i class="fa-solid fa-plus"></i>
                 <span>Tambah</span>
@@ -447,7 +445,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.4.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.4.1 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -502,13 +500,13 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.4.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.4.1</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG (DENGAN DROP-DOWN LIST DARI MASTER REFERENSI) -->
+  <!-- MODAL: TAMBAH / EDIT BARANG (DENGAN INPUT STOK AWAL DILENGKAPI) -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -524,7 +522,7 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">KATEGORI (DROP-DOWN)</label>
+            <label class="block text-xs font-semibold mb-1">KATEGORI</label>
             <select id="barangKategori" required class="w-full p-2 border rounded text-sm uppercase-input font-bold bg-white"></select>
           </div>
           <div>
@@ -534,7 +532,7 @@
         </div>
 
         <div class="bg-indigo-50/70 border border-indigo-200 p-3 rounded-lg space-y-2">
-          <p class="text-[11px] font-bold text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-boxes-packing mr-1"></i> Satuan Default SKU (Drop-Down List)</p>
+          <p class="text-[11px] font-bold text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-boxes-packing mr-1"></i> Satuan Default SKU & Konversi</p>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN ECERAN (KECIL)</label>
@@ -549,6 +547,13 @@
             <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">ISI DEFAULT PER DUS (KONVERSI SKU)</label>
             <input type="number" id="barangRasio" required value="1" min="1" placeholder="Contoh: Indomie = 40, Aqua = 24" class="w-full p-1.5 border rounded text-xs bg-white font-mono font-bold">
           </div>
+        </div>
+
+        <!-- KOLOM INPUT STOK AWAL LANSUNG SAAT BARANG BARU DIBUAT -->
+        <div id="groupInitialStock" class="bg-emerald-50 border border-emerald-200 p-2.5 rounded-lg">
+          <label class="block text-xs font-bold text-emerald-900 mb-1">STOK AWAL SAAT INI (DALAM SATUAN ECERAN)</label>
+          <input type="number" id="barangInitialStock" value="0" min="0" class="w-full p-2 border border-emerald-300 rounded text-sm font-bold font-mono text-emerald-900 bg-white">
+          <p class="text-[10px] text-emerald-700 mt-1">Masukkan jumlah stok fisik yang saat ini ada di gudang.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
@@ -670,13 +675,13 @@
       units: ['PCS', 'BUNGKUS', 'BOTOL', 'KALENG', 'KG', 'KARTON', 'DUS', 'PACK', 'BAL', 'IKAT', 'SACHET'],
       products: [
         { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
-        { id: '2', sku: 'BRG-002', name: 'INDOMIE GORENG 85G', category: 'SEMBAKO', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 40, minStock: 50, stock: 120, avgHpp: 2800, sellPrice: 3500, barcode: '8991234567891' }
+        { id: '2', sku: 'BRG-002', name: 'KARDUS BOX 30X20', category: 'KEMASAN', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 25, minStock: 50, stock: 50, avgHpp: 2500, sellPrice: 3500, barcode: '8991234567891' }
       ],
       mutasi: [
         { id: 'TX-1001', date: '2026-08-18 08:30', type: 'IN', productId: '1', name: 'MINYAK GORENG 1L', qty: 48, txUnit: 'KARTON', inputQty: 4, unitCost: 168000, batchNo: 'BTC-20260818-001', expireDate: '2027-08-18', notes: 'SUPPLIER A (4 KARTON ISI 12)', user: 'ADMIN' }
       ],
       opname: [
-        { id: 'ADJ-1', date: '2026-08-17', name: 'INDOMIE GORENG 85G', systemQty: 123, actualQty: 120, diffQty: -3, reason: 'DUS RUSAK', user: 'ADMIN' }
+        { id: 'ADJ-1', date: '2026-08-17', name: 'KARDUS BOX 30X20', systemQty: 53, actualQty: 50, diffQty: -3, reason: 'RUSAK BASAH', user: 'ADMIN' }
       ]
     };
 
@@ -861,7 +866,6 @@
       renderCharts();
     }
 
-    /* LOGIC MASTER KATEGORI & SATUAN MANDIRI */
     function renderRefMasterTables() {
       const tbodyCat = document.getElementById('tableCategoryBody');
       const tbodyUnit = document.getElementById('tableUnitBody');
@@ -1114,6 +1118,8 @@
       document.getElementById('barangMinStock').value = p.minStock || 10;
       document.getElementById('barangBarcode').value = p.barcode || '';
 
+      document.getElementById('groupInitialStock').style.display = 'none'; // Sembunyikan stok awal jika mode edit
+
       document.getElementById('modalBarang').classList.remove('hidden');
     }
 
@@ -1143,6 +1149,7 @@
           product.barcode = document.getElementById('barangBarcode').value.toUpperCase();
         }
       } else {
+        const initStock = Number(document.getElementById('barangInitialStock').value) || 0;
         const newProduct = {
           id: Date.now().toString(),
           sku: document.getElementById('barangSku').value.toUpperCase(),
@@ -1153,16 +1160,35 @@
           satuanBesar: satuanBig,
           rasioKonversi: rasio,
           minStock: Number(document.getElementById('barangMinStock').value),
-          stock: 0,
+          stock: initStock,
           avgHpp: costPrice,
           sellPrice: sellPrice,
           barcode: document.getElementById('barangBarcode').value.toUpperCase()
         };
         appData.products.push(newProduct);
+
+        if(initStock > 0) {
+          appData.mutasi.push({
+            id: 'TX-' + Date.now().toString().slice(-5),
+            date: new Date().toISOString().replace('T', ' ').slice(0, 16),
+            type: 'IN',
+            productId: newProduct.id,
+            name: newProduct.name,
+            qty: initStock,
+            txUnit: satuanSmall,
+            inputQty: initStock,
+            unitCost: costPrice,
+            batchNo: getAutoBatchNo(),
+            expireDate: '-',
+            notes: 'STOK AWAL SAAT PENDAFTARAN BARANG',
+            user: (appData.currentUser ? appData.currentUser.name : 'SYSTEM').toUpperCase()
+          });
+        }
       }
 
       closeModal('modalBarang');
       saveData();
+      alert('Data barang berhasil disimpan!');
     }
 
     function renderMutasi() {
@@ -1693,6 +1719,7 @@
 
       closeModal('modalTx');
       saveData();
+      alert(`Transaksi Stok ${type === 'IN' ? 'Masuk' : 'Keluar'} Berhasil Disimpan!`);
     }
 
     function openModal(type) {
@@ -1701,6 +1728,7 @@
         document.getElementById('modalBarangTitle').innerText = 'TAMBAH BARANG BARU';
         document.getElementById('barangId').value = '';
         document.getElementById('formBarang').reset();
+        document.getElementById('groupInitialStock').style.display = 'block'; // Tampilkan stok awal untuk barang baru
         document.getElementById('modalBarang').classList.remove('hidden');
       } else if(type === 'stokMasuk' || type === 'stokKeluar') {
         const isMasuk = type === 'stokMasuk';
