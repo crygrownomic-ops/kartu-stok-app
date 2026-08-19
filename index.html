@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Sistem Manajerial Kartu Stok Gudang v4.3.0 FMCG Enterprise</title>
+  <title>Sistem Manajerial Kartu Stok Gudang v4.4.0 FMCG Enterprise</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -36,7 +36,7 @@
     <div class="flex items-center space-x-2">
       <i class="fa-solid fa-shield-halved text-emerald-400"></i>
       <h1 class="font-bold text-base tracking-tight">Kartu Stok Pro</h1>
-      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.3.0</span>
+      <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded">v4.4.0</span>
     </div>
     <div class="flex items-center space-x-2">
       <span id="lblMobileUser" class="text-xs font-bold text-amber-300">ADMIN</span>
@@ -57,6 +57,7 @@
     <nav class="space-y-1 text-sm pt-1">
       <button onclick="switchTab('dashboard')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Dashboard Overview</button>
       <button onclick="switchTab('products')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Master Data Barang</button>
+      <button onclick="switchTab('refmaster')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800 admin-only">Master Satuan & Kategori</button>
       <button onclick="switchTab('mutasi')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Riwayat Mutasi & Batch</button>
       <button onclick="switchTab('opname')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Stok Opname Massal</button>
       <button onclick="switchTab('ledger')" class="nav-btn-mobile w-full text-left px-3 py-2 rounded font-medium text-slate-300 hover:bg-slate-800">Kartu Stok Ledger</button>
@@ -71,7 +72,7 @@
       <div class="p-5 border-b border-slate-800">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-white text-lg tracking-tight">Kartu Stok Gudang</h1>
-          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.3.0</span>
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold px-2 py-0.5 rounded">v4.4.0</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Enterprise Operations System</p>
       </div>
@@ -90,6 +91,7 @@
       <nav class="p-4 space-y-1 text-sm">
         <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition bg-indigo-600 text-white">Dashboard Overview</button>
         <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Master Data Barang</button>
+        <button onclick="switchTab('refmaster')" id="nav-refmaster" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white admin-only">Master Satuan & Kategori</button>
         <button onclick="switchTab('mutasi')" id="nav-mutasi" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Riwayat Mutasi & Batch</button>
         <button onclick="switchTab('opname')" id="nav-opname" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Stok Opname Massal</button>
         <button onclick="switchTab('ledger')" id="nav-ledger" class="nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium transition text-slate-400 hover:bg-slate-800 hover:text-white">Kartu Stok Ledger</button>
@@ -191,7 +193,76 @@
         </div>
       </section>
 
-      <!-- VIEW 3: MUTASI & BATCH -->
+      <!-- VIEW BARU: MASTER SATUAN & KATEGORI (MANAJEMEN MANDIRI) -->
+      <section id="view-refmaster" class="tab-view mt-4 hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- MANAJEMEN KATEGORI -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+              <div>
+                <h4 class="font-bold text-slate-900 text-base">Kelola Master Kategori</h4>
+                <p class="text-xs text-slate-500">Tambah pilihan kategori produk untuk drop-down list.</p>
+              </div>
+              <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-lg font-mono" id="cntCategory">0</span>
+            </div>
+            
+            <form onsubmit="handleAddCategory(event)" class="flex gap-2">
+              <input type="text" id="inputNewCategory" required placeholder="NAMA KATEGORI BARU..." class="flex-1 p-2 border rounded text-sm uppercase-input">
+              <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm font-bold flex items-center space-x-1">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah</span>
+              </button>
+            </form>
+
+            <div class="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600 border-b">
+                  <tr>
+                    <th class="p-2.5">No</th>
+                    <th class="p-2.5">Nama Kategori</th>
+                    <th class="p-2.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableCategoryBody" class="divide-y"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- MANAJEMEN SATUAN -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+              <div>
+                <h4 class="font-bold text-slate-900 text-base">Kelola Master Satuan</h4>
+                <p class="text-xs text-slate-500">Tambah satuan eceran/grosir baru untuk drop-down list.</p>
+              </div>
+              <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-lg font-mono" id="cntUnit">0</span>
+            </div>
+            
+            <form onsubmit="handleAddUnit(event)" class="flex gap-2">
+              <input type="text" id="inputNewUnit" required placeholder="NAMA SATUAN BARU (E.G. BOTOL, KALENG)..." class="flex-1 p-2 border rounded text-sm uppercase-input">
+              <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-sm font-bold flex items-center space-x-1">
+                <i class="fa-solid fa-plus"></i>
+                <span>Tambah</span>
+              </button>
+            </form>
+
+            <div class="border rounded-lg overflow-hidden max-h-80 overflow-y-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-600 border-b">
+                  <tr>
+                    <th class="p-2.5">No</th>
+                    <th class="p-2.5">Nama Satuan</th>
+                    <th class="p-2.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tableUnitBody" class="divide-y"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: MUTASI & BATCH -->
       <section id="view-mutasi" class="tab-view mt-4 hidden space-y-4">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-2 border-b pb-3">
@@ -218,7 +289,7 @@
         </div>
       </section>
 
-      <!-- VIEW 4: STOK OPNAME MASSAL -->
+      <!-- VIEW 5: STOK OPNAME MASSAL -->
       <section id="view-opname" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 gap-3">
@@ -271,7 +342,7 @@
         </div>
       </section>
 
-      <!-- VIEW 5: KARTU STOK LEDGER -->
+      <!-- VIEW 6: KARTU STOK LEDGER -->
       <section id="view-ledger" class="tab-view mt-4 hidden space-y-4">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 space-y-4">
           <div class="flex flex-col sm:flex-row justify-between gap-3 no-print">
@@ -303,7 +374,7 @@
         </div>
       </section>
 
-      <!-- VIEW 6: LAPORAN & DOKUMEN FISIK -->
+      <!-- VIEW 7: LAPORAN & DOKUMEN FISIK -->
       <section id="view-reports" class="tab-view mt-4 hidden space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
@@ -327,7 +398,7 @@
         </div>
       </section>
 
-      <!-- VIEW 7: PENGATURAN PROFIL -->
+      <!-- VIEW 8: PENGATURAN PROFIL -->
       <section id="view-settings" class="tab-view mt-4 hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div>
@@ -376,7 +447,7 @@
 
     <!-- FOOTER -->
     <footer class="mt-8 pt-4 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 no-print gap-2">
-      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.3.0 Enterprise</span></div>
+      <div>Sistem Manajemen Kartu Stok Gudang <span class="font-mono font-bold text-indigo-600">v4.4.0 Enterprise</span></div>
       <div>Dikembangkan oleh: <strong class="text-slate-800">Urai Ikhsan Fadhilah</strong> &copy; 2026</div>
     </footer>
   </main>
@@ -431,13 +502,13 @@
 
       <div class="border-t pt-3 text-[11px] text-slate-500 space-y-1 bg-slate-50 p-3 rounded-lg text-center">
         <p class="font-bold text-slate-700">Kartu Stok Gudang Enterprise</p>
-        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.3.0</span></p>
+        <p class="text-[10px] text-slate-500">Versi Sistem: <span class="font-mono font-bold text-indigo-600">v4.4.0</span></p>
         <p class="text-[10px] text-slate-500">Pengembang: <span class="font-semibold text-slate-800">Urai Ikhsan Fadhilah</span></p>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH / EDIT BARANG -->
+  <!-- MODAL: TAMBAH / EDIT BARANG (DENGAN DROP-DOWN LIST DARI MASTER REFERENSI) -->
   <div id="modalBarang" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalBarangTitle" class="font-bold text-lg text-slate-900">TAMBAH BARANG BARU</h3>
@@ -453,8 +524,8 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs font-semibold mb-1">KATEGORI</label>
-            <input type="text" id="barangKategori" required placeholder="SEMBAKO" class="w-full p-2 border rounded text-sm uppercase-input">
+            <label class="block text-xs font-semibold mb-1">KATEGORI (DROP-DOWN)</label>
+            <select id="barangKategori" required class="w-full p-2 border rounded text-sm uppercase-input font-bold bg-white"></select>
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1">GUDANG / LOKASI RAK</label>
@@ -463,15 +534,15 @@
         </div>
 
         <div class="bg-indigo-50/70 border border-indigo-200 p-3 rounded-lg space-y-2">
-          <p class="text-[11px] font-bold text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-boxes-packing mr-1"></i> Satuan Default SKU</p>
+          <p class="text-[11px] font-bold text-indigo-900 uppercase tracking-wide"><i class="fa-solid fa-boxes-packing mr-1"></i> Satuan Default SKU (Drop-Down List)</p>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN ECERAN (TERKECIL)</label>
-              <input type="text" id="barangSatuan" required placeholder="PCS / BUNGKUS / BOTOL" class="w-full p-1.5 border rounded text-xs uppercase-input bg-white">
+              <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN ECERAN (KECIL)</label>
+              <select id="barangSatuan" required class="w-full p-1.5 border rounded text-xs uppercase-input bg-white font-bold"></select>
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-700 mb-0.5">SATUAN GROSIR (DUS/GROSS)</label>
-              <input type="text" id="barangSatuanBesar" placeholder="KARTON / DUS / PACK" class="w-full p-1.5 border rounded text-xs uppercase-input bg-white">
+              <select id="barangSatuanBesar" class="w-full p-1.5 border rounded text-xs uppercase-input bg-white font-bold"></select>
             </div>
           </div>
           <div>
@@ -508,7 +579,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR (WITH MANUAL FMCG OVERRIDE) -->
+  <!-- MODAL: TRANSAKSI STOK MASUK / KELUAR -->
   <div id="modalTx" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4 hidden no-print z-50 overflow-y-auto">
     <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-5 sm:p-6 space-y-4 my-auto max-h-[92vh] overflow-y-auto">
       <h3 id="modalTxTitle" class="font-bold text-lg text-slate-900">INPUT STOK MASUK</h3>
@@ -530,7 +601,6 @@
           </div>
         </div>
 
-        <!-- INPUT EDITABLE ISI PER KARTON KHUSUS TRANSAKSI GROSIR -->
         <div id="boxCustomRatioGroup" class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg hidden">
           <label class="block text-[11px] font-bold text-amber-900 mb-1">
             <i class="fa-solid fa-pen-to-square mr-1"></i>ISI PER DUS KHUSUS TRANSAKSI INI (MANUAL):
@@ -596,6 +666,8 @@
         phone: '0812-3456-7890',
         licenseKey: ''
       },
+      categories: ['SEMBAKO', 'KEMASAN', 'MINUMAN', 'SABUN & DETERJEN', 'MAKANAN RINGAN'],
+      units: ['PCS', 'BUNGKUS', 'BOTOL', 'KALENG', 'KG', 'KARTON', 'DUS', 'PACK', 'BAL', 'IKAT', 'SACHET'],
       products: [
         { id: '1', sku: 'BRG-001', name: 'MINYAK GORENG 1L', category: 'SEMBAKO', warehouse: 'RAK A-01', satuan: 'BUNGKUS', satuanBesar: 'KARTON', rasioKonversi: 12, minStock: 20, stock: 48, avgHpp: 14000, sellPrice: 18000, barcode: '8991234567890' },
         { id: '2', sku: 'BRG-002', name: 'INDOMIE GORENG 85G', category: 'SEMBAKO', warehouse: 'RAK B-03', satuan: 'PCS', satuanBesar: 'KARTON', rasioKonversi: 40, minStock: 50, stock: 120, avgHpp: 2800, sellPrice: 3500, barcode: '8991234567891' }
@@ -613,6 +685,8 @@
     if(!appData.mutasi) appData.mutasi = DEFAULT_DATA.mutasi;
     if(!appData.opname) appData.opname = DEFAULT_DATA.opname;
     if(!appData.profile) appData.profile = DEFAULT_DATA.profile;
+    if(!appData.categories) appData.categories = DEFAULT_DATA.categories;
+    if(!appData.units) appData.units = DEFAULT_DATA.units;
 
     let html5QrcodeScanner = null;
 
@@ -773,6 +847,7 @@
       if(tabId === 'ledger') populateLedgerSelect();
       if(tabId === 'opname') renderMassOpnameTable();
       if(tabId === 'settings') loadProfileInputs();
+      if(tabId === 'refmaster') renderRefMasterTables();
     }
 
     function renderAll() {
@@ -782,7 +857,100 @@
       renderProducts();
       renderMutasi();
       renderMassOpnameTable();
+      renderRefMasterTables();
       renderCharts();
+    }
+
+    /* LOGIC MASTER KATEGORI & SATUAN MANDIRI */
+    function renderRefMasterTables() {
+      const tbodyCat = document.getElementById('tableCategoryBody');
+      const tbodyUnit = document.getElementById('tableUnitBody');
+      const cntCat = document.getElementById('cntCategory');
+      const cntUnit = document.getElementById('cntUnit');
+
+      if(tbodyCat) {
+        tbodyCat.innerHTML = (appData.categories || []).map((cat, idx) => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono text-xs text-slate-400">${idx + 1}</td>
+            <td class="p-2.5 font-bold text-slate-800">${cat}</td>
+            <td class="p-2.5 text-center">
+              <button onclick="deleteCategory(${idx})" class="text-rose-600 hover:text-rose-800 text-xs font-semibold px-2 py-0.5 rounded bg-rose-50">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+        if(cntCat) cntCat.innerText = (appData.categories || []).length;
+      }
+
+      if(tbodyUnit) {
+        tbodyUnit.innerHTML = (appData.units || []).map((unit, idx) => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono text-xs text-slate-400">${idx + 1}</td>
+            <td class="p-2.5 font-bold text-slate-800">${unit}</td>
+            <td class="p-2.5 text-center">
+              <button onclick="deleteUnit(${idx})" class="text-rose-600 hover:text-rose-800 text-xs font-semibold px-2 py-0.5 rounded bg-rose-50">Hapus</button>
+            </td>
+          </tr>
+        `).join('');
+        if(cntUnit) cntUnit.innerText = (appData.units || []).length;
+      }
+
+      populateFormDropdowns();
+    }
+
+    function handleAddCategory(e) {
+      e.preventDefault();
+      const input = document.getElementById('inputNewCategory');
+      const val = input.value.toUpperCase().trim();
+      if(val && !appData.categories.includes(val)) {
+        appData.categories.push(val);
+        input.value = '';
+        saveData();
+      } else {
+        alert('Kategori sudah ada atau tidak valid!');
+      }
+    }
+
+    function deleteCategory(idx) {
+      if(confirm('Hapus kategori ini?')) {
+        appData.categories.splice(idx, 1);
+        saveData();
+      }
+    }
+
+    function handleAddUnit(e) {
+      e.preventDefault();
+      const input = document.getElementById('inputNewUnit');
+      const val = input.value.toUpperCase().trim();
+      if(val && !appData.units.includes(val)) {
+        appData.units.push(val);
+        input.value = '';
+        saveData();
+      } else {
+        alert('Satuan sudah ada atau tidak valid!');
+      }
+    }
+
+    function deleteUnit(idx) {
+      if(confirm('Hapus satuan ini?')) {
+        appData.units.splice(idx, 1);
+        saveData();
+      }
+    }
+
+    function populateFormDropdowns() {
+      const selCat = document.getElementById('barangKategori');
+      const selSat = document.getElementById('barangSatuan');
+      const selSatBig = document.getElementById('barangSatuanBesar');
+
+      if(selCat) {
+        selCat.innerHTML = (appData.categories || []).map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+      if(selSat) {
+        selSat.innerHTML = (appData.units || []).map(u => `<option value="${u}">${u}</option>`).join('');
+      }
+      if(selSatBig) {
+        selSatBig.innerHTML = `<option value="">-- TANPA SATUAN GROSIR --</option>` + (appData.units || []).map(u => `<option value="${u}">${u}</option>`).join('');
+      }
     }
 
     function loadProfileInputs() {
@@ -930,13 +1098,15 @@
       const p = (appData.products || []).find(item => item.id === productId);
       if(!p) return;
 
+      populateFormDropdowns();
+
       document.getElementById('modalBarangTitle').innerText = 'EDIT DATA BARANG (' + p.sku + ')';
       document.getElementById('barangId').value = p.id;
       document.getElementById('barangSku').value = p.sku || '';
       document.getElementById('barangNama').value = p.name || '';
-      document.getElementById('barangKategori').value = p.category || '';
+      document.getElementById('barangKategori').value = p.category || (appData.categories[0] || '');
       document.getElementById('barangGudang').value = p.warehouse || '';
-      document.getElementById('barangSatuan').value = p.satuan || 'PCS';
+      document.getElementById('barangSatuan').value = p.satuan || (appData.units[0] || 'PCS');
       document.getElementById('barangSatuanBesar').value = p.satuanBesar || '';
       document.getElementById('barangRasio').value = p.rasioKonversi || 1;
       document.getElementById('barangCostPrice').value = p.avgHpp ? Number(p.avgHpp).toLocaleString('id-ID') : '';
@@ -1527,6 +1697,7 @@
 
     function openModal(type) {
       if(type === 'tambahBarang') {
+        populateFormDropdowns();
         document.getElementById('modalBarangTitle').innerText = 'TAMBAH BARANG BARU';
         document.getElementById('barangId').value = '';
         document.getElementById('formBarang').reset();
