@@ -3,7 +3,7 @@ name: Keep Supabase Alive
 on:
   schedule:
     # Dijalankan setiap hari Senin & Kamis jam 00:00 UTC
-    - cron: '0 0 * * 1,4'
+    - cron: '0 0 */3 * *'
   workflow_dispatch: # Agar bisa dites jalan manual kapan saja
 
 jobs:
