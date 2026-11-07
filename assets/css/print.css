@@ -1,0 +1,221 @@
+/* =========================================================
+   Kartu Stok — Print & Official Documents
+   ========================================================= */
+
+#printArea { display: none; }
+
+.doc {
+  color: #0b1220;
+  background: #fff;
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  line-height: 1.45;
+  padding: 0;
+}
+.doc * { box-sizing: border-box; }
+
+.doc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2.5px solid #0b1220;
+}
+.doc-brand { display: flex; align-items: flex-start; gap: 11px; }
+.doc-logo {
+  width: 42px; height: 42px; flex: 0 0 42px;
+  display: grid; place-items: center;
+  border-radius: 9px;
+  background: #0b1220;
+  color: #fff;
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  font-size: 16pt;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.doc-company-name {
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  font-size: 13pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.doc-company-meta { margin-top: 3px; font-size: 8.5pt; color: #334155; line-height: 1.45; }
+.doc-meta { text-align: right; flex-shrink: 0; }
+.doc-kicker {
+  display: inline-block;
+  font-size: 7pt;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-bottom: 5px;
+}
+.doc-date { font-size: 8.5pt; color: #334155; line-height: 1.5; }
+.doc-date strong { color: #0b1220; }
+
+.doc-title-block { padding: 16px 0 12px; text-align: center; }
+.doc-title {
+  font-family: "Plus Jakarta Sans", Arial, sans-serif;
+  font-size: 15pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: #0b1220;
+}
+.doc-subtitle { margin-top: 3px; font-size: 9pt; color: #475569; }
+
+.doc-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  margin: 0 0 13px;
+  overflow: hidden;
+}
+.doc-info-cell { padding: 7px 9px; border-right: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; font-size: 8.5pt; }
+.doc-info-cell:nth-child(2n) { border-right: 0; }
+.doc-info-cell:nth-last-child(-n+2) { border-bottom: 0; }
+.doc-info-label { font-size: 7pt; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #64748b; }
+.doc-info-value { margin-top: 1px; font-weight: 700; color: #0b1220; }
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+  margin: 0 0 12px;
+}
+.doc-table th,
+.doc-table td {
+  border: 1px solid #64748b;
+  padding: 5px 6px;
+  vertical-align: top;
+  text-align: left;
+}
+.doc-table th {
+  background: #f1f5f9;
+  font-size: 7.5pt;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1e293b;
+}
+.doc-table td.num, .doc-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.doc-table td.center, .doc-table th.center { text-align: center; }
+.doc-table tbody tr:nth-child(even) td { background: #fbfdff; }
+.doc-table .doc-strong { font-weight: 700; color: #0b1220; }
+.doc-total-row td { font-weight: 800; background: #f1f5f9 !important; }
+
+.doc-summary {
+  display: flex;
+  gap: 0;
+  border: 1px solid #94a3b8;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 13px;
+  background: #f8fafc;
+}
+.doc-summary-item { flex: 1; padding: 7px 10px; border-right: 1px solid #cbd5e1; }
+.doc-summary-item:last-child { border-right: 0; }
+.doc-summary-label { font-size: 6.8pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; }
+.doc-summary-value { margin-top: 2px; font-size: 10pt; font-weight: 800; color: #0b1220; font-variant-numeric: tabular-nums; }
+
+.doc-signs {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 34px;
+  padding-top: 4px;
+}
+.doc-sign { flex: 1; max-width: 210px; text-align: center; font-size: 8.5pt; }
+.doc-sign-label { color: #475569; }
+.doc-sign-space { height: 52px; }
+.doc-sign-line {
+  border-top: 1px solid #0b1220;
+  padding-top: 4px;
+  font-weight: 700;
+  color: #0b1220;
+}
+.doc-note {
+  margin-top: 14px;
+  padding: 7px 9px;
+  border: 1px dashed #94a3b8;
+  border-radius: 4px;
+  font-size: 7.5pt;
+  color: #475569;
+  line-height: 1.5;
+}
+.doc-footer {
+  margin-top: 18px;
+  padding-top: 7px;
+  border-top: 1px solid #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 7pt;
+  color: #94a3b8;
+}
+.doc-page-break { page-break-before: always; }
+
+/* Thermal receipt */
+.receipt {
+  width: 54mm;
+  margin: 0 auto;
+  color: #000;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 8.5pt;
+  line-height: 1.45;
+}
+.receipt-center { text-align: center; }
+.receipt-store { font-size: 10.5pt; font-weight: 800; text-transform: uppercase; line-height: 1.2; }
+.receipt-meta { font-size: 7.5pt; }
+.receipt-line { border-top: 1px dashed #000; margin: 5px 0; }
+.receipt-row { display: flex; justify-content: space-between; gap: 6px; }
+.receipt-row span:last-child { text-align: right; }
+.receipt-table { width: 100%; border-collapse: collapse; font-size: 8pt; }
+.receipt-table td { padding: 1px 0; vertical-align: top; }
+.receipt-total { font-weight: 800; font-size: 9pt; }
+
+/* ---------------------------------------------------------
+   Print mode
+   --------------------------------------------------------- */
+@media print {
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    min-height: 0 !important;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .app-shell,
+  .auth-screen,
+  .modal-overlay,
+  .toast-host,
+  .sidebar-overlay,
+  .no-print {
+    display: none !important;
+  }
+  #printArea {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .doc { box-shadow: none !important; }
+  .doc-table { page-break-inside: auto; }
+  .doc-table tr { page-break-inside: avoid; page-break-after: auto; }
+  .doc-signs { page-break-inside: avoid; }
+  a { text-decoration: none !important; color: inherit !important; }
+}
