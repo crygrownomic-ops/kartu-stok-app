@@ -401,10 +401,10 @@
      --------------------------------------------------------- */
   function sjRowHtml() {
     return '<div class="sj-row" data-sj-row style="display:grid;grid-template-columns:minmax(0,1fr) 105px 150px 34px;gap:8px;align-items:end;margin-bottom:8px">' +
-      '<div class="field"><select name="productId" class="select">' + productOptions("", false) + '</select></div>' +
-      '<div class="field"><input name="qty" class="input mono" type="number" min="0.01" step="any" placeholder="Qty" value="1"></div>' +
-      '<div class="field"><input name="notes" class="input uppercase-input" value="PENGIRIMAN BARANG" placeholder="Keterangan"></div>' +
-      '<button type="button" class="btn btn-icon btn-sm btn-soft-danger" data-action="reports:sj-remove-row" title="Hapus baris"><i class="fa-solid fa-trash"></i></button>' +
+      '<div class="field sj-col-product"><select name="productId" class="select">' + productOptions("", false) + '</select></div>' +
+      '<div class="field sj-col-qty"><input name="qty" class="input mono" type="number" min="0.01" step="any" placeholder="Qty" value="1"></div>' +
+      '<div class="field sj-col-notes"><input name="notes" class="input uppercase-input" value="PENGIRIMAN BARANG" placeholder="Keterangan"></div>' +
+      '<button type="button" class="btn btn-icon btn-sm btn-soft-danger sj-col-action" data-action="reports:sj-remove-row" title="Hapus baris"><i class="fa-solid fa-trash"></i></button>' +
     '</div>';
   }
 
@@ -431,7 +431,7 @@
           '<div class="fs-11 fw-700">Daftar Barang Dikirim</div>' +
           '<button type="button" class="btn btn-sm btn-secondary" data-action="reports:sj-add-row"><i class="fa-solid fa-plus"></i> Tambah Baris</button>' +
         '</div>' +
-        '<div style="display:grid;grid-template-columns:minmax(0,1fr) 105px 150px 34px;gap:8px;margin-bottom:5px">' +
+        '<div class="sj-head" style="display:grid;grid-template-columns:minmax(0,1fr) 105px 150px 34px;gap:8px;margin-bottom:5px">' +
           '<span class="fs-10 fw-700 muted">BARANG</span><span class="fs-10 fw-700 muted">QTY</span>' +
           '<span class="fs-10 fw-700 muted">KETERANGAN</span><span></span>' +
         '</div>' +

@@ -425,20 +425,37 @@
         let adjusted = 0;
         const now = U.nowStamp();
 
+        // CSV headers are normalized by removing spaces and punctuation, so match
+        // flexible aliases such as "NAMA BARANG", "HARGA BELI (HPP)" or "STOK FISIK".
+        function pick(row, aliases) {
+          for (let i = 0; i < aliases.length; i += 1) {
+            const key = U.upper(aliases[i]).replace(/[^A-Z0-9]/g, "");
+            if (!key) continue;
+            const value = row[key];
+            if (value !== undefined && value !== "") return value;
+          }
+          return undefined;
+        }
+
         rows.forEach(function (row, index) {
-          const name = U.upper(row.NAMA || row.NAMA_BARANG || row.NAME || row.BARANG);
+          const name = U.upper(pick(row, ["NAMA", "NAMA BARANG", "NAME", "BARANG"]));
           if (!name) return;
-          const sku = U.upper(row.SKU || row.KODE);
-          const barcode = U.upper(row.BARCODE || row.BAR_CODE);
+          const sku = U.upper(pick(row, ["SKU", "KODE"]));
+          const barcode = U.upper(pick(row, ["BARCODE", "BAR CODE"]));
           let product = null;
           if (sku) product = data.products.find(function (p) { return U.upper(p.sku) === sku; });
           if (!product && barcode) product = data.products.find(function (p) { return U.upper(p.barcode) === barcode; });
           if (!product) product = data.products.find(function (p) { return U.upper(p.name) === name; });
 
-          const stockVal = row.STOK_FISIK !== undefined ? row.STOK_FISIK : (row.STOK !== undefined ? row.STOK : row.STOCK);
-          const minVal = row.BATAS_MINIMUM !== undefined ? row.BATAS_MINIMUM : row.MIN_STOCK;
-          const hppVal = row.HARGA_BELI_HPP !== undefined ? row.HARGA_BELI_HPP : (row.HPP !== undefined ? row.HPP : row.HARGA_BELI);
-          const sellVal = row.HARGA_JUAL !== undefined ? row.HARGA_JUAL : row.SELL_PRICE;
+          const stockVal = pick(row, ["STOK FISIK", "STOK", "STOCK"]);
+          const minVal = pick(row, ["BATAS MINIMUM", "MIN STOCK", "MINIMUM"]);
+          const hppVal = pick(row, ["HARGA BELI (HPP)", "HARGA BELI", "HPP"]);
+          const sellVal = pick(row, ["HARGA JUAL", "SELL PRICE"]);
+          const categoryVal = pick(row, ["KATEGORI", "CATEGORY"]);
+          const warehouseVal = pick(row, ["GUDANG/RAK", "GUDANG", "RAK", "WAREHOUSE"]);
+          const unitVal = pick(row, ["SATUAN ECERAN", "SATUAN", "UNIT"]);
+          const bigUnitVal = pick(row, ["SATUAN GROSIR", "SATUAN DUS", "SATUAN BESAR"]);
+          const ratioVal = pick(row, ["RASIO KONVERSI", "RASIO"]);
 
           if (!product) {
             const stock = Math.max(0, U.parseNumber(stockVal));
@@ -447,11 +464,11 @@
               sku: sku || ("IMP-" + String(Date.now()).slice(-6) + "-" + index),
               barcode: barcode,
               name: name,
-              category: U.upper(row.KATEGORI || row.CATEGORY) || "LAINNYA",
-              warehouse: U.upper(row.GUDANG_RAK || row.GUDANG || row.RAK || row.WAREHOUSE),
-              satuan: U.upper(row.SATUAN_ECERAN || row.SATUAN || row.UNIT) || "PCS",
-              satuanBesar: U.upper(row.SATUAN_GROSIR || row.SATUAN_DUS || row.SATUAN_BESAR),
-              rasioKonversi: Math.max(1, U.parseNumber(row.RASIO_KONVERSI || row.RASIO) || 1),
+              category: U.upper(categoryVal) || "LAINNYA",
+              warehouse: U.upper(warehouseVal),
+              satuan: U.upper(unitVal) || "PCS",
+              satuanBesar: U.upper(bigUnitVal),
+              rasioKonversi: Math.max(1, U.parseNumber(ratioVal) || 1),
               minStock: Math.max(0, U.parseNumber(minVal)),
               stock: stock,
               avgHpp: Math.max(0, U.parseNumber(hppVal)),
@@ -480,13 +497,11 @@
             product.name = name;
             if (sku) product.sku = sku;
             if (barcode) product.barcode = barcode;
-            if (row.KATEGORI || row.CATEGORY) product.category = U.upper(row.KATEGORI || row.CATEGORY);
-            if (row.GUDANG_RAK || row.GUDANG || row.RAK || row.WAREHOUSE) {
-              product.warehouse = U.upper(row.GUDANG_RAK || row.GUDANG || row.RAK || row.WAREHOUSE);
-            }
-            if (row.SATUAN_ECERAN || row.SATUAN || row.UNIT) product.satuan = U.upper(row.SATUAN_ECERAN || row.SATUAN || row.UNIT);
-            if (row.SATUAN_GROSIR || row.SATUAN_DUS || row.SATUAN_BESAR) product.satuanBesar = U.upper(row.SATUAN_GROSIR || row.SATUAN_DUS || row.SATUAN_BESAR);
-            if (row.RASIO_KONVERSI || row.RASIO) product.rasioKonversi = Math.max(1, U.parseNumber(row.RASIO_KONVERSI || row.RASIO) || 1);
+            if (categoryVal) product.category = U.upper(categoryVal);
+            if (warehouseVal) product.warehouse = U.upper(warehouseVal);
+            if (unitVal) product.satuan = U.upper(unitVal);
+            if (bigUnitVal) product.satuanBesar = U.upper(bigUnitVal);
+            if (ratioVal !== undefined && ratioVal !== "") product.rasioKonversi = Math.max(1, U.parseNumber(ratioVal) || 1);
             if (minVal !== undefined && minVal !== "") product.minStock = Math.max(0, U.parseNumber(minVal));
             if (hppVal !== undefined && hppVal !== "") product.avgHpp = Math.max(0, U.parseNumber(hppVal));
             if (sellVal !== undefined && sellVal !== "") product.sellPrice = Math.max(0, U.parseNumber(sellVal));

@@ -263,7 +263,7 @@
     document.documentElement.setAttribute("data-theme", resolved);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", resolved === "dark" ? "#070d19" : "#f4f6fb");
-    UI.$$(".theme-icon").forEach(function (icon) {
+    U.$$(".theme-icon").forEach(function (icon) {
       icon.className = "fa-solid theme-icon " + (resolved === "dark" ? "fa-sun" : "fa-moon");
     });
     if (opts.refresh && App.router && App.router.refresh) App.router.refresh();

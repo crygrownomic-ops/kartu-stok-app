@@ -67,6 +67,7 @@
           icon: "fa-tags",
           itemIcon: "fa-tag",
           listName: "categories",
+          items: store.categories(),
           inputId: "inputNewCategory",
           placeholder: "Contoh: SEMBAKO",
           formAction: "reference:add-category"
@@ -77,6 +78,7 @@
           icon: "fa-ruler-combined",
           itemIcon: "fa-ruler",
           listName: "units",
+          items: store.units(),
           inputId: "inputNewUnit",
           placeholder: "Contoh: KARTON",
           formAction: "reference:add-unit"
