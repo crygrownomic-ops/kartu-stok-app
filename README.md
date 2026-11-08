@@ -98,6 +98,8 @@ kartu-stok-app/
 │        ├─ reports.js
 │        ├─ settings.js
 │        └─ scanner.js
+├─ supabase/
+│  └─ migrate-opname-product-id.sql   # Migrasi kolom opname.product_id untuk database lama
 └─ .github/workflows/keep-alive.yml
 ```
 
@@ -169,6 +171,12 @@ Tabel yang dibutuhkan beserta kolom utamanya:
 - `mutasi` — `id`, `date`, `type`, `product_id`, `name`, `qty`, `tx_unit`, `input_qty`, `unit_cost`, `batch_no`, `expire_date`, `notes`, `user_name`
 - `opname` — `id`, `date`, `product_id`, `name`, `system_qty`, `actual_qty`, `diff_qty`, `reason`, `user_name`
 - `profile` — `id` (tetap `1`), `store_name`, `address`, `city`, `phone`, `license_key`
+
+### Memperbarui skema database lama
+
+Jika tabel dibuat dari versi aplikasi sebelumnya, kolom `opname.product_id` bisa belum ada. Gejalanya: setiap kali menyimpan transaksi, indikator cloud berubah menjadi **“Cloud bermasalah”** dan console menampilkan `Could not find the 'product_id' column of 'opname' in the schema cache`.
+
+Perbaiki dengan menjalankan `supabase/migrate-opname-product-id.sql` pada **SQL Editor** Supabase. Aplikasi v6.0 kini tetap menyinkronkan kolom lain dan menampilkan peringatan bila ada kolom yang belum tersedia, tetapi tautan opname ke barang baru tersimpan setelah migrasi dijalankan.
 
 Aktifkan Row Level Security dan kebijakan akses sesuai kebutuhan. Jangan menaruh service role key di sisi klien.
 

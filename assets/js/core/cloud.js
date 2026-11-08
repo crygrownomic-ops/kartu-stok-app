@@ -12,6 +12,8 @@
   let pushTimer = null;
   let syncing = false;
   let bootstrapped = false;
+  let lastErrorShown = "";
+  const schemaWarnings = {};
 
   function enabled() {
     return Boolean(client) && App.config.cloud.enabled;
@@ -25,6 +27,17 @@
     try {
       localStorage.setItem(App.config.storageKeys.lastSync, U.nowStamp());
     } catch (error) { /* ignore */ }
+    lastErrorShown = "";
+  }
+
+  function reportError(prefix, error) {
+    const detail = String((error && error.message) || error || "Kesalahan tidak diketahui");
+    console.warn(prefix, error);
+    if (detail === lastErrorShown) return;
+    lastErrorShown = detail;
+    if (App.ui && App.ui.toast) {
+      App.ui.toast(detail, "error", "Sinkronisasi cloud gagal");
+    }
   }
 
   C.lastSync = function () {
@@ -156,14 +169,76 @@
     };
   }
 
+  function missingColumn(error) {
+    const match = /Could not find the '([^']+)' column of '([^']+)'/i.exec(String((error && error.message) || ""));
+    return match ? match[1] : "";
+  }
+
+  function warnMissingColumn(table, column) {
+    const key = table + "." + column;
+    if (schemaWarnings[key]) return;
+    schemaWarnings[key] = true;
+    console.warn("Kolom '" + column + "' belum ada pada tabel '" + table + "' di Supabase. " +
+      "Sinkronisasi dilanjutkan tanpa kolom tersebut; jalankan supabase/migrate-opname-product-id.sql.");
+    if (App.ui && App.ui.toast) {
+      App.ui.toast("Kolom " + column + " belum ada di tabel " + table + " pada database cloud. " +
+        "Data tetap tersimpan di perangkat; perbarui skema Supabase agar kolom ini ikut tersinkron.",
+        "warning", "Skema cloud perlu diperbarui");
+    }
+  }
+
+  function uniqueById(rows) {
+    const map = new Map();
+    rows.forEach(function (row) {
+      map.set(String(row && row.id), row);
+    });
+    return Array.from(map.values());
+  }
+
+  function knownMissingColumns(table) {
+    return Object.keys(schemaWarnings)
+      .filter(function (key) { return key.indexOf(table + ".") === 0; })
+      .map(function (key) { return key.slice(table.length + 1); });
+  }
+
+  function withoutMissingColumns(table, rows) {
+    const columns = knownMissingColumns(table);
+    if (!columns.length) return rows;
+    return rows.map(function (row) {
+      const copy = Object.assign({}, row);
+      columns.forEach(function (column) { delete copy[column]; });
+      return copy;
+    });
+  }
+
   async function upsertChunked(table, rows, label) {
     if (!rows || !rows.length) return;
+    let pending = withoutMissingColumns(table, uniqueById(rows));
     const chunkSize = 400;
-    for (let i = 0; i < rows.length; i += chunkSize) {
-      const chunk = rows.slice(i, i + chunkSize);
-      const result = await client.from(table).upsert(chunk, { onConflict: "id" });
-      if (result.error) {
-        throw new Error("Gagal menyinkronkan " + label + ": " + result.error.message);
+    for (let i = 0; i < pending.length; i += chunkSize) {
+      let chunk = pending.slice(i, i + chunkSize);
+      let attempts = 0;
+      while (true) {
+        const result = await client.from(table).upsert(chunk, { onConflict: "id" });
+        if (!result.error) break;
+
+        const column = missingColumn(result.error);
+        const retryable = column &&
+          attempts < 5 &&
+          Object.prototype.hasOwnProperty.call(chunk[0] || {}, column);
+
+        if (!retryable) {
+          throw new Error("Gagal menyinkronkan " + label + ": " + result.error.message);
+        }
+
+        attempts += 1;
+        warnMissingColumn(table, column);
+        pending = pending.map(function (row) {
+          const copy = Object.assign({}, row);
+          delete copy[column];
+          return copy;
+        });
+        chunk = pending.slice(i, i + chunkSize);
       }
     }
   }
@@ -281,6 +356,7 @@
     } catch (error) {
       console.warn("Bootstrap cloud gagal:", error);
       setStatus("error", "Cloud bermasalah");
+      reportError("Bootstrap cloud gagal:", error);
     } finally {
       syncing = false;
     }
@@ -337,6 +413,7 @@
       } catch (error) {
         console.warn("Push cloud gagal:", error);
         setStatus("error", "Cloud bermasalah");
+        reportError("Push cloud gagal:", error);
       } finally {
         syncing = false;
       }
